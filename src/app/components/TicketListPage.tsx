@@ -242,7 +242,7 @@ export function TicketListPage({ onNavigate }: { onNavigate?: (page: string) => 
     <div className="flex h-screen bg-[#f9fafb]">
       <Sidebar activePage="request" onNavigate={onNavigate} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Header selectedCount={selectedTickets.size} />
+        <Header selectedCount={selectedTickets.size} onOpenAdmin={() => onNavigate('admin')} />
         <Toolbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <main className="flex-1 overflow-hidden flex flex-col">
           <div className="flex-1 overflow-auto bg-white min-h-0">

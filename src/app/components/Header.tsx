@@ -117,9 +117,11 @@ function MotadataLogo() {
 
 interface HeaderProps {
   selectedCount: number;
+  /** Opens the Admin hub. Passed only where the gear should navigate. */
+  onOpenAdmin?: () => void;
 }
 
-export function Header({ selectedCount }: HeaderProps) {
+export function Header({ selectedCount, onOpenAdmin }: HeaderProps) {
   return (
     <header className="flex h-[56px] items-center justify-between border-b border-[#e5e7eb] bg-white px-6">
       <div className="flex items-center gap-4">
@@ -139,7 +141,11 @@ export function Header({ selectedCount }: HeaderProps) {
           <Bell size={18} strokeWidth={2} />
         </button>
         
-        <button className="flex h-[32px] w-[32px] items-center justify-center rounded text-[#6b7280] hover:bg-[#f3f4f6]">
+        <button
+          onClick={onOpenAdmin}
+          title={onOpenAdmin ? 'Admin' : undefined}
+          className="flex h-[32px] w-[32px] items-center justify-center rounded text-[#6b7280] hover:bg-[#f3f4f6]"
+        >
           <Settings size={18} strokeWidth={2} />
         </button>
         

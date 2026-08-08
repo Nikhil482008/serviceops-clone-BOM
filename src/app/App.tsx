@@ -17,10 +17,11 @@ import { EndpointsListPage } from './components/EndpointsListPage';
 import { VulnerabilitiesListPage } from './components/VulnerabilitiesListPage';
 import { DetectedCvesListPage } from './components/DetectedCvesListPage';
 import { BomInventoryListPage } from './components/BomInventoryListPage';
+import { AdminPage } from './components/AdminPage';
 import { DrawerStackProvider } from './components/DrawerStack';
 import { Toaster } from 'sonner';
 
-type Page = 'request' | 'problem' | 'change' | 'release' | 'hardware-assets' | 'software-assets' | 'non-it-assets' | 'consumable-assets' | 'software-licenses' | 'contracts' | 'purchases' | 'cmdb' | 'patches' | 'patch-deployments' | 'endpoints' | 'vulnerabilities' | 'detected-cves' | 'bom';
+type Page = 'request' | 'problem' | 'change' | 'release' | 'hardware-assets' | 'software-assets' | 'non-it-assets' | 'consumable-assets' | 'software-licenses' | 'contracts' | 'purchases' | 'cmdb' | 'patches' | 'patch-deployments' | 'endpoints' | 'vulnerabilities' | 'detected-cves' | 'bom' | 'admin';
 
 export default function App() {
   const [activePage, setActivePage] = useState<Page>('request');
@@ -50,6 +51,7 @@ export default function App() {
       {activePage === 'vulnerabilities' && <VulnerabilitiesListPage onNavigate={navigate} />}
       {activePage === 'detected-cves' && <DetectedCvesListPage onNavigate={navigate} />}
       {activePage === 'bom' && <BomInventoryListPage onNavigate={navigate} />}
+      {activePage === 'admin' && <AdminPage onNavigate={navigate} />}
       <Toaster position="top-right" />
     </DrawerStackProvider>
   );

@@ -159,7 +159,7 @@ export function BomInventoryListPage({ onNavigate }: { onNavigate: (page: string
     <div className="flex h-screen bg-[#f9fafb]">
       <Sidebar activePage="bom" onNavigate={onNavigate} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Header selectedCount={selected.size} />
+        <Header selectedCount={selected.size} onOpenAdmin={() => onNavigate('admin')} />
         <BomToolbar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
