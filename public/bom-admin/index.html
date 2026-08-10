@@ -400,6 +400,15 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .pk-row .id{font-family:var(--mono);font-weight:600}
 .pk-row .ip{font-family:var(--mono);color:var(--dim)}
 .pk-empty{padding:48px 20px;text-align:center;font-size:13px;color:var(--faint)}
+/* Sortable header inside the Matching CIs list — the only interactive thing in a
+   read-only table, so it reads as a header until hovered. */
+.vsort{display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:0;
+  font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;color:inherit;
+  cursor:pointer;text-align:left}
+.vsort:hover{color:var(--brand)}
+.vsort .ar{font-size:9px;color:var(--brand)}
+.pk-row .vwhen{font-size:12px;color:var(--ink);font-variant-numeric:tabular-nums}
+.pk-row .vnone{color:var(--faint)}
 .fld{margin-bottom:14px}
 .flab{display:block;font-size:12px;font-weight:500;color:var(--dim);margin-bottom:6px}
 .flab .req{color:var(--crit);margin-left:2px}
@@ -3328,12 +3337,36 @@ let LIC_RULES = [
                                {field:"status", op:"Equals", value:"Inactive"}]}]}
 ];
 let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM=null,
-    LIC_SEL=new Set(), LIC_MENU=null, LIC_RCONF=null, LIC_DRAWER=null, LIC_VIEW=null;
+    LIC_SEL=new Set(), LIC_MENU=null, LIC_RCONF=null, LIC_DRAWER=null, LIC_VIEW=null,
+    /* Matching CIs: newest enrolment first — admins open it to confirm a rule just
+       picked something up, so recency is what they came to see. */
+    LIC_VSORT="desc";
 
 const licUsed = () => ENROLLED_CIS.length;
 const licLeft = () => LIC_SEATS - licUsed();
 const licPool = () => ALL_CIS.filter(c=>!c.enrolled);
 const ruleHits  = r => ALL_CIS.filter(c => (r.groups||[]).some(g=>groupMatch(g,c)));
+
+/* Which rule swept a CI in, and exactly when. Recorded at enrolment rather than
+   derived at render time — the moment is the fact being reported, so it cannot be
+   reconstructed later. Seeded across the past week so the newest-first default has
+   something real to order; anything enrolled by hand has no such moment and reads
+   as an em-dash. */
+(function seedRuleEnrolments(){
+  const DAY = 864e5, now = Date.now();
+  [["CI-1", 0.35], ["CI-3", 2.4], ["CI-4", 5.7]].forEach(([id, daysAgo])=>{
+    const c = ciOf(id);
+    if(c && c.enrolled && c.by === "Auto"){ c.byRule = "AR-1"; c.ruleAt = now - daysAgo*DAY; }
+  });
+})();
+
+/* "Aug 10, 2026 · 2:45 PM" — date AND time, because two CIs swept in by the same
+   rule minutes apart have to be distinguishable in the list. */
+const licStamp = ms => {
+  const d = new Date(ms);
+  return `${MON[d.getMonth()]} ${String(d.getDate()).padStart(2,"0")}, ${d.getFullYear()} · ` +
+         d.toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit"});
+};
 /* What the rule says, in words. The list has to be readable on its own —
    if you must open the drawer to learn what a policy does, the drawer
    has become the management screen. */
@@ -3604,7 +3637,7 @@ function licWire(){
   if($("licSelNone")) $("licSelNone").onclick = ()=>{ LIC_SEL.clear(); renderLicensing(); };
   if($("licBulk")) $("licBulk").onclick = ()=>{
     const n = LIC_SEL.size;
-    LIC_SEL.forEach(id=>{ const c=ciOf(id); c.enrolled=false; c.by=null; c.byRule=null; });
+    LIC_SEL.forEach(id=>{ const c=ciOf(id); c.enrolled=false; c.by=null; c.byRule=null; c.ruleAt=null; });
     LIC_SEL.clear(); syncEnrolled(); renderLicensing();
     toast(`${n} CI${n===1?"":"s"} removed — ${licLeft()} seat${licLeft()===1?"":"s"} now available`);
   };
@@ -3615,7 +3648,7 @@ function licWire(){
   document.querySelectorAll("[data-licrmno]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); LIC_CONFIRM=null; renderLicensing(); });
   document.querySelectorAll("[data-licrmyes]").forEach(b=>b.onclick=e=>{
     e.stopPropagation();
-    const c = ciOf(b.dataset.licrmyes); c.enrolled=false; c.by=null; c.byRule=null;
+    const c = ciOf(b.dataset.licrmyes); c.enrolled=false; c.by=null; c.byRule=null; c.ruleAt=null;
     syncEnrolled(); LIC_CONFIRM=null; renderLicensing();
     toast(`${c.id} removed — ${licLeft()} seat${licLeft()===1?"":"s"} now available`);
   });
@@ -3635,7 +3668,7 @@ function licAddOpen(){
     cta: "Enrol",
     seat: {cap: LIC_SEATS, used: licUsed()},
     onApply: ids => {
-      ids.forEach(id=>{ const c=ciOf(id); c.enrolled=true; c.by="Manual"; c.byRule=null; });
+      ids.forEach(id=>{ const c=ciOf(id); c.enrolled=true; c.by="Manual"; c.byRule=null; c.ruleAt=null; });
       syncEnrolled();
     }
   });
@@ -3767,19 +3800,38 @@ function renderLicDrawer(){
   /* read-only matched-CI list — the result of a policy, never the place to edit it */
   let view = "";
   if(LIC_VIEW){
-    const r = ruleOf(LIC_VIEW), rows = r ? ruleHits(r) : [];
+    const r = ruleOf(LIC_VIEW);
+    /* Only THIS rule's enrolment counts as "added by rule" — a CI enrolled by hand,
+       or swept in by a different rule, has no moment to report here. Those sort last
+       either way: they are not the recency the ordering is about. */
+    const stampOf = c => (r && c.byRule === r.id && c.ruleAt) ? c.ruleAt : null;
+    const rows = (r ? ruleHits(r) : []).slice().sort((a,b)=>{
+      const x = stampOf(a), y = stampOf(b);
+      if(x === y) return a.id.localeCompare(b.id, undefined, {numeric:true});
+      if(x === null) return 1;
+      if(y === null) return -1;
+      return LIC_VSORT === "desc" ? y - x : x - y;
+    });
+    const VCOLS = "66px 1fr 122px 168px 96px";
     view = `<div class="dw-scrim in" id="licVScrim"></div>
     <aside class="dw in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Matching CIs">
       <div class="dw-head"><div><h3>Matching CIs</h3>
         <p>${esc(r?r.name:"")} · ${rows.length} of ${ALL_CIS.length} discovered CIs · read-only</p></div>
         <button class="x" id="licVClose" aria-label="Close">${IC_X}</button></div>
       <div class="dw-body" style="padding:0">
-        <div class="pk-hd" style="grid-template-columns:66px 1fr 122px 96px"><span>CI ID</span><span>Host Name</span><span>CI Type</span><span>Enrolled</span></div>
-        ${rows.length ? rows.map(c=>`<div class="pk-row" style="grid-template-columns:66px 1fr 122px 96px;cursor:default">
+        <div class="pk-hd" style="grid-template-columns:${VCOLS}"><span>CI ID</span><span>Host Name</span><span>CI Type</span>
+          <button class="vsort" id="licVSort" aria-label="Sort by enrolment time, ${LIC_VSORT==="desc"?"newest":"oldest"} first"
+                  title="${LIC_VSORT==="desc"?"Newest first — click for oldest":"Oldest first — click for newest"}">Added by Rule<span class="ar">${LIC_VSORT==="desc"?"▼":"▲"}</span></button>
+          <span>Enrolled</span></div>
+        ${rows.length ? rows.map(c=>{
+          const at = stampOf(c);
+          return `<div class="pk-row" style="grid-template-columns:${VCOLS};cursor:default">
           <span class="id">${c.id}</span><span>${esc(c.host)}<div class="sc-sub">${c.ip}</div></span>
           <span><span class="pill ghost">${esc(c.type)}</span></span>
+          <span class="vwhen">${at ? licStamp(at) : `<span class="vnone">${DASH}</span>`}</span>
           <span>${c.enrolled ? `<span class="pill ok"><span class="d"></span>Yes</span>` : `<span class="pill ghost">Not yet</span>`}</span>
-        </div>`).join("") : `<div class="pk-empty">Nothing matches this rule right now.</div>`}
+        </div>`;}).join("") : `<div class="pk-empty">No CIs have been enrolled by this rule yet.
+          <div style="margin-top:5px">Future matching CIs will appear here automatically.</div></div>`}
       </div>
       <div class="dw-foot"><span class="avail">Change this list by editing the rule, not the CIs.</span>
         <span class="gap"></span><button class="btn lg" id="licVDone">Close</button></div>
@@ -3843,7 +3895,7 @@ function renderLicDrawer(){
     $("licRScrim").onclick = ()=>{ if(!LIC_VIEW) licRulesClose(); };
     $("licRNew").onclick   = ()=>licRuleOpen(null, true);
     document.querySelectorAll("[data-licedit]").forEach(b=>b.onclick=()=>licRuleOpen(b.dataset.licedit, true));
-    document.querySelectorAll("[data-licview]").forEach(b=>b.onclick=()=>{ LIC_VIEW=b.dataset.licview; renderLicDrawer(); });
+    document.querySelectorAll("[data-licview]").forEach(b=>b.onclick=()=>{ LIC_VIEW=b.dataset.licview; LIC_VSORT="desc"; renderLicDrawer(); });
     /* Enabling enrols what it matches, within seats. Disabling leaves
        already-enrolled CIs alone — a seat is never silently reclaimed. */
     document.querySelectorAll("[data-lictoggle]").forEach(b=>b.onclick=e=>{
@@ -3851,7 +3903,7 @@ function renderLicDrawer(){
       const r = ruleOf(b.dataset.lictoggle); r.on = !r.on; r.updated = todayLabel();
       if(r.on){
         const room = Math.max(0, licLeft());
-        ruleFresh(r).slice(0, room).forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=r.id; });
+        ruleFresh(r).slice(0, room).forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=r.id; c.ruleAt=Date.now(); });
         syncEnrolled();
       }
       renderLicDrawer(); renderLicensing();
@@ -3864,7 +3916,7 @@ function renderLicDrawer(){
     document.querySelectorAll("[data-licdelyes]").forEach(b=>b.onclick=e=>{
       e.stopPropagation();
       const r = ruleOf(b.dataset.licdelyes);
-      ALL_CIS.forEach(c=>{ if(c.byRule===r.id){ c.by="Manual"; c.byRule=null; } });
+      ALL_CIS.forEach(c=>{ if(c.byRule===r.id){ c.by="Manual"; c.byRule=null; c.ruleAt=null; } });
       LIC_RULES = LIC_RULES.filter(x=>x.id!==r.id);
       LIC_RCONF=null; syncEnrolled(); renderLicDrawer(); renderLicensing();
       toast(`Deleted "${r.name}" — the CIs it enrolled keep their seats`);
@@ -3874,6 +3926,9 @@ function renderLicDrawer(){
   if(LIC_VIEW){
     const close = ()=>{ LIC_VIEW=null; renderLicDrawer(); };
     $("licVClose").onclick = close; $("licVDone").onclick = close; $("licVScrim").onclick = close;
+    /* Sort resets to newest-first each time the drawer opens (licRulesOpen), so the
+       toggle is a look at this list rather than a preference to remember. */
+    $("licVSort").onclick = ()=>{ LIC_VSORT = LIC_VSORT === "desc" ? "asc" : "desc"; renderLicDrawer(); };
   }
   if(!LIC_DRAWER) return;
   const d = LIC_DRAWER;
@@ -3915,7 +3970,7 @@ function renderLicDrawer(){
                          .map(g=>({join:g.join, conds:g.conds.filter(condDone).map(c=>({...c}))}))};
     if(d.editing) LIC_RULES = LIC_RULES.map(x=>x.id===rule.id ? rule : x);
     else LIC_RULES.push(rule);
-    if(rule.on) ruleFresh(rule).forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=rule.id; });
+    if(rule.on) ruleFresh(rule).forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=rule.id; c.ruleAt=Date.now(); });
     syncEnrolled(); licRuleClose(); LIC_TAB="rules"; renderLicensing();
     toast(rule.on
       ? `"${rule.name}" saved — ${fresh.length} CI${fresh.length===1?"":"s"} enrolled, ${licLeft()} seat${licLeft()===1?"":"s"} left`
