@@ -87,6 +87,26 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .sub{color:var(--dim);font-size:13px;line-height:1.55;max-width:92ch}
 .sub b{color:var(--ink);font-weight:500}
 .head-actions{margin-left:auto;display:flex;gap:8px;flex:none}
+/* ── primary action menu ──────────────────────────────────────
+   Same popover language as the row overflow menus (.sc-menu), widened because each
+   choice carries a line saying what it does — the point of the menu is that the
+   decision is made here rather than after a drawer has already opened. */
+.addwrap{position:relative;display:inline-flex}
+.addwrap .cv{margin-left:2px;transition:transform .14s}
+.addwrap.open .cv{transform:rotate(180deg)}
+.addwrap .catcher{display:none}
+.addwrap.open .catcher{display:block;position:fixed;inset:0;z-index:40}
+.addmenu{display:none;position:absolute;right:0;top:38px;z-index:50;width:308px;background:#fff;
+  border:1px solid var(--line);border-radius:8px;box-shadow:var(--sh-lg);padding:4px 0;text-align:left}
+.addwrap.open .addmenu{display:block}
+.addmenu button{display:flex;width:100%;align-items:flex-start;gap:10px;padding:10px 13px;border:0;
+  background:none;cursor:pointer;text-align:left;transition:background-color .14s}
+.addmenu button:hover{background:var(--row-hover)}
+.addmenu .am-i{width:28px;height:28px;border-radius:6px;background:var(--chip-n);color:var(--dim);
+  display:grid;place-items:center;flex:none}
+.addmenu button:hover .am-i{background:var(--pill-id);color:var(--brand)}
+.addmenu .am-t{min-width:0;font-size:13px;font-weight:500;color:var(--ink);line-height:1.35}
+.addmenu .am-d{display:block;margin-top:3px;font-size:12px;font-weight:400;color:var(--dim);line-height:1.45}
 /* §2.1 — secondary (bordered) */
 .btn{height:32px;padding:0 12px;border:1px solid var(--line);background:#fff;border-radius:4px;
   display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;
@@ -1069,6 +1089,29 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
       <div>
         <h1>BOM Licensing</h1>
         <div class="sub">Enrol CIs to generate SBOM, CBOM and AI BOM. Each enrolled CI — whether agent-scanned or manually ingested — consumes one license seat.</div>
+      </div>
+      <!-- One CTA for the page: decide to add enrolment first, choose how second.
+           The tabs are a way to READ the estate; adding is not tab-scoped, so the
+           action does not belong to whichever tab happens to be open. A menu also
+           takes a third method (CSV, Discovery) without growing the header. -->
+      <div class="head-actions">
+        <span class="addwrap" id="licAddWrap">
+          <button class="btn pri" id="licAddBtn" aria-haspopup="menu" aria-expanded="false">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>Add enrollment
+            <svg class="cv" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6.5L8 10.5l4-4"/></svg>
+          </button>
+          <span class="catcher" id="licAddCatch"></span>
+          <div class="addmenu" id="licAddMenu" role="menu">
+            <button role="menuitem" id="licAddManual">
+              <span class="am-i"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.6 14.4c0-2.6 2.2-4.2 4.8-4.2s4.8 1.6 4.8 4.2"/><circle cx="7.4" cy="6" r="2.7"/><path d="M13.4 6.4h3.2M15 4.8v3.2"/></svg></span>
+              <span class="am-t">Add manually<span class="am-d">Choose specific CIs to enrol.</span></span>
+            </button>
+            <button role="menuitem" id="licAddRule">
+              <span class="am-i"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
+              <span class="am-t">Create auto-enrol rule<span class="am-d">Automatically enrol future CIs that match conditions.</span></span>
+            </button>
+          </div>
+        </span>
       </div>
     </div>
 
@@ -3527,14 +3570,9 @@ function renderLicensing(){
         <span class="mag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
         <input id="licQ" type="search" value="${esc(LIC_Q)}" placeholder="Search CIs…" autocomplete="off"></div>
       <span id="licFilter"></span>
-      ${manual
-        ? `<button class="btn pri" id="licAdd">
-             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>Add manually</button>`
-        : `<button class="btn" id="licViewRules">
+      ${manual ? "" : `<button class="btn" id="licViewRules">
              <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg>View Rules
-             <span class="pill ghost" style="margin-left:2px">${LIC_RULES.length}</span></button>
-           <button class="btn pri" id="licNewRule">
-             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>New Rule</button>`}
+             <span class="pill ghost" style="margin-left:2px">${LIC_RULES.length}</span></button>`}
     </div>`;
 
   document.getElementById("licWrap").innerHTML = manual ? licManualHTML() : licAutoHTML();
@@ -3674,9 +3712,10 @@ function licWire(){
   if($("licClr")) $("licClr").onclick = ()=>{ LIC_FILT.clear(); LIC_Q=""; renderLicensing(); };
 
   /* tab-specific actions */
-  if($("licAdd"))       $("licAdd").onclick       = licAddOpen;
+  /* The tab-scoped add buttons are gone — the page's one CTA lives in the header.
+     Empty-state CTAs stay: they are the answer to "this list is empty", not a
+     second persistent way to do the same thing. */
   if($("licEmptyAdd"))  $("licEmptyAdd").onclick  = licAddOpen;
-  if($("licNewRule"))   $("licNewRule").onclick   = ()=>licRuleOpen(null, false);
   if($("licEmptyRule")) $("licEmptyRule").onclick = ()=>licRuleOpen(null, false);
   if($("licViewRules")) $("licViewRules").onclick = licRulesOpen;
   if($("licEmptyView")) $("licEmptyView").onclick = licRulesOpen;
@@ -4279,6 +4318,24 @@ document.querySelectorAll(".adcard").forEach(c=>c.onclick=()=>{
 });
 document.getElementById("bsQ").addEventListener("input", e=>{ BS_Q=e.target.value; renderScheduler(); });
 document.getElementById("bsNew").onclick = ()=>bsOpen(null);
+
+/* ── the licensing page's one CTA ─────────────────────────────
+   Wired once, here, because it lives in the static page head rather than in a
+   re-rendered region — so a class toggle is enough and the menu never has to
+   survive a re-render. The menu only CHOOSES; the drawers it opens are untouched. */
+(function licAddMenuInit(){
+  const wrap = document.getElementById("licAddWrap"),
+        btn  = document.getElementById("licAddBtn"),
+        set  = open => { wrap.classList.toggle("open", open); btn.setAttribute("aria-expanded", String(open)); };
+  btn.onclick = e => { e.stopPropagation(); set(!wrap.classList.contains("open")); };
+  document.getElementById("licAddCatch").onclick = e => { e.stopPropagation(); set(false); };
+  document.getElementById("licAddMenu").onclick  = e => e.stopPropagation();
+  document.getElementById("licAddManual").onclick = ()=>{ set(false); licAddOpen(); };
+  document.getElementById("licAddRule").onclick   = ()=>{ set(false); licRuleOpen(null, false); };
+  document.addEventListener("click", ()=>set(false));
+  document.addEventListener("keydown", e=>{ if(e.key === "Escape") set(false); });
+})();
+
 /* No licQ wiring here: that input is CREATED by renderLicensing(), which binds
    it (guarded) on every re-render. Reaching for it at load time dereferenced
    null and killed the whole script — nothing after this line ran, so no view
