@@ -421,6 +421,21 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .vwhen .vnone{color:var(--faint)}
 .vempty .t{font-size:14px;font-weight:500;color:var(--ink)}
 .vempty .d{margin-top:5px;font-size:13px;color:var(--dim)}
+/* ── rule preview ─────────────────────────────────────────────
+   One number, one way to inspect it, one consequence. */
+.lp-head{display:flex;align-items:baseline;gap:8px}
+.lp-n{font-size:24px;font-weight:600;color:var(--ink);letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+.lp-t{font-size:13px;color:var(--ink)}
+.lp-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;border:0;background:none;padding:0;
+  font:inherit;font-size:13px;font-weight:500;color:var(--brand);cursor:pointer}
+.lp-link:hover{color:var(--brand-ink);text-decoration:underline}
+.lp-seats{display:flex;align-items:baseline;gap:8px;margin-top:14px;padding-top:11px;
+  border-top:1px solid var(--line-soft)}
+.lp-seats-l{font-size:13px;color:var(--dim)}
+.lp-seats-v{margin-left:auto;font-size:15px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.lp-cap{font-size:12px;font-weight:500}
+.lp-none{font-size:13px;color:var(--ink);line-height:1.5}
+.lp-none .lp-sub{margin-top:4px;font-size:12px;color:var(--dim)}
 .fld{margin-bottom:14px}
 .flab{display:block;font-size:12px;font-weight:500;color:var(--dim);margin-bottom:6px}
 .flab .req{color:var(--crit);margin-left:2px}
@@ -3352,7 +3367,9 @@ let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM
     LIC_SEL=new Set(), LIC_MENU=null, LIC_RCONF=null, LIC_DRAWER=null, LIC_VIEW=null,
     /* Matching CIs: newest enrolment first — admins open it to confirm a rule just
        picked something up, so recency is what they came to see. */
-    LIC_VSORT="desc";
+    LIC_VSORT="desc",
+    /* The rule drawer's preview list, stacked over the draft it describes. */
+    LIC_PEND=false;
 
 const licUsed = () => ENROLLED_CIS.length;
 const licLeft = () => LIC_SEATS - licUsed();
@@ -3370,6 +3387,10 @@ const ruleHits  = r => ALL_CIS.filter(c => (r.groups||[]).some(g=>groupMatch(g,c
     const c = ciOf(id);
     if(c && c.enrolled && c.by === "Auto"){ c.byRule = "AR-1"; c.ruleAt = now - daysAgo*DAY; }
   });
+  /* When discovery first saw each CI. An unenrolled CI has no enrolment moment to
+     show, so this is what dates it — and a recently discovered one is exactly what
+     an admin is checking the rule caught. Spread deterministically by index. */
+  ALL_CIS.forEach((c,i)=>{ c.disc = now - ((i*37) % 90 + 0.6) * DAY; });
 })();
 
 /* "Aug 10, 2026 · 2:45 PM" — date AND time, because two CIs swept in by the same
@@ -3704,40 +3725,61 @@ function licRuleOpen(id, fromRules){
     ? {id:r.id, name:r.name, auto:r.on, editing:true, err:false, fromRules:!!fromRules,
        groups:r.groups.map((g,i,a)=>({join:g.join||"And", open:i===a.length-1, conds:g.conds.map(c=>({...c}))}))}
     : {id:null, name:"", auto:true, editing:false, err:false, fromRules:!!fromRules, groups:[newGroup()]};
-  LIC_VIEW = null; COND = null; LIC_RULESPANEL = false;
+  LIC_VIEW = null; COND = null; LIC_RULESPANEL = false; LIC_PEND = false;
   renderLicDrawer();
 }
 function licRuleClose(){
   const back = LIC_DRAWER && LIC_DRAWER.fromRules;
-  LIC_DRAWER=null; COND=null;
+  LIC_DRAWER=null; COND=null; LIC_PEND=false;
   if(back) LIC_RULESPANEL = true;
   renderLicDrawer();
 }
 
-/* Compact live preview — replaces the seat-impact table. Answers the
-   only three questions rule creation raises: what matches, what that
-   enrols, and what it leaves in the seat pool. Regenerated on every
-   keystroke, so it is patched into #licPrev rather than re-rendered. */
+/* Compact live preview. It answers ONE question — what will this rule add? — so it
+   states only what changes. Already-enrolled matches are deliberately absent: they
+   are unaffected by saving, and counting them made the admin subtract to find the
+   number they actually came for. Seat maths is unchanged; only what is shown is.
+   Regenerated on every keystroke, so it is patched into #licPrev, not re-rendered. */
+function licPending(d){ return d.auto ? ruleHits(d).filter(c=>!c.enrolled) : []; }
+
 function licPrevInner(d){
   const hits  = ruleHits(d);
-  const fresh = hits.filter(c=>!c.enrolled);
+  const fresh = licPending(d);
   const left  = licLeft();
-  const would = d.auto ? fresh.length : 0;
+  const would = fresh.length;
   const after = left - would;
   const over  = would - left;
+
+  const seats = `
+    <div class="lp-seats">
+      <span class="lp-seats-l">Seats after save</span>
+      <span class="lp-seats-v ${over>0?"n-red":after<=2?"n-amber":""}">${after}${
+        over>0 ? ` <span class="lp-cap">(Over capacity)</span>` : ""}</span>
+    </div>`;
+
   if(!hits.length) return `
     <div class="cb-prev-h">Rule preview</div>
-    <div class="avail" style="line-height:1.6">No CIs currently match this rule.<br>${d.auto
-      ? "Future matching CIs will be enrolled automatically as they are discovered."
-      : "Rule is disabled — conditions are kept, nothing is enrolled."}</div>`;
+    <div class="lp-none">No CIs currently match this rule.
+      <div class="lp-sub">${d.auto
+        ? "Future matching CIs will be enrolled automatically as they are discovered."
+        : "Rule is disabled — conditions are kept, nothing is enrolled."}</div></div>`;
+
+  if(!would) return `
+    <div class="cb-prev-h">Rule preview</div>
+    <div class="lp-none">${d.auto ? "No new CIs will be enrolled." : "Rule is disabled — nothing will be enrolled."}
+      <div class="lp-sub">${d.auto
+        ? "All matching CIs are already enrolled."
+        : "Conditions are kept; turn the rule on to enrol what it matches."}</div></div>`;
+
   return `
-    <div class="cb-prev-h">Rule preview — <b>${hits.length}</b> of ${ALL_CIS.length} discovered CI${hits.length===1?"":"s"} match</div>
-    <div class="seatimpact${over>0?" over":""}">
-      <div class="si-row"><span>Will be newly enrolled</span><b>${would}</b></div>
-      <div class="si-row"><span>Already enrolled</span><b>${hits.length-fresh.length}</b></div>
-      <div class="si-row tot"><span>Seats available after save</span>
-        <b class="${over>0?"n-red":after<=2?"n-amber":""}">${after}</b></div>
+    <div class="cb-prev-h">Rule preview</div>
+    <div class="lp-head">
+      <span class="lp-n">${would}</span>
+      <span class="lp-t">new CI${would===1?"":"s"} will be enrolled</span>
     </div>
+    <button class="lp-link" id="licPrevView">View matching CIs
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5"/></svg></button>
+    ${seats}
     ${over>0 ? `<div class="ferr" style="margin-top:10px;padding:11px 13px;background:var(--crit-soft);border-radius:6px;line-height:1.55">
       <b>Over limit by ${over} seat${over===1?"":"s"}.</b> Narrow the conditions, free seats by removing CIs, or buy more before saving.
     </div>` : ""}`;
@@ -3900,6 +3942,36 @@ function renderLicDrawer(){
         <button class="btn pri lg" id="licDSave"${over>0?" disabled":""}>${d.editing?"Save changes":"Create rule"}</button>
       </div>
     </aside>`;
+
+    /* Stacked over the draft, never instead of it — the list is evidence for a
+       decision still being made, so the rule stays visible behind it. Only pending
+       CIs appear: an already-enrolled match is not something saving would change,
+       and an Enrolled column would say "No" on every row. */
+    if(LIC_PEND){
+      const pend = licPending(d);
+      const PCOLS = "56px minmax(0,1fr) 120px 150px";
+      main += `<div class="dw-scrim lite in" id="licPScrim"></div>
+      <aside class="dw stack in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="CIs to be Enrolled">
+        <div class="dw-head"><div><h3>CIs to be Enrolled</h3>
+          <p>${esc(d.name.trim() || "Untitled rule")} · ${pend.length} CI${pend.length===1?"":"s"} will be enrolled when this rule is saved.</p></div>
+          <button class="x" id="licPClose" aria-label="Close">${IC_X}</button></div>
+        <div class="dw-body" style="padding:0">
+          <div class="pk-hd vhd" style="grid-template-columns:${PCOLS}">
+            <span>CI ID</span><span>Host Name</span><span>CI Type</span><span>Discovered On</span></div>
+          ${pend.length ? pend.slice().sort((a,b)=>b.disc-a.disc).map(c=>`
+            <div class="pk-row vrow" style="grid-template-columns:${PCOLS};cursor:default">
+              <span class="id">${c.id}</span>
+              <span class="vhost"><span class="hn" title="${esc(c.host)}">${esc(c.host)}</span><span class="ip">${c.ip}</span></span>
+              <span><span class="pill ghost">${esc(c.type)}</span></span>
+              <span class="vwhen"><span class="vd">${licStamp(c.disc).split(" · ")[0]}</span><span class="vt">${licStamp(c.disc).split(" · ")[1]}</span></span>
+            </div>`).join("") : `<div class="pk-empty vempty">
+              <div class="t">No new CIs will be enrolled.</div>
+              <div class="d">All matching CIs are already enrolled.</div></div>`}
+        </div>
+        <div class="dw-foot"><span class="avail">Nothing is enrolled until the rule is saved.</span>
+          <span class="gap"></span><button class="btn lg" id="licPDone">Close</button></div>
+      </aside>`;
+    }
   }
 
   host.innerHTML = main + rules + view;
@@ -3953,18 +4025,26 @@ function renderLicDrawer(){
   const d = LIC_DRAWER;
   $("licDClose").onclick  = licRuleClose;
   $("licDCancel").onclick = licRuleClose;
-  $("licScrim").onclick   = ()=>{ if(!COND && !LIC_VIEW) licRuleClose(); };
+  $("licScrim").onclick   = ()=>{ if(!COND && !LIC_VIEW && !LIC_PEND) licRuleClose(); };
   $("licRName").oninput   = e => { d.name = e.target.value; };
   $("licDSw").onclick     = ()=>{ d.auto = !d.auto; renderLicDrawer(); };
 
+  if(LIC_PEND){
+    const closePend = ()=>{ LIC_PEND=false; renderLicDrawer(); };
+    $("licPClose").onclick = closePend; $("licPDone").onclick = closePend; $("licPScrim").onclick = closePend;
+  }
+
   /* Typing a value re-computes the preview, the footer line and the save
-     gate in place — a full re-render here would steal the caret. */
+     gate in place — a full re-render here would steal the caret. The preview
+     is replaced wholesale, so its link is re-bound with it. */
   const licSync = ()=>{
     const p = $("licPrev"); if(p) p.innerHTML = licPrevInner(d);
     const f = $("licFoot"); if(f) f.textContent = licFootLine(d);
     const s = $("licDSave");
     if(s) s.disabled = (d.auto ? ruleHits(d).filter(c=>!c.enrolled).length : 0) - licLeft() > 0;
+    const v = $("licPrevView"); if(v) v.onclick = ()=>{ LIC_PEND=true; renderLicDrawer(); };
   };
+  const pv = $("licPrevView"); if(pv) pv.onclick = ()=>{ LIC_PEND=true; renderLicDrawer(); };
   wireCbGroups(d.groups, renderLicDrawer, licSync);
   /* The builder's selects live in this drawer, not the stack — bind them
      here so #stackHost's own wiring is never involved. */
