@@ -1,11 +1,9 @@
 import { useRef, useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import { Header } from './Header';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminOverview } from './AdminOverview';
 import { ADMIN_SECTIONS, sectionByTitle } from './adminData';
-import { BomLicensingPage } from './BomLicensingPage';
-import { BomSchedulerPage } from './BomSchedulerPage';
-import { BomRetentionPage } from './BomRetentionPage';
 
 /* Admin hub — the settings surface. Its own shell: the product's left icon rail is replaced by a
  * grouped settings nav, with "Back to app" as the way out.
@@ -17,6 +15,15 @@ import { BomRetentionPage } from './BomRetentionPage';
  * the page is where the work happens. */
 
 type AdminView = 'hub' | 'bom-licensing' | 'bom-scheduler' | 'bom-retention';
+
+/* The three BOM settings screens are the original prototype in public/bom-admin —
+ * mounted as-is rather than reimplemented, so they stay pixel-identical to the
+ * signed-off design instead of drifting with every restyle. */
+const BOM_SCREENS: Record<Exclude<AdminView, 'hub'>, { label: string; route: string }> = {
+  'bom-licensing': { label: 'BOM Licensing', route: '#/admin/bom-licensing' },
+  'bom-scheduler': { label: 'BOM Scheduler', route: '#/admin/bom-scheduler' },
+  'bom-retention': { label: 'BOM Retention', route: '#/admin/bom-retention' },
+};
 
 export function AdminPage({ onNavigate }: { onNavigate: (page: string) => void }) {
   const [active, setActive] = useState('Overview');
@@ -55,8 +62,8 @@ export function AdminPage({ onNavigate }: { onNavigate: (page: string) => void }
       <Header selectedCount={0} />
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <AdminSidebar active={active} onSelect={select} onBackToApp={() => onNavigate('request')} />
-        <div data-admin-scroll className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          {view === 'hub' && (
+        <div data-admin-scroll className={`flex min-h-0 flex-1 flex-col ${view === 'hub' ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+          {view === 'hub' ? (
             <AdminOverview
               openKeys={openKeys}
               onToggle={toggle}
@@ -65,10 +72,24 @@ export function AdminPage({ onNavigate }: { onNavigate: (page: string) => void }
               registerSection={(key, el) => { sectionRefs.current[key] = el; }}
               onOpenCard={(page) => { setView(page as AdminView); setActive('BOM Management'); }}
             />
+          ) : (
+            <>
+              <div className="flex flex-shrink-0 items-center gap-1 border-b border-[#E5E7EB] bg-white px-6 py-2">
+                <button onClick={() => { setView('hub'); setActive('Overview'); }}
+                        className="inline-flex items-center gap-1 text-[12px] font-medium text-[#7B8FA5] transition-colors hover:text-[#3D8BD0]">
+                  <ChevronLeft size={13} /> Admin
+                </button>
+                <span className="text-[12px] text-[#9CA3AF]">›</span>
+                <span className="text-[12px] text-[#364658]">{BOM_SCREENS[view].label}</span>
+              </div>
+              <iframe
+                key={view}
+                title={BOM_SCREENS[view].label}
+                src={`${import.meta.env.BASE_URL}bom-admin/index.html?embed=1${BOM_SCREENS[view].route}`}
+                className="min-h-0 w-full flex-1 border-0"
+              />
+            </>
           )}
-          {view === 'bom-licensing' && <BomLicensingPage onBack={() => setView('hub')} />}
-          {view === 'bom-scheduler' && <BomSchedulerPage onBack={() => setView('hub')} />}
-          {view === 'bom-retention' && <BomRetentionPage onBack={() => setView('hub')} />}
         </div>
       </div>
     </div>
