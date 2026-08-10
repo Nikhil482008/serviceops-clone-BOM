@@ -16,6 +16,8 @@ export interface AdminCard {
   icon: string;
   /** Route on the real product — kept so the prototype's links stay truthful. */
   href: string;
+  /** Page id inside THIS prototype — a card that has one actually opens its screen. */
+  page?: string;
 }
 
 export interface AdminSection {
@@ -31,7 +33,7 @@ export const ADMIN_NAV: { group: string; items: string[] }[] = [
   { group: 'Intelligent Automation', items: ['Automation', 'AI'] },
   { group: 'Platform Configuration', items: ['Users', 'Organization', 'Support Channels', 'User Survey'] },
   { group: 'Service Desk', items: ['Request Management', 'Service Catalog', 'Problem Management', 'Change Management', 'Release Management', 'Knowledge Management', 'Task Management'] },
-  { group: 'IT Operations', items: ['CMDB', 'Discovery And Agents', 'Patch Management', 'Asset Management', 'Vulnerability Management', 'OS Deployment'] },
+  { group: 'IT Operations', items: ['CMDB', 'Discovery And Agents', 'Patch Management', 'Asset Management', 'Vulnerability Management', 'BOM Management', 'OS Deployment'] },
   { group: 'Vendor & Procurement', items: ['Supplier Management', 'Contract Management', 'Purchase Management'] },
   { group: 'Project Delivery', items: ['Project Management'] },
 ];
@@ -313,6 +315,17 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     icon: 'ShieldAlert',
     cards: [
     { title: 'Vulnerability Settings', desc: 'Configure database update schedules, proxy, notifications, and review update audit history.', icon: 'ShieldAlert', href: '/admin/vulnerability-management/vulnerability-settings?tab=vulnerability_database' },
+    ],
+  },
+  {
+    key: 'bom-management',
+    title: 'BOM Management',
+    desc: 'Schedule automatic BOM generation and manage BOM policies for connected devices.',
+    icon: 'Package',
+    cards: [
+    { title: 'BOM Scheduler', desc: 'Auto-generate SBOMs for connected devices on a schedule.', icon: 'CalendarClock', href: '/admin/bom-management/scheduler', page: 'bom-scheduler' },
+    { title: 'BOM Retention', desc: 'How many living-SBOM versions to keep per device, and for how long.', icon: 'SlidersHorizontal', href: '/admin/bom-management/retention', page: 'bom-retention' },
+    { title: 'BOM Licensing', desc: 'License agent-bearing CIs for BOM generation and group them into scopes.', icon: 'Lock', href: '/admin/bom-management/licensing', page: 'bom-licensing' },
     ],
   },
   {

@@ -15,9 +15,11 @@ interface AdminOverviewProps {
   onQuery: (q: string) => void;
   /** Registers each section's node so the sidebar can scroll to it. */
   registerSection: (key: string, el: HTMLDivElement | null) => void;
+  /** Opens a card's in-prototype screen. Cards without a `page` keep the route toast. */
+  onOpenCard?: (page: string) => void;
 }
 
-export function AdminOverview({ openKeys, onToggle, query, onQuery, registerSection }: AdminOverviewProps) {
+export function AdminOverview({ openKeys, onToggle, query, onQuery, registerSection, onOpenCard }: AdminOverviewProps) {
   const q = query.trim().toLowerCase();
 
   // A section survives search if its own name matches or any card does; when it survives on a
@@ -118,7 +120,7 @@ export function AdminOverview({ openKeys, onToggle, query, onQuery, registerSect
                         return (
                           <button
                             key={c.title}
-                            onClick={() => toast.success(`${c.title} — ${c.href}`)}
+                            onClick={() => (c.page && onOpenCard ? onOpenCard(c.page) : toast.success(`${c.title} — ${c.href}`))}
                             className="group rounded-lg border border-[#E5E7EB] bg-white p-3.5 text-left transition-all hover:border-[#3D8BD0] hover:shadow-[0_1px_2px_rgba(16,24,40,0.04),0_2px_8px_rgba(16,24,40,0.06)]"
                           >
                             <span className="flex items-center gap-2.5">
