@@ -400,15 +400,27 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .pk-row .id{font-family:var(--mono);font-weight:600}
 .pk-row .ip{font-family:var(--mono);color:var(--dim)}
 .pk-empty{padding:48px 20px;text-align:center;font-size:13px;color:var(--faint)}
-/* Sortable header inside the Matching CIs list — the only interactive thing in a
-   read-only table, so it reads as a header until hovered. */
+/* ── Matching CIs list ────────────────────────────────────────
+   Read-only, and every row is the same height: the host name truncates instead of
+   wrapping, so the eye can run down the timestamp column without stepping. */
+.vhd,.vrow{padding-left:20px;padding-right:20px}
+.vrow{align-items:center;min-height:52px}
+.vhost{min-width:0;display:flex;flex-direction:column;gap:2px}
+.vhost .hn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--ink)}
+.vhost .ip{font-family:var(--mono);font-size:12px;color:var(--dim)}
+/* The one interactive thing in a read-only table — reads as a header until hovered. */
 .vsort{display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:0;
   font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;color:inherit;
   cursor:pointer;text-align:left}
 .vsort:hover{color:var(--brand)}
 .vsort .ar{font-size:9px;color:var(--brand)}
-.pk-row .vwhen{font-size:12px;color:var(--ink);font-variant-numeric:tabular-nums}
-.pk-row .vnone{color:var(--faint)}
+/* Date leads, time is the tiebreak — same anatomy as Next Run in the scheduler. */
+.vwhen{display:flex;flex-direction:column;gap:2px;font-variant-numeric:tabular-nums}
+.vwhen .vd{font-size:13px;color:var(--ink);white-space:nowrap}
+.vwhen .vt{font-size:12px;color:var(--dim)}
+.vwhen .vnone{color:var(--faint)}
+.vempty .t{font-size:14px;font-weight:500;color:var(--ink)}
+.vempty .d{margin-top:5px;font-size:13px;color:var(--dim)}
 .fld{margin-bottom:14px}
 .flab{display:block;font-size:12px;font-weight:500;color:var(--dim);margin-bottom:6px}
 .flab .req{color:var(--crit);margin-left:2px}
@@ -3812,26 +3824,33 @@ function renderLicDrawer(){
       if(y === null) return -1;
       return LIC_VSORT === "desc" ? y - x : x - y;
     });
-    const VCOLS = "66px 1fr 122px 168px 96px";
+    /* minmax(0,…) not 1fr: a bare 1fr never shrinks below its content, so a long host
+       name widened that column on its own row and every column after it landed at a
+       different x. The fixed widths are sized to the longest real value each holds. */
+    const VCOLS = "56px minmax(0,1fr) 120px 150px 74px";
     view = `<div class="dw-scrim in" id="licVScrim"></div>
     <aside class="dw in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Matching CIs">
       <div class="dw-head"><div><h3>Matching CIs</h3>
         <p>${esc(r?r.name:"")} · ${rows.length} of ${ALL_CIS.length} discovered CIs · read-only</p></div>
         <button class="x" id="licVClose" aria-label="Close">${IC_X}</button></div>
       <div class="dw-body" style="padding:0">
-        <div class="pk-hd" style="grid-template-columns:${VCOLS}"><span>CI ID</span><span>Host Name</span><span>CI Type</span>
-          <button class="vsort" id="licVSort" aria-label="Sort by enrolment time, ${LIC_VSORT==="desc"?"newest":"oldest"} first"
-                  title="${LIC_VSORT==="desc"?"Newest first — click for oldest":"Oldest first — click for newest"}">Added by Rule<span class="ar">${LIC_VSORT==="desc"?"▼":"▲"}</span></button>
+        <div class="pk-hd vhd" style="grid-template-columns:${VCOLS}"><span>CI ID</span><span>Host Name</span><span>CI Type</span>
+          <button class="vsort" id="licVSort" aria-label="Sort by when this rule enrolled the CI, ${LIC_VSORT==="desc"?"newest":"oldest"} first"
+                  title="When this rule enrolled the CI — ${LIC_VSORT==="desc"?"newest first, click for oldest":"oldest first, click for newest"}">Added on<span class="ar">${LIC_VSORT==="desc"?"▼":"▲"}</span></button>
           <span>Enrolled</span></div>
         ${rows.length ? rows.map(c=>{
           const at = stampOf(c);
-          return `<div class="pk-row" style="grid-template-columns:${VCOLS};cursor:default">
-          <span class="id">${c.id}</span><span>${esc(c.host)}<div class="sc-sub">${c.ip}</div></span>
+          return `<div class="pk-row vrow" style="grid-template-columns:${VCOLS};cursor:default">
+          <span class="id">${c.id}</span>
+          <span class="vhost"><span class="hn" title="${esc(c.host)}">${esc(c.host)}</span><span class="ip">${c.ip}</span></span>
           <span><span class="pill ghost">${esc(c.type)}</span></span>
-          <span class="vwhen">${at ? licStamp(at) : `<span class="vnone">${DASH}</span>`}</span>
+          ${at
+            ? `<span class="vwhen"><span class="vd">${licStamp(at).split(" · ")[0]}</span><span class="vt">${licStamp(at).split(" · ")[1]}</span></span>`
+            : `<span class="vwhen"><span class="vnone" title="Enrolled by hand, not by this rule">${DASH}</span></span>`}
           <span>${c.enrolled ? `<span class="pill ok"><span class="d"></span>Yes</span>` : `<span class="pill ghost">Not yet</span>`}</span>
-        </div>`;}).join("") : `<div class="pk-empty">No CIs have been enrolled by this rule yet.
-          <div style="margin-top:5px">Future matching CIs will appear here automatically.</div></div>`}
+        </div>`;}).join("") : `<div class="pk-empty vempty">
+          <div class="t">No CIs have been enrolled by this rule yet.</div>
+          <div class="d">Future matching CIs will appear here automatically.</div></div>`}
       </div>
       <div class="dw-foot"><span class="avail">Change this list by editing the rule, not the CIs.</span>
         <span class="gap"></span><button class="btn lg" id="licVDone">Close</button></div>
