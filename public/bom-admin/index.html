@@ -492,6 +492,29 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .sumv.quiet{color:var(--faint)}
 
 /* compact settings banner — one line, not a container round a switch */
+/* ── scheduler status row ─────────────────────────────────────
+   Was a banner; it answers one yes/no question, so it is a row (~52px) rather than
+   a card competing with the metrics above it. */
+.setrow{display:flex;align-items:center;gap:14px;padding:9px 16px;margin-bottom:16px;max-width:1500px;
+  border:1px solid var(--line-tbl);border-radius:8px;background:#fff}
+.setrow.off{border-color:#F0E1BD;background:#FEFBF3}
+.setrow .sr-main{min-width:0;flex:1}
+.setrow .sr-t{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--ink)}
+.setrow .sr-d{margin-top:2px;font-size:12px;color:var(--dim);line-height:1.4}
+.setrow .sr-sep{margin:0 6px;color:var(--line)}
+/* Metric supporting line — the figure's context, not a second figure. */
+.sums{margin-top:3px;font-size:12px;color:var(--dim)}
+.sums.warn{color:var(--warn)}
+.sumv.big{font-size:20px;letter-spacing:-.4px}
+/* Running row: the spinner is the only thing that moves. */
+.sc-stat.run{color:var(--brand)}
+.sc-stat.run .d{background:var(--brand);animation:bspulse 1.4s ease-in-out infinite}
+@keyframes bspulse{0%,100%{opacity:1}50%{opacity:.35}}
+.iact.running{color:var(--brand);border-color:#CFE0F0;background:var(--sel-blue);cursor:default}
+.iact.ok{color:var(--ok);border-color:#BFE6D2;background:var(--ok-soft)}
+.spin{width:11px;height:11px;border-radius:9999px;border:1.5px solid #BFDBF7;border-top-color:var(--brand);
+  animation:bsspin .7s linear infinite;flex:none}
+@keyframes bsspin{to{transform:rotate(360deg)}}
 .setban{display:flex;align-items:center;gap:12px;border:1px solid var(--line-tbl);border-radius:8px;
   background:#fff;padding:12px 16px;margin-bottom:22px;max-width:1500px}
 .setban.off{border-color:#F0E1BD;background:#FEFBF3}
@@ -1061,6 +1084,14 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
         <h1>BOM Scheduler</h1>
         <div class="sub">Automatically generate SBOMs and CBOMs for enrolled Configuration Items based on scheduled policies.</div>
       </div>
+      <!-- Creating a schedule belongs to the page, not to the table below it: the
+           table's job is managing the policies that already exist. -->
+      <div class="head-actions">
+        <button class="btn pri" id="bsNew">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>
+          New schedule
+        </button>
+      </div>
     </div>
 
     <section class="sumstrip" id="bsSummary"></section>
@@ -1074,10 +1105,6 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
           <input id="bsQ" type="search" placeholder="Search policies…" autocomplete="off">
         </div>
         <span id="bsFilter"></span>
-        <button class="btn pri" id="bsNew">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>
-          New schedule
-        </button>
       </div>
     </div>
 
@@ -2975,6 +3002,54 @@ const bsClock = p => p.freq === "Custom" && p.kind === "Recurring"
 const bsCovered = () => new Set(BS_POLICIES.filter(p=>p.on).flatMap(p=>p.cis));
 const bsNextId  = () => "BS-" + (BS_POLICIES.reduce((m,p)=>Math.max(m,+(p.id.split("-")[1]||0)),0) + 1);
 
+/* ── scan runs ────────────────────────────────────────────────
+   The scheduler's execution record: one entry per run, whether the scheduler
+   started it or an admin did. Everything that reports on execution — the activity
+   figure, "last scheduler run", a row's running state and its last completion —
+   reads THIS, so those readings cannot drift apart or outlive the thing they
+   describe. Seeded with the runs today's active policies already performed at their
+   own scheduled times; nothing is recorded that a policy did not actually cover. */
+let BS_RUNS = [];
+(function seedRuns(){
+  const now = new Date();
+  BS_POLICIES.filter(p=>p.on).forEach(p=>{
+    const [hh,mm] = bsTime(p).split(":").map(Number);
+    const at = new Date(now); at.setHours(hh, mm, 0, 0);
+    if(at > now || !p.cis.length) return;              // not due yet today, or covers nothing
+    BS_RUNS.push({ id:"RUN-"+p.id+"-seed", policyId:p.id, by:"schedule",
+                   total:p.cis.length, done:p.cis.length,
+                   startedAt:at.getTime(), finishedAt:at.getTime() + p.cis.length*1200 });
+  });
+})();
+
+const bsToday = ms => { const a=new Date(); a.setHours(0,0,0,0); return ms >= a.getTime(); };
+const bsRunsToday = () => BS_RUNS.filter(r => bsToday(r.startedAt));
+/* The run in flight for a policy, if any — a policy runs once at a time. */
+const bsRunning  = pid => BS_RUNS.find(r => r.policyId===pid && r.finishedAt===null) || null;
+const bsLastDone = pid => BS_RUNS.filter(r => r.policyId===pid && r.finishedAt)
+                                 .sort((a,b)=>b.finishedAt-a.finishedAt)[0] || null;
+const bsLastAny  = () => BS_RUNS.filter(r=>r.finishedAt).sort((a,b)=>b.finishedAt-a.finishedAt)[0] || null;
+const bsClockOf  = ms => { const d=new Date(ms);
+  return (bsToday(ms) ? "Today" : `${MON[d.getMonth()]} ${d.getDate()}`) +
+         ` · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; };
+
+/* A run advances one CI at a time, so its length follows what it actually covers
+   rather than a fixed wait, and it finishes because the work finished. */
+const BS_TICK = 420;
+function bsRunNow(p){
+  if(bsRunning(p.id)) return;                          // already in flight
+  const run = { id:"RUN-"+p.id+"-"+Date.now(), policyId:p.id, by:"manual",
+                total:p.cis.length, done:0, startedAt:Date.now(), finishedAt:null };
+  BS_RUNS.push(run);
+  const step = ()=>{
+    run.done++;
+    if(run.done >= run.total){ run.finishedAt = Date.now(); renderScheduler(); return; }
+    renderScheduler(); setTimeout(step, BS_TICK);
+  };
+  if(!run.total){ run.finishedAt = run.startedAt; renderScheduler(); return; }
+  renderScheduler(); setTimeout(step, BS_TICK);
+}
+
 const BS_FILTERS = [
   {g:"Status",  id:"active",  lab:"Active",  fn:p=>p.on},
   {g:"Status",  id:"paused",  lab:"Disabled",fn:p=>!p.on},
@@ -3002,33 +3077,47 @@ function renderScheduler(){
   const soonest= nexts[0];
   const covered= bsCovered().size;
 
-  /* ── summary strip ─────────────────────────────────────── */
+  /* ── operational summary ────────────────────────────────
+     Three readings, each answering a question worth asking before touching a
+     policy: is the estate covered, are the policies live, is anything running.
+     "Next run" is not among them — it is a property of one policy, so it earns a
+     table cell rather than a headline. */
+  const uncovered = ENROLLED_CIS.length - covered;
+  const pct = ENROLLED_CIS.length ? Math.round(covered/ENROLLED_CIS.length*100) : 0;
+  const today = bsRunsToday(), inFlight = today.filter(r=>!r.finishedAt).length;
+  const doneToday = today.length - inFlight;
   document.getElementById("bsSummary").innerHTML = `
-    <div class="sumcell"><div class="suml">Active</div>
-      <div class="sumv${active.length?"":" quiet"}">${active.length}<span class="u">of ${BS_POLICIES.length} policies</span></div></div>
-    <div class="sumcell"><div class="suml">Disabled</div>
-      <div class="sumv${paused.length?"":" quiet"}">${paused.length}${paused.length?`<span class="u">not running</span>`:""}</div></div>
-    <div class="sumcell"><div class="suml">Next run</div>
-      <div class="sumv${soonest?"":" quiet"}">${soonest
-        ? `${bsWhen(soonest)}<span class="u">${String(soonest.getHours()).padStart(2,"0")}:${String(soonest.getMinutes()).padStart(2,"0")}</span>`
-        : (BS_ENABLED ? "None scheduled" : "Paused")}</div></div>
     <div class="sumcell"><div class="suml">Coverage</div>
-      <div class="sumv${covered?"":" quiet"}">${covered}<span class="u">of ${ENROLLED_CIS.length} enrolled CIs</span></div></div>`;
+      <div class="sumv big${covered?"":" quiet"}">${covered} / ${ENROLLED_CIS.length}<span class="u">CIs</span></div>
+      <div class="sums${uncovered?" warn":""}">${uncovered
+        ? `${uncovered} CI${uncovered===1?"":"s"} not covered`
+        : `${pct}% scheduled`}</div></div>
+    <div class="sumcell"><div class="suml">Active policies</div>
+      <div class="sumv big${active.length?"":" quiet"}">${active.length} / ${BS_POLICIES.length}</div>
+      <div class="sums">${paused.length ? `${paused.length} disabled` : "none disabled"}</div></div>
+    <div class="sumcell"><div class="suml">Scan activity</div>
+      <div class="sumv big${today.length?"":" quiet"}">${today.length}<span class="u">scan${today.length===1?"":"s"} today</span></div>
+      <div class="sums">${today.length
+        ? `${doneToday} completed${inFlight?` · ${inFlight} running`:""}`
+        : "no scans yet today"}</div></div>`;
 
-  /* ── settings banner ───────────────────────────────────── */
-  document.getElementById("bsBanner").className = "setban" + (BS_ENABLED ? "" : " off");
+  /* ── scheduler status ───────────────────────────────────
+     One compact row. It answers "is the scheduler actually running", which needs a
+     state, a consequence and a way to change it — not a card. The last run is read
+     from the run log, so it cannot claim an execution that never happened. */
+  const lastRun = bsLastAny();
+  document.getElementById("bsBanner").className = "setrow" + (BS_ENABLED ? "" : " off");
   document.getElementById("bsBanner").innerHTML = `
-    <button class="sw${BS_ENABLED?" on":""}" id="bsSw" role="switch" aria-checked="${BS_ENABLED}"
-            aria-label="Automatic BOM generation"></button>
-    <div style="min-width:0">
-      <div class="t">Automatic BOM Generation
-        <span class="pill ${BS_ENABLED?"ok":"gold"}" style="margin-left:7px"><span class="d"></span>${BS_ENABLED?"Enabled":"Disabled"}</span>
-      </div>
-      <div class="d">${BS_ENABLED
-        ? "Policies below run at their set times for the CIs they cover."
-        : "No policy will execute, whatever its own status, until this is turned back on."}</div>
+    <div class="sr-main">
+      <div class="sr-t">Automatic BOM generation
+        <span class="sc-stat ${BS_ENABLED?"on":"paused"}"><span class="d" style="background:${
+          BS_ENABLED?"var(--ok-dot)":"var(--warn-dot)"}"></span>${BS_ENABLED?"Enabled":"Disabled"}</span></div>
+      <div class="sr-d">${BS_ENABLED
+        ? "Policies run according to their schedules."
+        : "Scheduled scans are paused."}${lastRun
+        ? `<span class="sr-sep">·</span>Last scheduler run: ${bsClockOf(lastRun.finishedAt)}` : ""}</div>
     </div>
-    <div class="last">Last scheduler execution<b>Today · 02:00 IST</b></div>`;
+    <button class="btn" id="bsSw" aria-pressed="${BS_ENABLED}">${BS_ENABLED?"Disable":"Enable"}</button>`;
 
   /* ── filter control (§5.3 — one control, never a row) ──── */
   const groups = [...new Set(BS_FILTERS.map(f=>f.g))];
@@ -3074,17 +3163,31 @@ function renderScheduler(){
       </tr></thead>
       <tbody>${list.map(p=>{
         const n = bsNext(p);
+        /* Idle → Running → Completed, read from the run log. "Completed" is the
+           most recent finish and settles back to idle after a short while, so the
+           row states what is true now rather than what was true once. */
+        const run = bsRunning(p.id), done = bsLastDone(p.id);
+        const justDone = !run && done && (Date.now() - done.finishedAt) < 8000;
         return `<tr class="${p.on?"":"off"}">
           <td><div class="sc-name">${esc(p.name)}</div><div class="sc-id">${p.id}</div></td>
           <td><button class="sc-cov" data-bscov="${p.id}">${p.cis.length} Enrolled CI${p.cis.length===1?"":"s"}</button></td>
           <td><div class="sc-trig">${bsTrigger(p)}</div><div class="sc-sub">${bsClock(p)}</div></td>
           <td>${n
             ? `<div class="sc-when">${bsWhen(n)}</div><div class="sc-sub">${bsClock(p)}</div>`
-            : `<div class="sc-when" style="color:var(--faint)">${DASH}</div><div class="sc-sub">${BS_ENABLED?"Paused":"Scheduling off"}</div>`}</td>
-          <td><span class="sc-stat ${p.on?"on":"paused"}"><span class="d" style="background:${p.on?"var(--ok-dot)":"var(--neu-dot)"}"></span>${p.on?"Active":"Disabled"}</span></td>
+            : `<div class="sc-when" style="color:var(--faint)">${DASH}</div><div class="sc-sub">${BS_ENABLED?"Paused":"Scheduling off"}</div>`}
+            ${done ? `<div class="sc-sub">Last run ${bsClockOf(done.finishedAt)}</div>` : ""}</td>
+          <td>${run
+            ? `<span class="sc-stat run"><span class="d"></span>Running</span>
+               <div class="sc-sub">Scanning ${run.total} CI${run.total===1?"":"s"}… ${run.done}/${run.total}</div>`
+            : `<span class="sc-stat ${p.on?"on":"paused"}"><span class="d" style="background:${p.on?"var(--ok-dot)":"var(--neu-dot)"}"></span>${p.on?"Active":"Disabled"}</span>`}</td>
           <td><div class="sc-acts">
-            <button class="iact" data-bsrun="${p.id}" title="Generate BOMs for this policy now">
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4.5 3.2l8 4.8-8 4.8z"/></svg>Run Now</button>
+            ${run
+              ? `<button class="iact running" disabled><span class="spin"></span>Running</button>`
+              : justDone
+                ? `<button class="iact ok" data-bsrun="${p.id}" title="Completed ${bsClockOf(done.finishedAt)}">
+                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-6.5"/></svg>Completed</button>`
+                : `<button class="iact" data-bsrun="${p.id}" title="Generate BOMs for this policy now">
+                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4.5 3.2l8 4.8-8 4.8z"/></svg>Run now</button>`}
             <button class="iact" data-bsedit="${p.id}">Edit</button>
             <button class="iact sq" data-bsmenu="${p.id}" aria-label="More actions for ${esc(p.name)}">
               <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3.2" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="12.8" cy="8" r="1.3"/></svg></button>
@@ -3115,9 +3218,13 @@ function renderScheduler(){
   document.querySelectorAll("[data-bsf]").forEach(cb=>cb.onchange=()=>{
     cb.checked ? BS_FILT.add(cb.dataset.bsf) : BS_FILT.delete(cb.dataset.bsf); renderScheduler();
   });
+  /* Run Now starts a real run and the row follows its progress; it no longer just
+     announces one and leaves the button where it was. */
   document.querySelectorAll("[data-bsrun]").forEach(b=>b.onclick=()=>{
     const p = BS_POLICIES.find(x=>x.id===b.dataset.bsrun);
-    toast(`Running "${p.name}" now — generating BOMs for ${p.cis.length} CI${p.cis.length===1?"":"s"}`);
+    if(bsRunning(p.id)) return;
+    bsRunNow(p);
+    toast(`Running "${p.name}" — scanning ${p.cis.length} CI${p.cis.length===1?"":"s"}`);
   });
   document.querySelectorAll("[data-bsedit]").forEach(b=>b.onclick=()=>bsOpen(b.dataset.bsedit));
   document.querySelectorAll("[data-bscov]").forEach(b=>b.onclick=()=>{ BS_COV=b.dataset.bscov; renderScheduler(); renderBsDrawers(); });
