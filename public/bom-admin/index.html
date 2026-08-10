@@ -86,7 +86,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.4;color:var(--ink)}
 .sub{color:var(--dim);font-size:13px;line-height:1.55;max-width:92ch}
 .sub b{color:var(--ink);font-weight:500}
-.head-actions{margin-left:auto;display:flex;gap:8px;flex:none}
+.head-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
 /* ── primary action menu ──────────────────────────────────────
    Same popover language as the row overflow menus (.sc-menu), widened because each
    choice carries a line saying what it does — the point of the menu is that the
@@ -492,18 +492,23 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .sumv.quiet{color:var(--faint)}
 
 /* compact settings banner — one line, not a container round a switch */
-/* ── scheduler on/off, in the page header ─────────────────────
-   State and control together, sized like the furniture around it. Off is amber and
-   keeps its own tint, so a paused scheduler still reads at a glance. */
-.schedstate{display:inline-flex;align-items:center;gap:8px;padding:3px 3px 3px 10px;border-radius:6px;
-  border:1px solid var(--line);background:#fff}
-.schedstate.off{border-color:#F0E1BD;background:#FEFBF3}
-.schedstate .ss-lab{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--dim);
-  white-space:nowrap;cursor:default}
-.schedstate .ss-lab b{font-weight:600;color:var(--ok)}
-.schedstate.off .ss-lab b{color:var(--warn)}
-.schedstate .d{width:7px;height:7px;border-radius:9999px;background:var(--ok-dot);flex:none}
-.schedstate.off .d{background:var(--warn-dot)}
+/* ── scheduler status control, beside the page title ──────────
+   ~60px: caption, then state and its supporting fact on one line, with the action
+   naming what happens next. Paused keeps its own tint so it reads across the page. */
+.schedctl{display:flex;align-items:center;gap:16px;padding:10px 12px 10px 14px;border-radius:8px;
+  border:1px solid var(--line-tbl);background:#fff}
+.schedctl.off{border-color:#F0E1BD;background:#FEFBF3}
+.schedctl .sc-l{min-width:0}
+.schedctl .sc-cap{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+.schedctl .sc-row{margin-top:5px;display:flex;align-items:baseline;gap:12px;white-space:nowrap}
+.schedctl .sc-state{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--ok)}
+.schedctl.off .sc-state{color:var(--dim)}
+.schedctl .sc-state .d{width:8px;height:8px;border-radius:9999px;background:var(--ok-dot);flex:none;
+  box-shadow:0 0 0 3px rgba(34,197,94,.16)}
+.schedctl.off .sc-state .d{background:var(--neu-dot);box-shadow:0 0 0 3px rgba(148,163,184,.18)}
+.schedctl .sc-meta{font-size:12px;color:var(--dim)}
+.schedctl .sc-meta b{font-weight:600;color:var(--ink)}
+.schedctl .btn{flex:none;margin-left:auto}
 /* Metric supporting line — the figure's context, not a second figure. */
 .sums{margin-top:3px;font-size:12px;color:var(--dim)}
 .sums.warn{color:var(--warn)}
@@ -3033,6 +3038,18 @@ const bsRunning  = pid => BS_RUNS.find(r => r.policyId===pid && r.finishedAt===n
 const bsLastDone = pid => BS_RUNS.filter(r => r.policyId===pid && r.finishedAt)
                                  .sort((a,b)=>b.finishedAt-a.finishedAt)[0] || null;
 const bsLastAny  = () => BS_RUNS.filter(r=>r.finishedAt).sort((a,b)=>b.finishedAt-a.finishedAt)[0] || null;
+/* The reader's own zone, not a hardcoded one — the times are local Dates. Tried
+   against the browser locale first, then en-IN: en-US renders Asia/Kolkata as the
+   unhelpful "GMT+5:30" where en-IN gives "IST". A bare offset is dropped rather
+   than shown, since it tells the reader nothing they did not already know. */
+const TZ_SHORT = (()=>{
+  const pick = loc => { try{
+    const z = new Intl.DateTimeFormat(loc,{timeZoneName:"short"}).formatToParts(new Date())
+                  .find(x=>x.type==="timeZoneName");
+    return z && !/^(GMT|UTC)[+-]/.test(z.value) ? z.value : "";
+  }catch(e){ return ""; } };
+  return pick(undefined) || pick("en-IN") || "";
+})();
 const bsClockOf  = ms => { const d=new Date(ms);
   return (bsToday(ms) ? "Today" : `${MON[d.getMonth()]} ${d.getDate()}`) +
          ` · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; };
@@ -3101,27 +3118,34 @@ function renderScheduler(){
       <div class="sumv big${active.length?"":" quiet"}">${active.length} / ${BS_POLICIES.length}</div>
       <div class="sums">${paused.length ? `${paused.length} disabled` : "none disabled"}</div></div>
     <div class="sumcell"><div class="suml">Scan activity</div>
-      <div class="sumv big${today.length && BS_ENABLED?"":" quiet"}">${today.length}<span class="u">scan${today.length===1?"":"s"} today</span></div>
-      <div class="sums${BS_ENABLED?"":" warn"}">${!BS_ENABLED
-        ? "Paused — no scheduled scans will run"
-        : (today.length
-            ? `${doneToday} completed${inFlight?` · ${inFlight} running`:""}${
-                lastRun?` · last ${bsClockOf(lastRun.finishedAt).replace("Today · ","")}`:""}`
-            : "no scans yet today")}</div></div>`;
+      <div class="sumv big${today.length?"":" quiet"}">${today.length}<span class="u">scan${today.length===1?"":"s"} today</span></div>
+      <!-- State and last execution belong to the control above; repeating them here
+           would be the duplication that control was built to remove. -->
+      <div class="sums">${today.length
+        ? `${doneToday} completed${inFlight?` · ${inFlight} running`:""}`
+        : "no scans yet today"}</div></div>`;
 
-  /* ── scheduler on/off ───────────────────────────────────
-     In the header, as state + control. It used to be a full-width row below the
-     metrics, spending a band of the page on "everything is fine" — the common case.
-     The consequence of the uncommon case is not lost: switched off, the execution
-     metric says so in warn, which is where an admin looking for scans would notice
-     it. "Last scheduler run" moved into that same metric, being execution data. */
-  document.getElementById("bsState").className = "schedstate" + (BS_ENABLED ? "" : " off");
+  /* ── scheduler status control ───────────────────────────
+     State and action say DIFFERENT things: the status reports what the system is
+     doing right now ("Running"/"Paused"), the button names what will happen next
+     ("Pause"/"Resume"). The old chip said "On" beside "Disable", which is the same
+     fact twice and leaves the reader to work out which one is the state.
+     It sits beside the page title, in space the header was not using, so a control
+     of this size costs the page no vertical room at all. */
+  document.getElementById("bsState").className = "schedctl" + (BS_ENABLED ? "" : " off");
   document.getElementById("bsState").innerHTML = `
-    <span class="ss-lab" title="Automatic BOM generation${BS_ENABLED
-      ? " is on — policies run according to their schedules."
-      : " is off — no policy will execute, whatever its own status."}">
-      <span class="d"></span>Automatic generation<b>${BS_ENABLED?"On":"Off"}</b></span>
-    <button class="btn sm" id="bsSw" aria-pressed="${BS_ENABLED}">${BS_ENABLED?"Disable":"Enable"}</button>`;
+    <div class="sc-l">
+      <div class="sc-cap">Automatic BOM generation</div>
+      <div class="sc-row">
+        <span class="sc-state"><span class="d"></span>${BS_ENABLED ? "Running" : "Paused"}</span>
+        ${BS_ENABLED
+          ? (lastRun
+              ? `<span class="sc-meta">Last execution <b>${bsClockOf(lastRun.finishedAt)}${TZ_SHORT?` ${TZ_SHORT}`:""}</b></span>`
+              : `<span class="sc-meta">No execution yet today</span>`)
+          : `<span class="sc-meta">No scheduled scans will run until resumed.</span>`}
+      </div>
+    </div>
+    <button class="btn sm" id="bsSw">${BS_ENABLED ? "Pause scheduler" : "Resume scheduler"}</button>`;
 
   /* ── filter control (§5.3 — one control, never a row) ──── */
   const groups = [...new Set(BS_FILTERS.map(f=>f.g))];
