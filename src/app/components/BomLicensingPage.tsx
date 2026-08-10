@@ -91,7 +91,7 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
       />
 
       {/* Seat KPIs. "By rule / by hand" are live drivers — clicking one opens that tab. */}
-      <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi label="Seats purchased" value={BOM_SEATS} sub="licensed for BOM generation" />
         <Kpi
           label="Seats available" value={left}
@@ -105,20 +105,20 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
           tone={inactive ? 'warn' : undefined}
           sub={inactive ? `${inactive} inactive — still holding a seat` : 'all enrolled CIs are reporting'}
         />
-        <div className="rounded-xl border border-[#E5E7EB] bg-white px-4 py-3">
-          <div className="text-[12px] text-[#7B8FA5]">Source mix</div>
-          <div className="mt-1 flex items-baseline gap-2 text-[13px]">
+        <div className="rounded-lg border border-[#E5E7EB] bg-white px-4 py-3.5 transition-colors hover:border-[#cfd8e3]">
+          <div className="text-[13px] font-medium text-[#7B8FA5]">Source mix</div>
+          <div className="mt-2 flex flex-wrap items-baseline text-[12px] leading-[1.6]">
             <button onClick={() => switchTab('auto')} title="Swept in by an auto-enrol rule, and kept in sync."
-                    className="text-[#3D8BD0] hover:underline">
-              <b className="text-[16px]" style={{ fontVariantNumeric: 'tabular-nums' }}>{byAuto.length}</b> by rule
+                    className="group inline-flex items-baseline gap-1 text-[#7B8FA5] transition-colors hover:text-[#364658]">
+              <b className="font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>{byAuto.length}</b> <span className="border-b border-dotted border-[#C3CFDA] transition-colors group-hover:border-[#7B8FA5]">by rule</span>
             </button>
-            <span className="text-[#D5DBE3]">•</span>
+            <span className="select-none px-2 text-[#DFE5ED]">•</span>
             <button onClick={() => switchTab('manual')} title="Chosen by an admin. Never changes on its own."
-                    className="text-[#3D8BD0] hover:underline">
-              <b className="text-[16px]" style={{ fontVariantNumeric: 'tabular-nums' }}>{byHand.length}</b> by hand
+                    className="group inline-flex items-baseline gap-1 text-[#7B8FA5] transition-colors hover:text-[#364658]">
+              <b className="font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>{byHand.length}</b> <span className="border-b border-dotted border-[#C3CFDA] transition-colors group-hover:border-[#7B8FA5]">by hand</span>
             </button>
           </div>
-          <div className="mt-1.5 text-[12px] text-[#9CA3AF]">
+          <div className="mt-2.5 text-[12px] leading-[1.4] text-[#7B8FA5]">
             {!store.rules.length ? 'No auto-enrol rules — every seat was allocated by hand'
               : !liveRules.length ? `${store.rules.length} rule${store.rules.length === 1 ? '' : 's'}, all disabled`
               : `${liveRules.length} of ${store.rules.length} rule${store.rules.length === 1 ? '' : 's'} enabled`}
@@ -127,23 +127,23 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Tabs + toolbar */}
-      <div className="mt-5 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
-        <div className="flex flex-wrap items-center gap-2 border-b border-[#E5E7EB] px-4 pt-1">
+      <div className="mt-5 overflow-visible rounded-lg border border-[#E5E7EB] bg-white">
+        <div className="flex flex-wrap items-center gap-[2px] border-b border-[#E5E7EB] px-5">
           {([['manual', 'Manual Enrolment', byHand.length], ['auto', 'Auto-enrol', byAuto.length]] as const).map(([id, lab, n]) => (
             <button
               key={id} role="tab" aria-selected={tab === id}
               onClick={() => switchTab(id)}
-              className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-2 py-2.5 text-[13px] font-medium transition-colors ${tab === id ? 'border-[#3D8BD0] text-[#3D8BD0]' : 'border-transparent text-[#7B8FA5] hover:text-[#364658]'}`}
+              className={`-mb-px inline-flex items-center gap-2 border-b-2 px-3 pb-[11px] pt-[13px] text-[14px] transition-colors ${tab === id ? 'border-[#3D8BD0] font-semibold text-[#3D8BD0]' : 'border-transparent font-medium text-[#7B8FA5] hover:text-[#364658]'}`}
             >
-              {id === 'manual' ? <Monitor size={14} /> : <ListChecks size={14} />}{lab}
-              <span className={`inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-full px-1 text-[11px] font-semibold ${tab === id ? 'bg-[#EBF5FF] text-[#3D8BD0]' : 'bg-[#F1F5F9] text-[#64748B]'}`}>{n}</span>
+              {id === 'manual' ? <Monitor size={15} /> : <ListChecks size={15} />}{lab}
+              <span style={{ fontVariantNumeric: 'tabular-nums' }} className={`inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[12px] font-semibold ${tab === id ? 'bg-[#E8F4FD] text-[#3D8BD0]' : 'bg-[#EEF2F6] text-[#64748B]'}`}>{n}</span>
             </button>
           ))}
-          <div className="ml-auto flex items-center gap-2 py-1.5">
+          <div className="ml-auto flex items-center gap-2.5 py-1.5">
             <div className="relative w-[220px]">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#9ca3af]" size={13} />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search CIs..." className={`${inputCls} h-8 w-full pl-7`} />
-              {query && <button onClick={() => setQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#364658]"><X size={13} /></button>}
+              <Search className="absolute left-[9px] top-1/2 -translate-y-1/2 text-[#9CA3AF]" size={14} />
+              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search CIs..." style={{ height: 30 }} className={`${inputCls} w-full pl-[31px]`} />
+              {query && <button onClick={() => setQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#364658]"><X size={13} /></button>}
             </div>
             <FilterControl defs={LIC_FILTERS} active={filt} onChange={setFilt} />
             {tab === 'manual' ? (
@@ -151,7 +151,7 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
             ) : (
               <>
                 <button onClick={() => setRulesOpen(true)} className={`${secBtnCls} h-8`}>
-                  View Rules <span className="rounded-full bg-[#F1F5F9] px-1.5 text-[11px] font-semibold text-[#64748B]">{store.rules.length}</span>
+                  View Rules <span className="ml-0.5 rounded-[2px] bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#64748B]">{store.rules.length}</span>
                 </button>
                 <button onClick={() => openRule(null)} className={`${priBtnCls} h-8`}><Plus size={14} /> New Rule</button>
               </>
@@ -161,20 +161,20 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
 
         {/* Auto tab summary strip */}
         {tab === 'auto' && (
-          <div className="grid grid-cols-3 gap-px border-b border-[#E5E7EB] bg-[#E5E7EB]">
-            <div className="bg-[#FBFCFD] px-4 py-2.5">
-              <div className="text-[11px] text-[#7B8FA5]">Auto-enrolled CIs</div>
-              <div className="text-[15px] font-semibold text-[#364658]" style={{ fontVariantNumeric: 'tabular-nums' }}>{byAuto.length}<span className="ml-1 text-[11px] font-normal text-[#9CA3AF]">of {enrolled.length} enrolled</span></div>
+          <div className="flex border-b border-[#E5E7EB] bg-white">
+            <div className="min-w-0 flex-1 border-r border-[#F0F2F5] px-4 py-[11px]">
+              <div className="text-[11px] font-semibold uppercase tracking-[.05em] text-[#7B8FA5]">Auto-enrolled CIs</div>
+              <div className="mt-1.5 truncate text-[15px] font-semibold tracking-[-0.2px] text-[#364658]" style={{ fontVariantNumeric: 'tabular-nums' }}>{byAuto.length}<span className="ml-[5px] text-[12px] font-normal text-[#7B8FA5]">of {enrolled.length} enrolled</span></div>
             </div>
-            <div className="bg-[#FBFCFD] px-4 py-2.5">
-              <div className="text-[11px] text-[#7B8FA5]">Rules</div>
-              <div className="text-[15px] font-semibold text-[#364658]" style={{ fontVariantNumeric: 'tabular-nums' }}>{store.rules.length}<span className="ml-1 text-[11px] font-normal text-[#9CA3AF]">{liveRules.length} active · {store.rules.length - liveRules.length} disabled</span></div>
+            <div className="min-w-0 flex-1 border-r border-[#F0F2F5] px-4 py-[11px]">
+              <div className="text-[11px] font-semibold uppercase tracking-[.05em] text-[#7B8FA5]">Rules</div>
+              <div className="mt-1.5 truncate text-[15px] font-semibold tracking-[-0.2px] text-[#364658]" style={{ fontVariantNumeric: 'tabular-nums' }}>{store.rules.length}<span className="ml-[5px] text-[12px] font-normal text-[#7B8FA5]">{liveRules.length} active · {store.rules.length - liveRules.length} disabled</span></div>
             </div>
-            <div className="bg-[#FBFCFD] px-4 py-2.5">
-              <div className="text-[11px] text-[#7B8FA5]">Waiting to enrol</div>
-              <div className={`text-[15px] font-semibold ${waiting > left ? 'text-[#DC2626]' : 'text-[#364658]'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <div className="min-w-0 flex-1 px-4 py-[11px]">
+              <div className="text-[11px] font-semibold uppercase tracking-[.05em] text-[#7B8FA5]">Waiting to enrol</div>
+              <div className={`mt-1.5 truncate text-[15px] font-semibold tracking-[-0.2px] ${waiting > left ? 'text-[#DC2626]' : 'text-[#364658]'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
                 {waiting}
-                {waiting > 0 && <span className="ml-1 text-[11px] font-normal text-[#9CA3AF]">{waiting > left ? `only ${Math.max(0, left)} seat${left === 1 ? '' : 's'} left` : 'matched, not yet enrolled'}</span>}
+                {waiting > 0 && <span className="ml-[5px] text-[12px] font-normal text-[#7B8FA5]">{waiting > left ? `only ${Math.max(0, left)} seat${left === 1 ? '' : 's'} left` : 'matched, not yet enrolled'}</span>}
               </div>
             </div>
           </div>
@@ -182,17 +182,17 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
 
         {/* Bulk bar */}
         {sel.size > 0 && (
-          <div className="flex items-center gap-3 border-b border-[#E5E7EB] bg-[#F0F7FD] px-4 py-2 text-[13px] text-[#364658]">
-            <b>{sel.size}</b> selected
+          <div className="flex items-center gap-3 border-b border-[#E5E7EB] bg-[#EBF5FF] px-4 py-2.5 text-[13px] text-[#3D8BD0]">
+            <b className="font-semibold text-[#3D8BD0]">{sel.size}</b> selected
             <span className="flex-1" />
-            <button onClick={() => setSel(new Set())} className="text-[12px] text-[#3D8BD0] hover:underline">Clear selection</button>
+            <button onClick={() => setSel(new Set())} className="rounded px-1.5 py-1 text-[13px] font-medium text-[#3D8BD0] transition-colors hover:bg-[#F5FAFF]">Clear selection</button>
             <button
               onClick={() => {
                 sel.forEach((id) => store.enrolled.delete(id));
                 toast(`${sel.size} CI${sel.size === 1 ? '' : 's'} removed — seats freed`);
                 setSel(new Set()); refresh();
               }}
-              className="inline-flex h-7 items-center rounded bg-[#DC2626] px-2.5 text-[12px] font-medium text-white hover:bg-[#b91c1c]"
+              className="inline-flex h-7 items-center rounded border border-[#DC2626] bg-[#DC2626] px-2.5 text-[12px] font-medium text-white transition-colors hover:border-[#B91C1C] hover:bg-[#B91C1C]"
             >Remove {sel.size} CI{sel.size === 1 ? '' : 's'}</button>
           </div>
         )}
@@ -216,8 +216,8 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
         ) : (
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#F0F2F5] text-[12px] font-semibold text-[#364658]">
-                <th className="w-[38px] px-4 py-2.5">
+              <tr className="border-b border-[#E5E7EB] text-[12px] font-semibold tracking-[.05em] text-[#364658]">
+                <th className="w-[38px] px-4 py-[11px]">
                   <input type="checkbox" aria-label="Select all shown" className="size-3.5 accent-[#3D8BD0]"
                          checked={list.length > 0 && list.every((c) => sel.has(c.id))}
                          onChange={() => setSel((prev) => {
@@ -227,10 +227,10 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
                            return next;
                          })} />
                 </th>
-                <th className="py-2.5 pr-3">CI ID</th><th className="px-3 py-2.5">Host Name</th>
-                <th className="px-3 py-2.5">CI Type</th><th className="px-3 py-2.5">IP Address</th>
-                <th className="px-3 py-2.5">Origin</th><th className="px-3 py-2.5">Status</th>
-                <th className="px-3 py-2.5">Last seen</th><th className="w-[110px] px-3 py-2.5" />
+                <th className="whitespace-nowrap px-4 py-[11px]">CI ID</th><th className="whitespace-nowrap px-4 py-[11px]">Host Name</th>
+                <th className="whitespace-nowrap px-4 py-[11px]">CI Type</th><th className="whitespace-nowrap px-4 py-[11px]">IP Address</th>
+                <th className="whitespace-nowrap px-4 py-[11px]">Origin</th><th className="whitespace-nowrap px-4 py-[11px]">Status</th>
+                <th className="whitespace-nowrap px-4 py-[11px]">Last seen</th><th className="w-[110px] px-4 py-[11px]" />
               </tr>
             </thead>
             <tbody>
@@ -238,35 +238,35 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
                 const info = store.enrolled.get(c.id)!;
                 const on = sel.has(c.id);
                 return (
-                  <tr key={c.id} className={`border-b border-[#F0F2F5] text-[13px] text-[#364658] last:border-b-0 ${on ? 'bg-[#F0F7FD]' : 'hover:bg-[#F9FAFB]'} ${c.status === 'Active' ? '' : 'opacity-70'}`}>
-                    <td className="px-4 py-2.5">
+                  <tr key={c.id} className={`border-b border-[#F0F2F5] text-[13px] text-[#364658] last:border-b-0 ${on ? 'bg-[#F5FAFF]' : c.status === 'Active' ? 'hover:bg-[#F9FAFB]' : 'bg-[#FCFDFE]'}`}>
+                    <td className="px-4 py-3.5">
                       <input type="checkbox" checked={on} aria-label={`Select ${c.id}`} className="size-3.5 accent-[#3D8BD0]"
                              onChange={() => setSel((prev) => { const next = new Set(prev); on ? next.delete(c.id) : next.add(c.id); return next; })} />
                     </td>
-                    <td className="py-2.5 pr-3"><span className="font-mono text-[12px] text-[#3D8BD0]">{c.id}</span></td>
-                    <td className="px-3 py-2.5">{c.host}<div className="text-[11px] text-[#9CA3AF]">{c.os}</div></td>
-                    <td className="px-3 py-2.5"><span className="rounded-full border border-[#E5E7EB] px-2 py-0.5 text-[11px] text-[#64748B]">{c.type}</span></td>
-                    <td className="px-3 py-2.5 font-mono text-[12px] text-[#7B8FA5]">{c.ip}</td>
-                    <td className="px-3 py-2.5">
+                    <td className="px-4 py-3.5"><span className="font-mono text-[12px] font-semibold text-[#364658]">{c.id}</span></td>
+                    <td className={`px-4 py-3.5 ${c.status === 'Active' ? '' : 'text-[#7B8FA5]'}`}>{c.host}<div className="mt-[3px] text-[12px] text-[#7B8FA5]">{c.os}</div></td>
+                    <td className="px-4 py-3.5"><span className="inline-flex items-center rounded-[2px] bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#64748B]">{c.type}</span></td>
+                    <td className="px-4 py-3.5 font-mono text-[12px] font-medium">{c.ip}</td>
+                    <td className="px-4 py-3.5">
                       {info.by === 'Auto'
-                        ? <span className="rounded-full bg-[#E6F7F4] px-2 py-0.5 text-[11px] font-medium text-[#0D9488]">Auto-enrolled</span>
-                        : <span className="text-[12px] text-[#7B8FA5]">{c.origin === 'Agent' ? 'Agent' : 'Manual ingest'}</span>}
+                        ? <span className="inline-flex items-center rounded-[2px] bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#64748B]">Auto-enrolled</span>
+                        : <span className="inline-flex items-center rounded-[2px] bg-[#F1F5F9] px-1.5 py-0.5 text-[11px] font-medium text-[#64748B]">{c.origin === 'Agent' ? 'Agent' : 'Manual ingest'}</span>}
                     </td>
-                    <td className="px-3 py-2.5"><StatusPill on={c.status === 'Active'} onLabel="Active" offLabel="Inactive" /></td>
-                    <td className="px-3 py-2.5 text-[12px] text-[#7B8FA5]">{c.seen}</td>
-                    <td className="relative px-3 py-2.5 text-right">
+                    <td className="px-4 py-3.5"><StatusPill on={c.status === 'Active'} onLabel="Active" offLabel="Inactive" /></td>
+                    <td className="px-4 py-3.5 text-[12px] text-[#7B8FA5]">{c.seen}</td>
+                    <td className="relative px-4 py-3.5 text-right">
                       <button onClick={() => setConfirmRm(confirmRm === c.id ? null : c.id)}
-                              className="rounded px-2 py-1 text-[12px] text-[#7B8FA5] transition-colors hover:bg-[#FEF3F2] hover:text-[#DC2626]">Remove</button>
+                              className="inline-flex h-7 items-center rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]">Remove</button>
                       {confirmRm === c.id && (
-                        <div className="absolute right-2 top-9 z-[70] w-[300px] rounded-lg border border-[#E5E7EB] bg-white p-3 text-left shadow-[0_8px_24px_-8px_rgba(16,24,40,0.25)]">
+                        <div className="absolute right-0 top-[34px] z-50 w-[280px] rounded-lg border border-[#DFE5ED] bg-white p-3 text-left shadow-[0_10px_15px_-3px_rgba(16,24,40,0.1),0_4px_6px_-4px_rgba(16,24,40,0.1)]">
                           <p className="text-[13px] font-medium text-[#364658]">Remove {c.id} from licensing?</p>
-                          <p className="mt-1 text-[12px] leading-[1.5] text-[#7B8FA5]">
+                          <p className="mt-1 text-[12px] font-normal leading-[1.5] text-[#7B8FA5]">
                             Its seat is freed and it stops being scanned, scheduled and retained. BOMs already generated are kept.
                             {info.by === 'Auto' && ' A rule still matches it, so it may be enrolled again.'}
                           </p>
-                          <div className="mt-2.5 flex justify-end gap-2">
-                            <button onClick={() => setConfirmRm(null)} className="rounded border border-[#d1d5db] px-2.5 py-1 text-[12px] text-[#364658] hover:bg-[#F9FAFB]">Cancel</button>
-                            <button onClick={() => removeCi(c.id)} className="rounded bg-[#DC2626] px-2.5 py-1 text-[12px] font-medium text-white hover:bg-[#b91c1c]">Remove CI</button>
+                          <div className="mt-3 flex justify-end gap-2">
+                            <button onClick={() => setConfirmRm(null)} className="inline-flex h-7 items-center rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]">Cancel</button>
+                            <button onClick={() => removeCi(c.id)} className="inline-flex h-7 items-center rounded border border-[#DC2626] bg-[#DC2626] px-2.5 text-[12px] font-medium text-white transition-colors hover:border-[#B91C1C] hover:bg-[#B91C1C]">Remove CI</button>
                           </div>
                         </div>
                       )}
@@ -309,16 +309,16 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
           onClose={() => { setRulesOpen(false); setConfirmRule(null); }}
           footer={
             <>
-              <span className="mr-auto text-[12px] text-[#7B8FA5]">Rules decide enrolment; the CI list is the result.</span>
+              <span className="mr-auto text-[13px] text-[#7B8FA5]">Rules decide enrolment; the CI list is the result.</span>
               <button onClick={() => { setRulesOpen(false); setConfirmRule(null); }} className={secBtnCls}>Close</button>
               <button onClick={() => openRule(null)} className={priBtnCls}><Plus size={15} /> New Rule</button>
             </>
           }
         >
           {store.rules.length === 0 && (
-            <div className="py-14 text-center">
+            <div className="flex flex-col items-center px-5 py-14 text-center">
               <p className="text-[14px] font-medium text-[#364658]">No rules yet.</p>
-              <p className="mt-1 text-[13px] text-[#7B8FA5]">Create one to enrol matching CIs automatically.</p>
+              <p className="mt-[5px] max-w-[440px] text-[13px] leading-[1.55] text-[#7B8FA5]">Create one to enrol matching CIs automatically.</p>
             </div>
           )}
           {store.rules.map((r) => {
@@ -327,9 +327,9 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
             const owned = enrolled.filter((c) => store.enrolled.get(c.id)?.ruleId === r.id).length;
             const over = r.on && fresh.length > left;
             return (
-              <div key={r.id} className={`mb-2.5 rounded-lg border border-[#E5E7EB] p-3.5 ${r.on ? '' : 'opacity-75'}`}>
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-semibold text-[#364658]">{r.name}</span>
+              <div key={r.id} className={`relative -mx-5 border-b border-[#F0F2F5] px-5 py-3.5 transition-colors last:border-b-0 ${r.on ? 'hover:bg-[#F9FAFB]' : 'bg-[#FCFDFE]'}`}>
+                <div className="flex items-center gap-2.5">
+                  <span className={`text-[13px] font-semibold ${r.on ? 'text-[#364658]' : 'text-[#7B8FA5]'}`}>{r.name}</span>
                   <StatusPill on={r.on} />
                   <span className="ml-auto flex items-center gap-1.5">
                     <button
@@ -341,34 +341,34 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
                         } else toast(`"${r.name}" disabled — enrolled CIs keep their seats`);
                         refresh();
                       }}
-                      className="rounded px-2 py-1 text-[12px] font-medium text-[#7B8FA5] hover:bg-[#F3F4F6] hover:text-[#364658]"
+                      className="inline-flex h-7 items-center rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]"
                     >{r.on ? 'Disable' : 'Enable'}</button>
-                    <button onClick={() => openRule(r)} className="rounded px-2 py-1 text-[12px] font-medium text-[#3D8BD0] hover:bg-[#EBF5FF]">Edit</button>
+                    <button onClick={() => openRule(r)} className="inline-flex h-7 items-center rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]">Edit</button>
                     <button onClick={() => setConfirmRule(confirmRule === r.id ? null : r.id)}
-                            className="rounded px-2 py-1 text-[12px] text-[#7B8FA5] hover:bg-[#FEF3F2] hover:text-[#DC2626]">Delete</button>
+                            className="inline-flex h-7 items-center rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#DC2626] transition-colors hover:border-[#F3D6D6] hover:bg-[#FEF3F2]">Delete</button>
                   </span>
                 </div>
-                <div className="mt-1 truncate text-[12px] text-[#7B8FA5]" title={groupsSummary(r.groups)}>
+                <div className={`mt-[5px] line-clamp-2 text-[13px] leading-[1.5] ${r.on ? 'text-[#364658]' : 'text-[#7B8FA5]'}`} title={groupsSummary(r.groups)}>
                   {groupsSummary(r.groups) || 'No conditions yet'}
                 </div>
-                <div className="mt-1.5 flex items-center gap-3 text-[12px] text-[#9CA3AF]">
-                  <button onClick={() => setViewRule(r)} className="font-medium text-[#3D8BD0] hover:underline">
+                <div className="mt-[7px] flex flex-wrap items-center gap-3 text-[12px] text-[#7B8FA5]">
+                  <button onClick={() => setViewRule(r)} className="text-[13px] font-medium text-[#3D8BD0] hover:underline">
                     {hit.length} Matching CI{hit.length === 1 ? '' : 's'}
                   </button>
                   <span>{r.id} · updated {r.updated}</span>
                   {over && <span className="text-[#DC2626]">{fresh.length} unenrolled · only {Math.max(0, left)} seat{left === 1 ? '' : 's'} left</span>}
                 </div>
                 {confirmRule === r.id && (
-                  <div className="mt-2.5 rounded-lg border border-[#FECDCA] bg-[#FEF3F2] p-3">
+                  <div className="absolute right-5 top-11 z-50 w-[280px] rounded-lg border border-[#DFE5ED] bg-white p-3 text-left shadow-[0_10px_15px_-3px_rgba(16,24,40,0.1),0_4px_6px_-4px_rgba(16,24,40,0.1)]">
                     <p className="text-[13px] font-medium text-[#364658]">Delete {r.name}?</p>
-                    <p className="mt-0.5 text-[12px] leading-[1.5] text-[#7B8FA5]">
+                    <p className="mt-1 text-[12px] font-normal leading-[1.5] text-[#7B8FA5]">
                       The {owned} CI{owned === 1 ? '' : 's'} it enrolled stay enrolled and keep their seats — they simply stop being managed by a rule.
                     </p>
-                    <div className="mt-2 flex justify-end gap-2">
-                      <button onClick={() => setConfirmRule(null)} className="rounded border border-[#d1d5db] bg-white px-2.5 py-1 text-[12px] text-[#364658] hover:bg-[#F9FAFB]">Cancel</button>
+                    <div className="mt-3 flex justify-end gap-2">
+                      <button onClick={() => setConfirmRule(null)} className="inline-flex h-7 items-center rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]">Cancel</button>
                       <button
                         onClick={() => { deleteRule(r.id); setConfirmRule(null); refresh(); toast(`Deleted "${r.name}" — the CIs it enrolled keep their seats`); }}
-                        className="rounded bg-[#DC2626] px-2.5 py-1 text-[12px] font-medium text-white hover:bg-[#b91c1c]"
+                        className="inline-flex h-7 items-center rounded border border-[#DC2626] bg-[#DC2626] px-2.5 text-[12px] font-medium text-white transition-colors hover:border-[#B91C1C] hover:bg-[#B91C1C]"
                       >Delete rule</button>
                     </div>
                   </div>
@@ -387,24 +387,24 @@ export function BomLicensingPage({ onBack }: { onBack: () => void }) {
           onClose={() => setViewRule(null)}
           footer={
             <>
-              <span className="mr-auto text-[12px] text-[#7B8FA5]">Change this list by editing the rule, not the CIs.</span>
+              <span className="mr-auto text-[13px] text-[#7B8FA5]">Change this list by editing the rule, not the CIs.</span>
               <button onClick={() => setViewRule(null)} className={secBtnCls}>Close</button>
             </>
           }
         >
           <div className="overflow-hidden rounded-lg border border-[#E5E7EB]">
             {matches(viewRule.groups).map((c) => (
-              <div key={c.id} className="flex items-center gap-3 border-b border-[#F0F2F5] px-3.5 py-2.5 text-[13px] last:border-b-0">
-                <span className="w-16 font-mono text-[12px] text-[#3D8BD0]">{c.id}</span>
-                <span className="min-w-0 flex-1 truncate text-[#364658]">{c.host}<div className="font-mono text-[11px] text-[#9CA3AF]">{c.ip}</div></span>
-                <span className="rounded-full border border-[#E5E7EB] px-2 py-0.5 text-[11px] text-[#64748B]">{c.type}</span>
+              <div key={c.id} className="flex items-center gap-3 border-b border-[#E5E7EB] px-3.5 py-2.5 text-[13px] last:border-b-0 hover:bg-[#F9FAFB]">
+                <span className="w-16 font-mono text-[12px] font-semibold text-[#364658]">{c.id}</span>
+                <span className="min-w-0 flex-1 truncate text-[#364658]">{c.host}<div className="mt-[3px] font-mono text-[12px] text-[#7B8FA5]">{c.ip}</div></span>
+                <span className="inline-flex items-center rounded-[2px] bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#64748B]">{c.type}</span>
                 {store.enrolled.has(c.id)
                   ? <StatusPill on onLabel="Enrolled" />
-                  : <span className="rounded-full border border-[#E5E7EB] px-2 py-0.5 text-[11px] text-[#64748B]">Not yet</span>}
+                  : <span className="inline-flex items-center rounded-[2px] bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#64748B]">Not yet</span>}
               </div>
             ))}
             {matches(viewRule.groups).length === 0 && (
-              <div className="px-4 py-8 text-center text-[13px] text-[#7B8FA5]">Nothing matches this rule right now.</div>
+              <div className="px-5 py-12 text-center text-[13px] text-[#9CA3AF]">Nothing matches this rule right now.</div>
             )}
           </div>
         </BomDrawer>

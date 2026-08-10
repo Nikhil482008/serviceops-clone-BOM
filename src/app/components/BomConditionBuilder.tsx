@@ -24,28 +24,31 @@ export function BomConditionBuilder({ groups, onChange }: BomConditionBuilderPro
     }));
 
   return (
-    <div>
+    <div className="rounded-lg border border-[#E5E7EB] bg-[#F8FAFC] p-3.5">
       {groups.map((g, gi) => (
         <div key={gi}>
           {gi > 0 && (
-            <div className="flex justify-center py-1.5">
+            <div
+              className="relative py-[9px] pl-[30px]"
+              style={{ backgroundImage: 'linear-gradient(#DFE5ED,#DFE5ED)', backgroundSize: '1px 100%', backgroundPosition: '30px 0', backgroundRepeat: 'no-repeat' }}
+            >
               <button
                 onClick={() => set(groups.map((x, i) => (i === gi ? { ...x, join: x.join === 'And' ? 'Or' : 'And' } : x)))}
                 title={`Switch to ${g.join === 'And' ? 'Or' : 'And'}`}
-                className="rounded-full border border-[#d1d5db] bg-white px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#3D8BD0] transition-colors hover:border-[#3D8BD0]"
+                className="relative inline-flex items-center gap-[7px] rounded border border-[#DFE5ED] bg-white px-[11px] py-[7px] text-[13px] font-semibold text-[#364658] transition-colors hover:border-[#3D8BD0] hover:text-[#3D8BD0]"
               >{g.join}</button>
             </div>
           )}
 
-          <div className="rounded-lg border border-[#E5E7EB] bg-[#FBFCFD]">
-            <div className="flex items-center justify-between border-b border-[#F0F2F5] px-3 py-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-[#7B8FA5]">
+          <div className="rounded-lg bg-white shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
+            <div className="flex items-center justify-between px-3 pb-0 pt-[11px]">
+              <span className="text-[11px] font-semibold uppercase tracking-[.05em] text-[#7B8FA5]">
                 Condition group {gi + 1}
               </span>
               {groups.length > 1 && (
                 <button
                   onClick={() => set(groups.filter((_, i) => i !== gi))}
-                  className="text-[12px] text-[#7B8FA5] transition-colors hover:text-[#DC2626]"
+                  className="rounded px-1.5 py-1 text-[13px] font-semibold text-[#DC2626] transition-colors hover:bg-[#FEF3F2]"
                 >Remove group</button>
               )}
             </div>
@@ -56,7 +59,7 @@ export function BomConditionBuilder({ groups, onChange }: BomConditionBuilderPro
                 const pick = f?.opts && isPickOp(c.op);
                 return (
                   <div key={ri} className="flex items-center gap-2">
-                    <span className="w-12 flex-shrink-0 text-right text-[12px] text-[#9CA3AF]">
+                    <span className="min-w-[62px] flex-shrink-0 whitespace-nowrap rounded bg-[#EEF2F6] p-2.5 text-center text-[12px] font-semibold text-[#364658]">
                       {ri ? 'And' : 'Where'}
                     </span>
                     <select
@@ -99,7 +102,7 @@ export function BomConditionBuilder({ groups, onChange }: BomConditionBuilderPro
                     <button
                       title="Duplicate condition"
                       onClick={() => set(groups.map((x, i) => i !== gi ? x : { ...x, conds: [...x.conds.slice(0, ri + 1), { ...c }, ...x.conds.slice(ri + 1)] }))}
-                      className="flex size-8 flex-shrink-0 items-center justify-center rounded text-[#9CA3AF] transition-colors hover:bg-[#F3F4F6] hover:text-[#364658]"
+                      className="flex size-9 flex-shrink-0 items-center justify-center rounded border border-[#DFE5ED] bg-white text-[#7B8FA5] transition-colors hover:bg-[#F5F7FA] hover:text-[#364658]"
                     ><Copy size={14} /></button>
                     <button
                       title="Delete condition"
@@ -110,7 +113,7 @@ export function BomConditionBuilder({ groups, onChange }: BomConditionBuilderPro
                         const conds = x.conds.filter((_, j) => j !== ri);
                         return { ...x, conds: conds.length ? conds : [newCond()] };
                       }))}
-                      className="flex size-8 flex-shrink-0 items-center justify-center rounded text-[#9CA3AF] transition-colors hover:bg-[#FEF3F2] hover:text-[#DC2626]"
+                      className="flex size-9 flex-shrink-0 items-center justify-center rounded border border-[#DFE5ED] bg-white text-[#DC2626] transition-colors hover:border-[#F3D6D6] hover:bg-[#FEF3F2]"
                     ><Trash2 size={14} /></button>
                   </div>
                 );
@@ -118,8 +121,8 @@ export function BomConditionBuilder({ groups, onChange }: BomConditionBuilderPro
 
               <button
                 onClick={() => set(groups.map((x, i) => (i === gi ? { ...x, conds: [...x.conds, newCond()] } : x)))}
-                className="inline-flex items-center gap-1 text-[12px] font-medium text-[#3D8BD0] hover:underline"
-              ><Plus size={13} /> Add condition</button>
+                className="inline-flex items-center gap-[7px] rounded px-1.5 py-[5px] text-[13px] font-medium text-[#7B8FA5] transition-colors hover:bg-[#F9FAFB] hover:text-[#364658]"
+              ><Plus size={14} /> Add condition</button>
             </div>
           </div>
         </div>
@@ -127,7 +130,7 @@ export function BomConditionBuilder({ groups, onChange }: BomConditionBuilderPro
 
       <button
         onClick={() => onChange([...groups, newGroup()])}
-        className="mt-2.5 inline-flex h-8 items-center gap-1.5 rounded border border-[#d1d5db] bg-white px-3 text-[12px] font-medium text-[#364658] transition-colors hover:border-[#3D8BD0] hover:text-[#3D8BD0]"
+        className="mt-3 inline-flex h-8 items-center gap-1.5 rounded border border-[#DFE5ED] bg-white px-3 text-[13px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]"
       ><Plus size={14} /> Add condition group</button>
     </div>
   );

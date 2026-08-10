@@ -64,102 +64,102 @@ export function BomRetentionPage({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* The default policy, stated rather than filled in — changes apply immediately. */}
-      <div className="mt-4 rounded-xl border border-[#E5E7EB] bg-white px-4 py-4">
-        <div className="flex items-baseline justify-between">
-          <span className="text-[12px] font-semibold uppercase tracking-wide text-[#7B8FA5]">Default policy</span>
-          <span className="text-[12px] text-[#9CA3AF]">Applies to every enrolled CI</span>
+      <div className="mt-4 rounded-lg border border-[#CFE0F0] bg-white px-[18px] pb-[17px] pt-4">
+        <div className="mb-3 flex items-center justify-between gap-2.5">
+          <span className="text-[11px] font-semibold uppercase tracking-[.05em] text-[#7B8FA5]">Default policy</span>
+          <span className="text-[12px] text-[#7B8FA5]">Applies to every enrolled CI</span>
         </div>
-        <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[14px] text-[#364658]">
+        <div className="flex flex-wrap items-center gap-2.5 text-[15px] leading-[1.5] text-[#364658]">
           Keep the latest
           <select
             value={D.keep}
             onChange={(e) => { D.keep = e.target.value; refresh(); toast.success(`Default retention: keep the latest ${e.target.value.toLowerCase()}`); }}
-            className={`${selectCls} w-[160px]`}
+            className={`${selectCls} w-[172px]`}
           >{KEEP_OPTIONS.map((k) => <option key={k} value={k}>{k}</option>)}</select>
-          <span className="text-[#7B8FA5]">or automatically delete versions older than</span>
+          <span className="text-[14px] text-[#7B8FA5]">or automatically delete versions older than</span>
           <select
             value={D.period}
             onChange={(e) => { D.period = e.target.value; refresh(); toast.success(`Default retention: delete after ${e.target.value.toLowerCase()}`); }}
-            className={`${selectCls} w-[140px]`}
+            className={`${selectCls} w-[150px]`}
           >{PERIOD_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}</select>
         </div>
-        <p className="mt-2 text-[12px] leading-[1.55] text-[#9CA3AF]">
+        <p className="mt-[11px] text-[12px] text-[#7B8FA5]">
           {rtNote(D.keep, D.period)} Each limit is set on its own — change one without touching the other.
         </p>
       </div>
 
       {/* Exceptions */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
-        <div className="border-b border-[#F0F2F5] px-4 py-3">
-          <span className="text-[14px] font-semibold text-[#364658]">Exception rules</span>
+      <div className="mt-4 rounded-lg border border-[#E5E7EB] bg-white">
+        <div className="border-b border-[#E5E7EB] px-4 py-3">
+          <span className="text-[15px] font-semibold text-[#364658]">Exception rules</span>
           <span className="ml-2 text-[12px] text-[#7B8FA5]">{store.retention.overrides.length} · override the default for the CIs they target</span>
         </div>
         {store.retention.overrides.length === 0 ? (
-          <div className="flex flex-col items-center px-6 py-14 text-center">
+          <div className="flex flex-col items-center px-5 py-[72px] text-center">
             <p className="text-[14px] font-medium text-[#364658]">No exceptions.</p>
-            <p className="mt-1 max-w-[520px] text-[13px] leading-[1.55] text-[#7B8FA5]">
+            <p className="mt-[5px] max-w-[440px] text-[13px] leading-[1.55] text-[#7B8FA5]">
               Every enrolled CI follows the default policy above. Add an exception when a group of CIs needs to keep more history — or less.
             </p>
             <button onClick={() => openDraft(null)} className={`mt-4 ${priBtnCls}`}>New Exception</button>
           </div>
         ) : (
-          <table className="w-full text-left">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-[#F0F2F5] text-[12px] font-semibold text-[#364658]">
-                <th className="w-[26%] px-4 py-2.5">Policy</th><th className="px-3 py-2.5">Applies To</th>
-                <th className="px-3 py-2.5">Retention Policy</th><th className="px-3 py-2.5">Status</th>
-                <th className="w-[170px] px-3 py-2.5">Actions</th>
+              <tr className="whitespace-nowrap border-b border-[#E5E7EB] text-[12px] font-semibold tracking-[.05em] text-[#364658]">
+                <th className="w-[26%] px-4 py-[11px]">Policy</th><th className="px-4 py-[11px]">Applies To</th>
+                <th className="px-4 py-[11px]">Retention Policy</th><th className="px-4 py-[11px]">Status</th>
+                <th className="w-[210px] px-4 py-[11px]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {store.retention.overrides.map((r) => {
                 const n = overrideTargets(r).length;
                 return (
-                  <tr key={r.id} className={`border-b border-[#F0F2F5] text-[13px] text-[#364658] last:border-b-0 hover:bg-[#F9FAFB] ${r.on ? '' : 'opacity-70'}`}>
-                    <td className="px-4 py-2.5">
-                      <div className="font-medium">{r.name}</div>
-                      <div className="font-mono text-[11px] text-[#9CA3AF]">{r.id} · overrides default</div>
+                  <tr key={r.id} className={`border-b border-[#F0F2F5] text-[13px] text-[#364658] last:border-b-0 hover:bg-[#F9FAFB] ${r.on ? '' : 'bg-[#FCFDFE]'}`}>
+                    <td className="px-4 py-3.5 align-middle">
+                      <div className={`text-[13px] font-semibold ${r.on ? 'text-[#364658]' : 'text-[#7B8FA5]'}`}>{r.name}</div>
+                      <div className="mt-[3px] font-mono text-[11px] text-[#9CA3AF]">{r.id} · overrides default</div>
                     </td>
-                    <td className="px-3 py-2.5">
-                      {rtApplies(r)}
-                      <div className="mt-0.5">
-                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${rtKind(r) === 'Fixed' ? 'border border-[#E5E7EB] text-[#64748B]' : 'bg-[#E6F7F4] text-[#0D9488]'}`}>{rtKind(r)}</span>
-                        {r.manual.length > 0 && <span className="ml-1.5 text-[11px] text-[#9CA3AF]">{r.manual.length} by hand</span>}
+                    <td className="px-4 py-3.5 align-middle">
+                      <div className="text-[13px] font-medium text-[#364658]">{rtApplies(r)}</div>
+                      <div className="mt-[3px] text-[12px] text-[#7B8FA5]" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        <span className={`inline-flex items-center gap-[5px] whitespace-nowrap rounded-[2px] px-2 py-0.5 text-[12px] font-medium ${rtKind(r) === 'Fixed' ? 'bg-[#F1F5F9] text-[#64748B]' : 'bg-[#F1F5F9] text-[#64748B]'}`}>{rtKind(r)}</span>
+                        {r.manual.length > 0 && <span className="ml-1.5">{r.manual.length} by hand</span>}
                       </div>
                     </td>
-                    <td className="px-3 py-2.5">
+                    <td className="px-4 py-3.5 align-middle">
                       Keep last {r.keep}
-                      <div className="text-[11px] text-[#9CA3AF]">{r.period === 'Forever' ? 'Never deleted' : `Delete after ${r.period.toLowerCase()}`}</div>
+                      <div className="mt-[3px] text-[12px] text-[#7B8FA5]">{r.period === 'Forever' ? 'Never deleted' : `Delete after ${r.period.toLowerCase()}`}</div>
                     </td>
-                    <td className="px-3 py-2.5"><StatusPill on={r.on} onLabel="Active" offLabel="Disabled" /></td>
-                    <td className="relative px-3 py-2.5">
-                      <div className="flex items-center gap-1">
+                    <td className="px-4 py-3.5 align-middle"><StatusPill on={r.on} onLabel="Active" offLabel="Disabled" /></td>
+                    <td className="relative px-4 py-3.5 align-middle">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => {
                             r.on = !r.on; refresh();
                             toast(r.on ? `"${r.name}" enabled — its CIs use this exception again` : `"${r.name}" disabled — its CIs fall back to the default policy`);
                           }}
-                          className="rounded px-2 py-1 text-[12px] font-medium text-[#7B8FA5] hover:bg-[#F3F4F6] hover:text-[#364658]"
+                          className="inline-flex h-7 items-center whitespace-nowrap rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]"
                         >{r.on ? 'Disable' : 'Enable'}</button>
-                        <button onClick={() => openDraft(r)} className="rounded px-2 py-1 text-[12px] font-medium text-[#3D8BD0] hover:bg-[#EBF5FF]">Edit</button>
+                        <button onClick={() => openDraft(r)} className="inline-flex h-7 items-center whitespace-nowrap rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]">Edit</button>
                         <button onClick={() => setConfirm(confirm === r.id ? null : r.id)}
-                                className="rounded px-2 py-1 text-[12px] text-[#7B8FA5] hover:bg-[#FEF3F2] hover:text-[#DC2626]">Delete</button>
+                                className="inline-flex h-7 items-center whitespace-nowrap rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#DC2626] transition-colors hover:border-[#F3D6D6] hover:bg-[#FEF3F2]">Delete</button>
                       </div>
                       {confirm === r.id && (
-                        <div className="absolute right-3 top-10 z-[70] w-[310px] rounded-lg border border-[#E5E7EB] bg-white p-3 text-left shadow-[0_8px_24px_-8px_rgba(16,24,40,0.25)]">
+                        <div className="absolute right-4 top-12 z-[70] w-[280px] rounded-lg border border-[#DFE5ED] bg-white p-3 text-left shadow-[0_10px_15px_-3px_rgba(16,24,40,0.1),0_4px_6px_-4px_rgba(16,24,40,0.1)]">
                           <p className="text-[13px] font-medium text-[#364658]">Delete {r.name}?</p>
-                          <p className="mt-1 text-[12px] leading-[1.5] text-[#7B8FA5]">
+                          <p className="mt-1 text-[12px] text-[#7B8FA5]">
                             The {n} CI{n === 1 ? '' : 's'} it covers fall back to the default policy — keep the latest {D.keep.toLowerCase()}, delete after {D.period.toLowerCase()}.
                           </p>
-                          <div className="mt-2.5 flex justify-end gap-2">
-                            <button onClick={() => setConfirm(null)} className="rounded border border-[#d1d5db] px-2.5 py-1 text-[12px] text-[#364658] hover:bg-[#F9FAFB]">Cancel</button>
+                          <div className="mt-3 flex justify-end gap-2">
+                            <button onClick={() => setConfirm(null)} className="inline-flex h-7 items-center rounded border border-[#DFE5ED] bg-white px-2.5 text-[12px] font-medium text-[#364658] transition-colors hover:bg-[#F5F7FA]">Cancel</button>
                             <button
                               onClick={() => {
                                 store.retention.overrides = store.retention.overrides.filter((x) => x.id !== r.id);
                                 setConfirm(null); refresh();
                                 toast(`Deleted "${r.name}" — its CIs fall back to the default policy`);
                               }}
-                              className="rounded bg-[#DC2626] px-2.5 py-1 text-[12px] font-medium text-white hover:bg-[#b91c1c]"
+                              className="inline-flex h-7 items-center rounded border border-[#DC2626] bg-[#DC2626] px-2.5 text-[12px] font-medium text-white transition-colors hover:border-[#B91C1C] hover:bg-[#B91C1C]"
                             >Delete exception</button>
                           </div>
                         </div>
@@ -221,29 +221,29 @@ function OverrideDrawer({ draft, onChange, onClose, onSaved }: {
           </>
         }
       >
-        <label className="mb-1 block text-[12px] font-medium text-[#364658]">Exception name <span className="text-[#DC2626]">*</span></label>
+        <label className="mb-1.5 block text-[12px] font-medium text-[#7B8FA5]">Exception name <span className="ml-0.5 text-[#DC2626]">*</span></label>
         <input
           autoFocus type="text" value={draft.name} placeholder="e.g. Payments host"
           onChange={(e) => { onChange({ ...draft, name: e.target.value }); if (e.target.value.trim()) setErr(false); }}
-          className={`${inputCls} w-full ${err && !draft.name.trim() ? 'border-[#DC2626] ring-1 ring-[#DC2626]' : ''}`}
+          className={`${inputCls} w-full ${err && !draft.name.trim() ? '!border-[#DC2626]' : ''}`}
         />
-        {err && !draft.name.trim() && <p className="mt-1 text-[12px] text-[#DC2626]">Give the exception a name so it can be recognised later.</p>}
+        {err && !draft.name.trim() && <p className="mt-[5px] text-[12px] text-[#DC2626]">Give the exception a name so it can be recognised later.</p>}
 
-        <div className="mt-4 mb-1.5 text-[12px] font-semibold uppercase tracking-wide text-[#7B8FA5]">Retention policy</div>
-        <div className="flex flex-wrap items-center gap-2 text-[13px] text-[#364658]">
+        <div className="mb-2.5 mt-4 text-[13px] font-semibold tracking-[-.1px] text-[#364658]">Retention policy</div>
+        <div className="flex flex-wrap items-center gap-2.5 rounded-lg border border-[#E5E7EB] bg-[#F5F7FA] px-3.5 py-3 text-[13px] text-[#364658]">
           Keep last
-          <select value={draft.keep} onChange={(e) => onChange({ ...draft, keep: e.target.value })} className={`${selectCls} w-[150px]`}>
+          <select value={draft.keep} onChange={(e) => onChange({ ...draft, keep: e.target.value })} className={`${selectCls} w-[168px]`}>
             {KEEP_OPTIONS.map((k) => <option key={k} value={k}>{k}</option>)}
           </select>
-          <span className="text-[#7B8FA5]">or delete after</span>
-          <select value={draft.period} onChange={(e) => onChange({ ...draft, period: e.target.value })} className={`${selectCls} w-[130px]`}>
+          <span className="text-[13px] text-[#7B8FA5]">or delete after</span>
+          <select value={draft.period} onChange={(e) => onChange({ ...draft, period: e.target.value })} className={`${selectCls} w-[150px]`}>
             {PERIOD_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
           </select>
         </div>
-        <p className="mt-1.5 text-[12px] text-[#9CA3AF]">{rtNote(draft.keep, draft.period)}</p>
+        <p className="mt-2 text-[12px] text-[#7B8FA5]">{rtNote(draft.keep, draft.period)}</p>
 
-        <div className="my-4 border-t border-[#E5E7EB]" />
-        <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#7B8FA5]">Applies to CIs <span className="font-normal normal-case">— by hand, by rule, or both</span></div>
+        <div className="mb-[18px] mt-5 border-t border-[#F0F2F5]" />
+        <div className="mb-2.5 text-[13px] font-semibold tracking-[-.1px] text-[#364658]">Applies to CIs <span className="text-[12px] font-normal text-[#7B8FA5]">— by hand, by rule, or both</span></div>
         <TargetTiles
           poolCount={enrolled.length} manualCount={draft.manual.length}
           groupsCount={draft.groups.filter((g) => g.conds.some(condDone)).length}
@@ -251,28 +251,28 @@ function OverrideDrawer({ draft, onChange, onClose, onSaved }: {
           onPick={() => setPicking(true)} onCond={() => setCondOpen(true)}
         />
 
-        <div className="my-4 border-t border-[#E5E7EB]" />
-        <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#7B8FA5]">Impact</div>
-        <div className={`flex items-start gap-4 rounded-lg border px-4 py-3.5 ${total ? 'border-[#BFDBF7] bg-[#F0F7FD]' : 'border-[#E5E7EB] bg-[#FBFCFD]'}`}>
-          <span className={`text-[28px] font-semibold leading-none ${total ? 'text-[#364658]' : 'text-[#9CA3AF]'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>{total}</span>
-          <div className="min-w-0 text-[12px] leading-[1.55]">
+        <div className="mb-[18px] mt-5 border-t border-[#F0F2F5]" />
+        <div className="mb-2.5 text-[13px] font-semibold tracking-[-.1px] text-[#364658]">Impact</div>
+        <div className={`flex items-start gap-3.5 rounded-lg px-4 py-3.5 ${total ? 'bg-[#F5FAFF]' : 'bg-[#F5F7FA]'}`}>
+          <span className={`min-w-[34px] flex-none text-[16px] font-semibold leading-none ${total ? 'text-[#3D8BD0]' : 'text-[#9CA3AF]'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>{total}</span>
+          <div className="min-w-0 text-[12px]">
             {total ? (
               <>
-                <div className="text-[13px] font-medium text-[#364658]">enrolled CI{total === 1 ? '' : 's'} will use this exception</div>
-                <div className="mt-0.5 text-[#7B8FA5]">
-                  Kept for <b className="text-[#364658]">{draft.keep}</b> instead of {D.keep}, deleted after <b className="text-[#364658]">{draft.period.toLowerCase()}</b> instead of {D.period.toLowerCase()}.
+                <div className="text-[13px] font-semibold leading-[1.4] text-[#364658]">enrolled CI{total === 1 ? '' : 's'} will use this exception</div>
+                <div className="mt-1 text-[12px] leading-[1.6] text-[#7B8FA5]">
+                  Kept for <b className="font-semibold text-[#364658]">{draft.keep}</b> instead of {D.keep}, deleted after <b className="font-semibold text-[#364658]">{draft.period.toLowerCase()}</b> instead of {D.period.toLowerCase()}.
                   The other {enrolled.length - total} enrolled CI{enrolled.length - total === 1 ? '' : 's'} keep the default.
                 </div>
-                <div className="mt-1 flex gap-2 text-[11px] text-[#64748B]">
-                  {draft.manual.length > 0 && <span>{draft.manual.length} by hand</span>}
-                  {draft.auto && autoCount > 0 && <span>{autoCount} by rule</span>}
-                  {draft.manual.length > 0 && draft.auto && autoCount > 0 && <span className="text-[#9CA3AF]">mixed targeting</span>}
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {draft.manual.length > 0 && <span className="inline-flex items-center whitespace-nowrap rounded-[2px] bg-[#EBF5FF] px-2 py-1 text-[12px] font-medium text-[#3D8BD0]">{draft.manual.length} by hand</span>}
+                  {draft.auto && autoCount > 0 && <span className="inline-flex items-center whitespace-nowrap rounded-[2px] bg-[#EBF5FF] px-2 py-1 text-[12px] font-medium text-[#3D8BD0]">{autoCount} by rule</span>}
+                  {draft.manual.length > 0 && draft.auto && autoCount > 0 && <span className="text-[12px] text-[#7B8FA5]">mixed targeting</span>}
                 </div>
               </>
             ) : (
               <>
-                <div className="text-[13px] font-medium text-[#364658]">This exception affects no CIs yet</div>
-                <div className="mt-0.5 text-[#7B8FA5]">Choose CIs by hand or build a condition above — until then, it overrides nothing.</div>
+                <div className="text-[13px] font-semibold leading-[1.4] text-[#364658]">This exception affects no CIs yet</div>
+                <div className="mt-1 text-[12px] leading-[1.6] text-[#7B8FA5]">Choose CIs by hand or build a condition above — until then, it overrides nothing.</div>
               </>
             )}
           </div>
