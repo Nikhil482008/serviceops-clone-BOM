@@ -30,6 +30,8 @@ export interface Ci {
   /** Agent = scanned by the endpoint agent; Manual = BOM pushed by hand (no agent). */
   origin: 'Agent' | 'Manual';
   agentOnline: boolean;
+  /** Last-seen label, derived deterministically. */
+  seen: string;
 }
 
 const typeOf = (hostName: string, id: string): Ci['type'] => {
@@ -47,6 +49,7 @@ export const ALL_CIS: Ci[] = mockEndpoints.map((e) => ({
   status: e.agentOnline ? 'Active' : 'Inactive',
   origin: hash(e.id) % 5 === 0 ? 'Manual' : 'Agent',
   agentOnline: e.agentOnline,
+  seen: e.agentOnline ? ['Today', 'Today', 'Yesterday'][hash(e.id) % 3] : ['3 days ago', '8 days ago', '21 days ago'][hash(e.id) % 3],
 }));
 
 // ---------------------------------------------------------------------------
@@ -143,13 +146,31 @@ export interface EnrolInfo { by: 'Manual' | 'Auto'; ruleId?: string }
 export interface AutoRule { id: string; name: string; on: boolean; groups: CondGroup[]; updated: string }
 export interface SchedulePolicy {
   id: string; name: string; on: boolean;
-  /** auto = whole CI types, grows with the estate; fixed = hand-picked, never grows. */
-  intent: 'auto' | 'fixed';
-  ciTypes: string[]; ciIds: string[];
-  frequency: 'Daily' | 'Weekly' | 'Monthly'; time: string;
+  /** Conditions kept but inactive when false. */
+  auto: boolean;
+  kind: 'Recurring' | 'One Time';
+  freq: 'Daily' | 'Weekly' | 'Monthly';
+  /** Weekly — which days run. */
+  days: string[];
+  /** Monthly — day of month (1–28). */
+  monthDay: number;
+  /** One Time — ISO date ("YYYY-MM-DD"); null until picked. */
+  startAt: string | null;
+  time: string;
+  /** Hand-picked CIs — pinned, never grow. */
+  manual: string[];
+  /** Condition-matched CIs — live, grow as matching CIs are enrolled. */
+  groups: CondGroup[];
 }
 export interface RetentionOverride {
-  id: string; name: string; groups: CondGroup[]; keep: string; period: string;
+  id: string; name: string; on: boolean;
+  /** Conditions can be switched off while being kept — groups stay, nothing matches. */
+  auto: boolean;
+  /** Hand-picked CIs — pinned, never grow. */
+  manual: string[];
+  /** Condition-matched CIs — live, grow as matching CIs are enrolled. */
+  groups: CondGroup[];
+  keep: string; period: string;
 }
 
 export const KEEP_OPTIONS = ['3 versions', '5 versions', '10 versions', '20 versions', 'All versions'];
@@ -175,13 +196,15 @@ const seed = (): BomAdminStore => {
       groups: [{ join: 'And', conds: [{ field: 'type', op: 'Equals', value: 'Laptop' }] }],
     }],
     schedules: [{
-      id: 'SP-1', name: 'Laptop nightly SBOM', on: true, intent: 'auto',
-      ciTypes: ['Laptop'], ciIds: [], frequency: 'Daily', time: '02:00',
+      id: 'BS-1', name: 'Laptop nightly SBOM', on: true, auto: true, kind: 'Recurring', freq: 'Daily',
+      days: [], monthDay: 1, startAt: null, time: '02:00', manual: [],
+      groups: [{ join: 'And', conds: [{ field: 'type', op: 'Equals', value: 'Laptop' }] }],
     }],
     retention: {
       keep: '10 versions', period: '90 days',
       overrides: [{
-        id: 'RR-1', name: 'Windows 10 — short retention', keep: '5 versions', period: '30 days',
+        id: 'RR-1', name: 'Windows 10 — short retention', on: true, auto: true, manual: [],
+        keep: '5 versions', period: '30 days',
         groups: [{ join: 'And', conds: [{ field: 'os', op: 'Contains', value: 'Windows 10' }] }],
       }],
     },
@@ -204,6 +227,24 @@ export const ruleFresh = (r: AutoRule): Ci[] => matches(r.groups).filter((c) => 
 
 export const nextId = (prefix: string, xs: { id: string }[]) =>
   `${prefix}-${xs.reduce((m, x) => Math.max(m, +(x.id.split('-')[1] || 0)), 0) + 1}`;
+
+/** Which ENROLLED CIs a retention override resolves to — manual picks stay pinned
+ *  (dropped silently if the CI loses its seat), condition matches stay live. */
+export const overrideTargets = (o: RetentionOverride): Ci[] => {
+  const pool = enrolledCis();
+  const ids = new Set(o.manual.filter((id) => pool.some((c) => c.id === id)));
+  if (o.auto) matches(o.groups, pool).forEach((c) => ids.add(c.id));
+  return pool.filter((c) => ids.has(c.id));
+};
+
+/** Which ENROLLED CIs a schedule policy resolves to — same manual-plus-conditions
+ *  combinator retention overrides use; only licensed CIs can be targeted. */
+export const policyTargets = (p: SchedulePolicy): Ci[] => {
+  const pool = enrolledCis();
+  const ids = new Set(p.manual.filter((id) => pool.some((c) => c.id === id)));
+  if (p.auto) matches(p.groups, pool).forEach((c) => ids.add(c.id));
+  return pool.filter((c) => ids.has(c.id));
+};
 
 /** Enrol within the seat cap; returns how many actually got a seat. */
 export const enrol = (ids: string[], info: EnrolInfo): number => {
