@@ -492,16 +492,18 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .sumv.quiet{color:var(--faint)}
 
 /* compact settings banner — one line, not a container round a switch */
-/* ── scheduler status row ─────────────────────────────────────
-   Was a banner; it answers one yes/no question, so it is a row (~52px) rather than
-   a card competing with the metrics above it. */
-.setrow{display:flex;align-items:center;gap:14px;padding:9px 16px;margin-bottom:16px;max-width:1500px;
-  border:1px solid var(--line-tbl);border-radius:8px;background:#fff}
-.setrow.off{border-color:#F0E1BD;background:#FEFBF3}
-.setrow .sr-main{min-width:0;flex:1}
-.setrow .sr-t{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--ink)}
-.setrow .sr-d{margin-top:2px;font-size:12px;color:var(--dim);line-height:1.4}
-.setrow .sr-sep{margin:0 6px;color:var(--line)}
+/* ── scheduler on/off, in the page header ─────────────────────
+   State and control together, sized like the furniture around it. Off is amber and
+   keeps its own tint, so a paused scheduler still reads at a glance. */
+.schedstate{display:inline-flex;align-items:center;gap:8px;padding:3px 3px 3px 10px;border-radius:6px;
+  border:1px solid var(--line);background:#fff}
+.schedstate.off{border-color:#F0E1BD;background:#FEFBF3}
+.schedstate .ss-lab{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--dim);
+  white-space:nowrap;cursor:default}
+.schedstate .ss-lab b{font-weight:600;color:var(--ok)}
+.schedstate.off .ss-lab b{color:var(--warn)}
+.schedstate .d{width:7px;height:7px;border-radius:9999px;background:var(--ok-dot);flex:none}
+.schedstate.off .d{background:var(--warn-dot)}
 /* Metric supporting line — the figure's context, not a second figure. */
 .sums{margin-top:3px;font-size:12px;color:var(--dim)}
 .sums.warn{color:var(--warn)}
@@ -1085,8 +1087,11 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
         <div class="sub">Automatically generate SBOMs and CBOMs for enrolled Configuration Items based on scheduled policies.</div>
       </div>
       <!-- Creating a schedule belongs to the page, not to the table below it: the
-           table's job is managing the policies that already exist. -->
+           table's job is managing the policies that already exist. The scheduler's
+           own on/off sits here too — it is a control with a state, not a metric, so
+           it belongs beside the other control rather than in the metrics band. -->
       <div class="head-actions">
+        <span class="schedstate" id="bsState"></span>
         <button class="btn pri" id="bsNew">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>
           New schedule
@@ -1095,7 +1100,6 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
     </div>
 
     <section class="sumstrip" id="bsSummary"></section>
-    <section class="setban" id="bsBanner"></section>
 
     <div class="sechd">
       <h2>Schedule Policies</h2><span class="n" id="bsCount">0</span>
@@ -3082,6 +3086,7 @@ function renderScheduler(){
      policy: is the estate covered, are the policies live, is anything running.
      "Next run" is not among them — it is a property of one policy, so it earns a
      table cell rather than a headline. */
+  const lastRun = bsLastAny();
   const uncovered = ENROLLED_CIS.length - covered;
   const pct = ENROLLED_CIS.length ? Math.round(covered/ENROLLED_CIS.length*100) : 0;
   const today = bsRunsToday(), inFlight = today.filter(r=>!r.finishedAt).length;
@@ -3096,28 +3101,27 @@ function renderScheduler(){
       <div class="sumv big${active.length?"":" quiet"}">${active.length} / ${BS_POLICIES.length}</div>
       <div class="sums">${paused.length ? `${paused.length} disabled` : "none disabled"}</div></div>
     <div class="sumcell"><div class="suml">Scan activity</div>
-      <div class="sumv big${today.length?"":" quiet"}">${today.length}<span class="u">scan${today.length===1?"":"s"} today</span></div>
-      <div class="sums">${today.length
-        ? `${doneToday} completed${inFlight?` · ${inFlight} running`:""}`
-        : "no scans yet today"}</div></div>`;
+      <div class="sumv big${today.length && BS_ENABLED?"":" quiet"}">${today.length}<span class="u">scan${today.length===1?"":"s"} today</span></div>
+      <div class="sums${BS_ENABLED?"":" warn"}">${!BS_ENABLED
+        ? "Paused — no scheduled scans will run"
+        : (today.length
+            ? `${doneToday} completed${inFlight?` · ${inFlight} running`:""}${
+                lastRun?` · last ${bsClockOf(lastRun.finishedAt).replace("Today · ","")}`:""}`
+            : "no scans yet today")}</div></div>`;
 
-  /* ── scheduler status ───────────────────────────────────
-     One compact row. It answers "is the scheduler actually running", which needs a
-     state, a consequence and a way to change it — not a card. The last run is read
-     from the run log, so it cannot claim an execution that never happened. */
-  const lastRun = bsLastAny();
-  document.getElementById("bsBanner").className = "setrow" + (BS_ENABLED ? "" : " off");
-  document.getElementById("bsBanner").innerHTML = `
-    <div class="sr-main">
-      <div class="sr-t">Automatic BOM generation
-        <span class="sc-stat ${BS_ENABLED?"on":"paused"}"><span class="d" style="background:${
-          BS_ENABLED?"var(--ok-dot)":"var(--warn-dot)"}"></span>${BS_ENABLED?"Enabled":"Disabled"}</span></div>
-      <div class="sr-d">${BS_ENABLED
-        ? "Policies run according to their schedules."
-        : "Scheduled scans are paused."}${lastRun
-        ? `<span class="sr-sep">·</span>Last scheduler run: ${bsClockOf(lastRun.finishedAt)}` : ""}</div>
-    </div>
-    <button class="btn" id="bsSw" aria-pressed="${BS_ENABLED}">${BS_ENABLED?"Disable":"Enable"}</button>`;
+  /* ── scheduler on/off ───────────────────────────────────
+     In the header, as state + control. It used to be a full-width row below the
+     metrics, spending a band of the page on "everything is fine" — the common case.
+     The consequence of the uncommon case is not lost: switched off, the execution
+     metric says so in warn, which is where an admin looking for scans would notice
+     it. "Last scheduler run" moved into that same metric, being execution data. */
+  document.getElementById("bsState").className = "schedstate" + (BS_ENABLED ? "" : " off");
+  document.getElementById("bsState").innerHTML = `
+    <span class="ss-lab" title="Automatic BOM generation${BS_ENABLED
+      ? " is on — policies run according to their schedules."
+      : " is off — no policy will execute, whatever its own status."}">
+      <span class="d"></span>Automatic generation<b>${BS_ENABLED?"On":"Off"}</b></span>
+    <button class="btn sm" id="bsSw" aria-pressed="${BS_ENABLED}">${BS_ENABLED?"Disable":"Enable"}</button>`;
 
   /* ── filter control (§5.3 — one control, never a row) ──── */
   const groups = [...new Set(BS_FILTERS.map(f=>f.g))];
