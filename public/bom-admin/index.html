@@ -626,6 +626,14 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .rbulk .gap{flex:1}
 .rbulk .clear{border:0;background:none;padding:0;font:inherit;font-size:12px;color:var(--brand);
   cursor:pointer;text-decoration:underline}
+/* Selected but filtered out of view — stated, never implied. */
+.rbulk .rhid{font-size:12px;color:var(--dim)}
+.rbulk .rfchip{display:inline-flex;align-items:center;gap:4px;padding:2px 4px 2px 8px;border-radius:2px;
+  background:#fff;border:1px solid var(--line);font-size:12px;color:var(--dim)}
+.rbulk .rfchip button{border:0;background:none;padding:0;display:grid;place-items:center;
+  color:var(--faint);cursor:pointer}
+.rbulk .rfchip button:hover{color:var(--ink)}
+.rbulk .rfchip svg{width:12px;height:12px}
 .rcheck{display:flex;align-items:center;flex:none;padding:2px}
 .rcheck input{accent-color:var(--brand);width:14px;height:14px;cursor:pointer}
 .rrow.sel{background:var(--sel-blue)}
@@ -3783,7 +3791,12 @@ function licRulesOpen(){ LIC_RULESPANEL = true; LIC_DRAWER = null;
   LIC_RQ=""; LIC_RSEL.clear(); LIC_RBULK=null; renderLicDrawer(); }
 function licRulesClose(){ LIC_RULESPANEL = false; LIC_RSEL.clear(); LIC_RBULK=null; renderLicDrawer(); }
 
+/* Leaving the panel for the builder ends the selection session. Carrying a query or
+   an armed delete across the round trip means cancelling out of an edit lands you on
+   a pre-armed "Delete N rules" you never asked for — and a rule saved under an active
+   search returns to a list that cannot show it. */
 function licRuleOpen(id, fromRules){
+  LIC_RQ=""; LIC_RSEL.clear(); LIC_RBULK=null;
   const r = id && ruleOf(id);
   /* The builder is part of the drawer, so the draft starts with a group
      ready to edit — the last one open when editing, a blank one when new.
@@ -3880,6 +3893,11 @@ function renderLicDrawer(){
     const canEnable  = sel.filter(r => !r.on).length;
     const canDisable = sel.filter(r =>  r.on).length;
     const allShown = shown.length > 0 && shown.every(r => LIC_RSEL.has(r.id));
+    /* A selection can outlive the filter that made it, so some selected rules may not
+       be on screen. The action still covers them — that is what persistence means —
+       but it has to SAY so, and the query has to stay visible and clearable from the
+       bulk bar, or the count is arithmetic the admin cannot check. */
+    const hiddenSel = sel.filter(r => !shown.includes(r)).length;
 
     rules = `<div class="dw-scrim in" id="licRScrim"></div>
     <aside class="dw in" style="width:${DW_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Auto-enrol rules">
@@ -3892,8 +3910,10 @@ function renderLicDrawer(){
       ${sel.length ? `
       <div class="rbulk">
         <label class="rcheck"><input type="checkbox" id="licRAll"${allShown?" checked":""} aria-label="Select all shown rules"></label>
-        <b>${sel.length}</b> selected
+        <b>${sel.length}</b> selected${hiddenSel ? ` <span class="rhid">${hiddenSel} not shown</span>` : ""}
         <button class="clear" id="licRNone">Clear</button>
+        ${LIC_RQ.trim() ? `<span class="rfchip">“${esc(LIC_RQ.trim())}”
+          <button id="licRQClr" aria-label="Clear search">${IC_X}</button></span>` : ""}
         <span class="gap"></span>
         ${canDisable ? `<button class="iact" id="licRbDis">Disable${canDisable<sel.length?` (${canDisable})`:""}</button>` : ""}
         ${canEnable  ? `<button class="iact" id="licRbEn">Enable${canEnable<sel.length?` (${canEnable})`:""}</button>` : ""}
@@ -3908,9 +3928,10 @@ function renderLicDrawer(){
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>New Rule</button>
       </div>`}
 
-      ${LIC_RBULK ? `<div class="rconfirm">
+      ${LIC_RBULK && sel.length ? `<div class="rconfirm">
         <p>Delete ${sel.length} auto-enrol rule${sel.length===1?"":"s"}?</p>
-        <p>This action stops future automatic enrolment. Already enrolled CIs remain enrolled.</p>
+        <p>This action stops future automatic enrolment. Already enrolled CIs remain enrolled.${
+          hiddenSel ? ` <b>${hiddenSel} of them ${hiddenSel===1?"is":"are"} not shown by the current search.</b>` : ""}</p>
         <div class="row"><button class="btn sm" id="licRbNo">Cancel</button>
           <button class="btn sm danger" id="licRbYes">Delete ${sel.length} rule${sel.length===1?"":"s"}</button></div>
       </div>` : ""}
@@ -4108,6 +4129,9 @@ function renderLicDrawer(){
     if(rq) rq.oninput = e=>{ LIC_RQ = e.target.value; renderLicDrawer();
       const el = $("licRQ"); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } };
     if($("licRClr")) $("licRClr").onclick = ()=>{ LIC_RQ=""; renderLicDrawer(); };
+    /* Reachable from the bulk bar too — the search input is not rendered there, so
+       without this the filter would be invisible AND unchangeable while selecting. */
+    if($("licRQClr")) $("licRQClr").onclick = e=>{ e.stopPropagation(); LIC_RQ=""; renderLicDrawer(); };
     if($("licRNew2")) $("licRNew2").onclick = ()=>licRuleOpen(null, true);
 
     const shownIds = () => {
@@ -4121,6 +4145,7 @@ function renderLicDrawer(){
     if($("licRAll")) $("licRAll").onclick = e=>{
       const ids = shownIds(), all = ids.length && ids.every(id=>LIC_RSEL.has(id));
       ids.forEach(id => all ? LIC_RSEL.delete(id) : LIC_RSEL.add(id));
+      if(!LIC_RSEL.size) LIC_RBULK=null;
       e.stopPropagation(); renderLicDrawer();
     };
     if($("licRNone")) $("licRNone").onclick = ()=>{ LIC_RSEL.clear(); LIC_RBULK=null; renderLicDrawer(); };
@@ -4128,6 +4153,7 @@ function renderLicDrawer(){
       e.stopPropagation();
       const id = cb.dataset.licrsel;
       LIC_RSEL.has(id) ? LIC_RSEL.delete(id) : LIC_RSEL.add(id);
+      if(!LIC_RSEL.size) LIC_RBULK=null;   // an emptied selection disarms the confirm
       renderLicDrawer();
     });
 
@@ -4146,13 +4172,13 @@ function renderLicDrawer(){
         take.forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=r.id; c.ruleAt=Date.now(); });
         added += take.length; syncEnrolled();
       });
-      LIC_RSEL.clear(); renderLicDrawer(); renderLicensing();
+      LIC_RSEL.clear(); LIC_RBULK=null; renderLicDrawer(); renderLicensing();
       toast(`${targets.length} rule${targets.length===1?"":"s"} enabled — ${added} CI${added===1?"":"s"} enrolled`);
     };
     if($("licRbDis")) $("licRbDis").onclick = ()=>{
       const targets = selRules().filter(r=>r.on);
       targets.forEach(r=>{ r.on = false; r.updated = todayLabel(); });
-      LIC_RSEL.clear(); renderLicDrawer(); renderLicensing();
+      LIC_RSEL.clear(); LIC_RBULK=null; renderLicDrawer(); renderLicensing();
       toast(`${targets.length} rule${targets.length===1?"":"s"} disabled — enrolled CIs keep their seats`);
     };
     if($("licRbDel")) $("licRbDel").onclick = ()=>{ LIC_RBULK = true; renderLicDrawer(); };
@@ -4190,6 +4216,10 @@ function renderLicDrawer(){
       const r = ruleOf(b.dataset.licdelyes);
       ALL_CIS.forEach(c=>{ if(c.byRule===r.id){ c.by="Manual"; c.byRule=null; c.ruleAt=null; } });
       LIC_RULES = LIC_RULES.filter(x=>x.id!==r.id);
+      /* Rule ids are recycled (licNextRuleId re-mints max+1), so a selection left
+         pointing at a deleted rule silently re-attaches to the NEXT rule created —
+         which would arrive pre-selected and one click from bulk deletion. */
+      LIC_RSEL.delete(r.id); if(!LIC_RSEL.size) LIC_RBULK=null;
       LIC_RCONF=null; syncEnrolled(); renderLicDrawer(); renderLicensing();
       toast(`Deleted "${r.name}" — the CIs it enrolled keep their seats`);
     });
