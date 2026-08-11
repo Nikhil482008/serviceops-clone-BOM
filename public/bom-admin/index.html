@@ -679,7 +679,6 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .iact.sq.del:hover{background:var(--crit-soft);border-color:#F3D6D6}
 .rt-def{margin-bottom:20px;padding:16px 18px 17px;border-color:var(--brand-ring,#CFE0F0)}
 .rt-def-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.rt-def-scope{margin-left:auto;font-size:12px;color:var(--dim)}
 .rt-sentence{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;color:var(--ink);line-height:1.5}
 .rt-sentence .j{color:var(--dim);font-size:14px}
 /* ── retention rule drawer ────────────────────────────────────
@@ -939,8 +938,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 .srcrow .t{color:var(--dim);flex:1;font-size:12px}
 .dfoot{padding:12px 20px;border-top:1px solid var(--line-soft);display:flex;gap:8px;background:#fff;flex-wrap:wrap}
 .dfoot .gap{flex:1}
-/* With a scope chosen there is one card left, and it takes the full row rather
-   than sitting beside a gap. */
+/* Licensing shows the policy card alone — full row, not beside a gap. */
 .tiles.one{grid-template-columns:1fr}
 /* conditions, read rather than edited */
 .cread{display:flex;flex-direction:column;gap:8px}
@@ -949,33 +947,11 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 .cread-j{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--brand);
   background:var(--pill-id);border-radius:4px;padding:3px 8px;align-self:flex-start}
 
-/* ── BOM Policies & CI Scopes ──────────────────────────────────
+/* ── BOM Policies ──────────────────────────────────
    Two new screens, no new design system: everything here is either an
    existing class or a small extension of one. */
 .ilink{color:var(--brand);text-decoration:none;border-bottom:1px solid transparent}
 .ilink:hover{border-bottom-color:var(--brand)}
-
-/* capability chips — what a policy actually does, readable from the row */
-.caps{display:flex;flex-wrap:wrap;gap:6px}
-.capchip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:4px;
-  font-size:12px;font-weight:500;background:var(--pill-id);color:var(--brand);white-space:nowrap}
-.capchip svg{width:13px;height:13px;flex:none}
-.capchip .v{color:var(--ink);font-weight:400}
-.capchip.off{background:var(--chip-n);color:var(--faint)}
-.capnone{font-size:12px;color:var(--faint)}
-
-/* priority — a rank, so it reads as a number and not as a quantity */
-.prio{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;
-  border-radius:4px;background:var(--chip-n2);color:var(--ink);font-size:12px;font-weight:600;
-  font-variant-numeric:tabular-nums}
-.prio.top{background:var(--pill-id);color:var(--brand)}
-
-/* the scope a policy points at, named in the row so the audience is never hidden */
-.scref{display:flex;flex-direction:column;gap:2px;min-width:0}
-.scref .nm{font-size:13px;color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.scref .cd{font-size:12px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.scref a.nm{color:var(--brand);text-decoration:none}
-.scref a.nm:hover{text-decoration:underline}
 
 /* overlap — calm, aggregate, never a red wall. Amber only where it is a real clash. */
 .ovl{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--warn-line);background:var(--warn-soft);
@@ -1004,58 +980,24 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 .ovside.win b{color:var(--ok-dot)}
 .ovacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
 
-/* capability cards in the policy drawer — a switch, then its settings */
-.capcard{border:1px solid var(--line-tbl);border-radius:8px;background:#fff;margin-bottom:12px;
-  transition:border-color .14s}
-.capcard.on{border-color:var(--brand)}
-.capcard-h{display:flex;align-items:flex-start;gap:12px;padding:13px 14px}
-.capcard-i{width:32px;height:32px;border-radius:8px;background:var(--chip-n);color:var(--neu);
-  display:grid;place-items:center;flex:none}
-.capcard.on .capcard-i{background:var(--brand);color:#fff}
-.capcard-t{font-size:13px;font-weight:600;color:var(--ink)}
-.capcard-d{font-size:12px;color:var(--dim);line-height:1.45;margin-top:3px}
-.capcard-sw{margin-left:auto;flex:none;padding-top:3px}
-.capcard-b{padding:0 14px 14px;border-top:1px solid var(--line-soft);margin-top:2px;padding-top:13px}
-.capcard-b .fld:last-child{margin-bottom:0}
+/* the BOM Policy chooser row inside the targeting card */
+.polpick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.polpick .gap{flex:1}
 
-/* the scope band above the two targeting cards in the legacy drawers */
-.scband{border:1px solid var(--line-tbl);border-radius:8px;background:#fff;padding:13px 14px;margin-bottom:12px;
-  transition:border-color .14s,background-color .14s}
-.scband.on{border-color:var(--brand);background:var(--sel-blue)}
-.scband-h{display:flex;align-items:flex-start;gap:11px}
-.scband-i{width:30px;height:30px;border-radius:8px;background:var(--pill-id);color:var(--brand);
-  display:grid;place-items:center;flex:none}
-.scband.on .scband-i{background:var(--brand);color:#fff}
-.scband-t{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px}
-.scband-d{font-size:12px;color:var(--dim);line-height:1.45;margin-top:3px}
-.scband-x{margin-top:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.scband-n{font-size:12px;color:var(--dim)}
-.scband-n b{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.3px;margin-right:3px;
-  font-variant-numeric:tabular-nums}
-
-/* scope change impact — never silent, so it sits in the flow, not in a toast */
-.scimp{border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:8px;
+/* policy change impact — never silent, so it sits in the flow, not in a toast */
+.polimp{border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:8px;
   padding:13px 15px;margin-top:14px}
-.scimp.none{border-color:var(--line-tbl);background:var(--surf-hover)}
-.scimp-t{font-size:13px;font-weight:600;color:var(--ink)}
-.scimp-r{display:flex;gap:18px;margin-top:9px;flex-wrap:wrap}
-.scimp-v{font-size:16px;font-weight:600;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
-.scimp-v.up{color:var(--ok-dot)}
-.scimp-v.dn{color:var(--crit-dot)}
-.scimp-l{font-size:12px;color:var(--dim);margin-top:1px}
-.scimp-d{font-size:12px;color:var(--dim);line-height:1.55;margin-top:10px;
+.polimp.none{border-color:var(--line-tbl);background:var(--surf-hover)}
+.polimp-t{font-size:13px;font-weight:600;color:var(--ink)}
+.polimp-r{display:flex;gap:18px;margin-top:9px;flex-wrap:wrap}
+.polimp-v{font-size:16px;font-weight:600;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.polimp-v.up{color:var(--ok-dot)}
+.polimp-v.dn{color:var(--crit-dot)}
+.polimp-l{font-size:12px;color:var(--dim);margin-top:1px}
+.polimp-d{font-size:12px;color:var(--dim);line-height:1.55;margin-top:10px;
   padding-top:10px;border-top:1px solid rgba(217,119,6,.18)}
-.scimp.none .scimp-d{border-top-color:var(--line-soft)}
+.polimp.none .polimp-d{border-top-color:var(--line-soft)}
 
-/* "governed by" — the same reading wherever a module names its owner */
-.govby{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--dim);min-width:0}
-.govby a{color:var(--brand);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.govby a:hover{text-decoration:underline}
-
-/* the policy-driven section each module screen grew */
-.polsec{margin-bottom:26px}
-.polsec .sechd h2{font-size:15px}
-.polsec-note{font-size:12px;color:var(--dim);margin:-4px 0 10px;line-height:1.55;max-width:900px}
 @media (max-width:1280px){.kpis{grid-template-columns:1fr}}
 </style>
 </head>
@@ -1173,23 +1115,15 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
         <span class="adchev"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4.5 11L9 6.5l4.5 4.5"/></svg></span>
       </button>
 
-      <!-- Policies and CI Scopes lead, because they are the two questions the other
-           three used to ask over and over: who, then what. The module screens below
-           remain — they are where each capability is READ in depth. -->
+      <!-- BOM Policies leads: it is the reusable WHO every module below can
+           target. Licensing, Scheduler and Retention own their behaviour and
+           remain fully usable on their own. -->
       <div class="adbody" id="adBody">
-        <button class="adcard" data-route="#/admin/bom-policies" data-desc="BOM Policies — what BOM Management does for a scope">
-          <span class="adcicon"><svg width="19" height="19" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.4 2.6h9.2a1 1 0 011 1v10.8a1 1 0 01-1 1H4.4a1 1 0 01-1-1V3.6a1 1 0 011-1z"/><path d="M6.2 6.4h5.6M6.2 9h5.6M6.2 11.6h3.2"/></svg></span>
-          <span class="adctext">
-            <span class="t">BOM Policies</span>
-            <span class="d">Attach licensing, scanning and retention to a CI scope — any combination, one place.</span>
-          </span>
-        </button>
-
-        <button class="adcard" data-route="#/admin/bom-scopes" data-desc="CI Scopes — the reusable audience every policy points at">
+        <button class="adcard" data-route="#/admin/bom-policies" data-desc="BOM Policies — reusable targeting rules for Licensing, Scheduler and Retention">
           <span class="adcicon"><svg width="19" height="19" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="6.4"/><circle cx="9" cy="9" r="2.5"/><path d="M9 1.3v2.2M9 14.5v2.2M1.3 9h2.2M14.5 9h2.2"/></svg></span>
           <span class="adctext">
-            <span class="t">CI Scopes</span>
-            <span class="d">Define which CIs belong together once, then reuse that audience everywhere.</span>
+            <span class="t">BOM Policies</span>
+            <span class="d">Define which CIs a rule targets once — then reuse it across Licensing, Scheduler and Retention.</span>
           </span>
         </button>
 
@@ -1220,86 +1154,47 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
     </section>
    </div><!-- /viewAdmin -->
 
-   <!-- ── BOM POLICIES ──────────────────────────────────────────
-        The central place behaviour is attached to an audience. It owns
-        no conditions of its own — the scope holds those — so this page
-        stays about WHAT happens, never about who. -->
+   <!-- ── CI BOM_POLICIES ─────────────────────────────────────────────
+        The reusable WHO. A policy performs no action of its own, which is
+        exactly what lets any number of rules reuse it. -->
    <div id="viewPolicies" hidden>
     <div class="crumb">
       <a href="#" data-nav="inventory">BOM</a><span>›</span>
-      <a href="#" data-nav="admin">Admin</a><span>›</span><span>Policies</span>
+      <a href="#" data-nav="admin">Admin</a><span>›</span><span>BOM Policies</span>
     </div>
 
     <div class="head">
       <div>
         <h1>BOM Policies</h1>
-        <div class="sub">A policy points at one CI scope and switches on any combination of licensing, scanning and retention. Define the audience once in <a href="#" data-nav="scopes" class="ilink">CI Scopes</a>; decide what happens to it here.</div>
+        <div class="sub">A BOM Policy answers one question — which CIs does a rule apply to. Define the conditions once and reuse them across Licensing, Scheduler and Retention; membership is worked out from the CMDB on every read, so a CI that starts matching tomorrow is covered tomorrow, with no edit.</div>
       </div>
       <div class="head-actions">
-        <button class="btn pri" id="plNew">
+        <button class="btn pri" id="bpNew">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>
           New BOM Policy
         </button>
       </div>
     </div>
 
-    <section class="sumstrip" id="plSummary"></section>
-    <div id="plBanner"></div>
+    <section class="sumstrip" id="bpSum"></section>
 
     <div class="sechd">
-      <h2>Policies</h2><span class="n" id="plCount">0</span>
+      <h2>Policies</h2><span class="n" id="bpCount">0</span>
       <div class="r">
         <div class="search" style="width:230px">
           <span class="mag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
-          <input id="plQ" type="search" placeholder="Search policies or scopes…" autocomplete="off">
+          <input id="bpQ" type="search" placeholder="Search policies or conditions…" autocomplete="off">
         </div>
       </div>
     </div>
 
-    <section class="sc-wrap" id="plWrap"></section>
+    <section class="sc-wrap" id="bpWrap"></section>
    </div><!-- /viewPolicies -->
-
-   <!-- ── CI SCOPES ─────────────────────────────────────────────
-        Audiences only. A scope performs no action, which is exactly
-        what lets it be reused by as many policies as need it. -->
-   <div id="viewScopes" hidden>
-    <div class="crumb">
-      <a href="#" data-nav="inventory">BOM</a><span>›</span>
-      <a href="#" data-nav="admin">Admin</a><span>›</span><span>CI Scopes</span>
-    </div>
-
-    <div class="head">
-      <div>
-        <h1>CI Scopes</h1>
-        <div class="sub">A scope answers one question — which CIs are we talking about. Membership is worked out from the CMDB every time it is read, so a CI that starts matching tomorrow is covered tomorrow, with no edit.</div>
-      </div>
-      <div class="head-actions">
-        <button class="btn pri" id="scNew">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>
-          New Scope
-        </button>
-      </div>
-    </div>
-
-    <section class="sumstrip" id="scSummary"></section>
-
-    <div class="sechd">
-      <h2>Scopes</h2><span class="n" id="scCount">0</span>
-      <div class="r">
-        <div class="search" style="width:230px">
-          <span class="mag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
-          <input id="scQ" type="search" placeholder="Search scopes or conditions…" autocomplete="off">
-        </div>
-      </div>
-    </div>
-
-    <section class="sc-wrap" id="scWrap"></section>
-   </div><!-- /viewScopes -->
 
    <!-- ── BOM RETENTION ─────────────────────────────────────────
         Decides how long a living BOM's versions survive. Default
         policy for every CI, plus overrides targeted with the same
-        CI-scope engine the scheduler uses. -->
+        targeting engine the scheduler uses. -->
    <div id="viewRetention" hidden>
     <div class="crumb">
       <a href="#" data-nav="inventory">BOM</a><span>›</span>
@@ -1326,7 +1221,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
          moves them are the same surface. There is no second copy below. -->
     <section class="kpis" id="rtCards"></section>
 
-    <div id="rtPolSec"></div>
+    
 
     <div class="sechd">
       <h2>Retention Exceptions</h2><span class="n" id="rtCount">0</span>
@@ -1364,7 +1259,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 
     <section class="sumstrip" id="bsSummary"></section>
 
-    <div id="bsPolSec"></div>
+    
 
     <div class="sechd">
       <h2>Schedule Policies</h2><span class="n" id="bsCount">0</span>
@@ -1421,9 +1316,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 
     <section class="kpis" id="licCards"></section>
 
-    <!-- What the policy layer decides for this module. The module keeps its own
-         enrolment ledger below; this says which of it is policy-driven. -->
-    <div id="licPolSec"></div>
+    
 
     <section class="panel" style="max-width:1500px">
       <div class="tabs" id="licTabs" role="tablist" aria-label="Enrolment mode"></div>
@@ -1439,8 +1332,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 <div id="modalHost"></div>
 <div id="bsHost"></div>
 <div id="licHost"></div>
-<div id="plHost"></div>
-<div id="scHost"></div>
+<div id="bpHost"></div>
 <div id="stackHost"></div>
 
 <script>
@@ -2319,18 +2211,18 @@ const ALL_CIS = [
   {id:"CI-10",host:"yash-gaudani-L470",type:"Linux Server",   plat:"Linux",   dept:"IT",         env:"Staging",     status:"Active",   origin:"Agent",  os:"Ubuntu 24.04",                    ip:"10.20.40.181",  enrolled:false, by:null,     seen:"Tue, Jul 14, 20:31"}
 ];
 /* ── the rest of the estate ───────────────────────────────────
-   Reuse only earns its keep at scale: a scope that names eighteen CIs is
-   worth defining once, where a scope naming two is not. The estate is built
+   Reuse only earns its keep at scale: a policy that names eighteen CIs is
+   worth defining once, where one naming two is not. The estate is built
    from fixed cohorts and a counter — no randomness anywhere — so every count
    the UI reports is reproducible, and the figures in the walkthrough
    (18 Design Windows devices, 42 production Linux servers) are DERIVED from
    this data rather than written into the screens. */
 (function seedEstate(){
   const COHORTS = [
-    /* Design's Windows estate — the walkthrough's scope. 12 + 6 = 18. */
+    /* Design's Windows estate — the walkthrough's policy. 12 + 6 = 18. */
     {n:12, pre:"DSGN-WS",  type:"Windows Desktop", plat:"Windows", dept:"Design",      env:"Production",  os:"Microsoft Windows 11 Pro"},
     {n:6,  pre:"DSGN-SRV", type:"Windows Server",  plat:"Windows", dept:"Design",      env:"Staging",     os:"Microsoft Windows Server 2022"},
-    /* Production Linux — the second walkthrough scope. 26 + 16 = 42. */
+    /* Production Linux — the second walkthrough policy. 26 + 16 = 42. */
     {n:26, pre:"PRD-APP",  type:"Linux Server",    plat:"Linux",   dept:"Engineering", env:"Production",  os:"Ubuntu 22.04 LTS"},
     {n:16, pre:"PRD-DB",   type:"Linux Server",    plat:"Linux",   dept:"IT",          env:"Production",  os:"Red Hat Enterprise Linux 9"},
     /* Everything else — deliberately satisfying neither of the two above. */
@@ -2423,11 +2315,11 @@ function groupMatch(g, ci){
   const cs = g.conds.filter(condDone);
   return cs.length > 0 && cs.every(c=>condMatch(c, ci));
 }
-/* ONE matcher, against whichever population the question is about. A CI Scope
-   asks it of the whole CMDB — an audience exists whether or not its members
-   happen to be licensed yet — while the capability-level targeting inside
-   Licensing, Scheduler and Retention keeps asking it of the enrolled set,
-   exactly as before. Same conditions, same fold, different pool. */
+/* ONE matcher, against whichever population the question is about. A BOM Policy
+   asks it of the whole CMDB — who a rule targets is a fact about the estate,
+   whether or not those CIs hold a licence yet — while the Scheduler and
+   Retention keep asking it of the enrolled set, exactly as before. Same
+   conditions, same fold, different pool. */
 function matchIn(pool, groups){
   const gs = (groups||[]).filter(g=>g.conds.some(condDone));   // empty groups sit out
   if(!gs.length) return [];
@@ -2455,185 +2347,69 @@ const newCond  = () => ({field:"", op:"", value:""});
 const newGroup = () => ({join:"And", open:true, conds:[newCond()]});
 
 /* ══════════════════════════════════════════════════════════════
-   CI SCOPES — the reusable audience
-   A scope answers exactly one question: WHICH CIs are we talking about.
-   It performs no action, so it can be named once and pointed at by as many
-   policies as need that audience — which is the whole point: OS Family =
-   Windows AND Department = Design gets defined here, not three times over in
-   Licensing, Scheduler and Retention.
+   BOM POLICIES — the reusable WHO
+   A BOM Policy answers exactly one question: which CIs does a rule apply
+   to. It holds a name and conditions — no schedule, no retention window,
+   no licensing action — so ONE policy can drive any number of rules in
+   Licensing, Scheduler and Retention, and the behaviour stays owned by
+   the module that runs it. "OS Family = Windows AND Department = Design"
+   gets defined once, here, instead of three times over.
 
-   Membership is DYNAMIC. It is computed from the CMDB on every read and never
-   stored, so a CI that starts matching tomorrow is in the scope tomorrow, and
-   one that stops matching leaves it — without an admin touching anything.
-   TODO(api): GET/PUT /admin/bom/scopes · GET …/{id}/members
+   Membership is DYNAMIC: computed from the CMDB on every read and never
+   stored. A CI that starts matching tomorrow is covered tomorrow by every
+   rule that references the policy — no admin action. One that stops
+   matching drops out the same way.
+   TODO(api): GET/PUT /admin/bom/policies · GET …/{id}/members
    ══════════════════════════════════════════════════════════════ */
-let SCOPES = [
-  {id:"SC-1", name:"Design Windows Devices",
+let BOM_POLICIES = [
+  {id:"BP-1", name:"Windows Design Devices",
    desc:"Windows desktops and servers owned by the Design department.",
    on:true, updated:"Aug 04, 2026",
    groups:[{join:"And", conds:[{field:"plat", op:"Equals", value:"Windows"},
                                {field:"dept", op:"Equals", value:"Design"}]}]},
-  {id:"SC-2", name:"Production Linux Servers",
+  {id:"BP-2", name:"Production Linux Servers",
    desc:"Every Linux server running in the production environment.",
    on:true, updated:"Jul 28, 2026",
    groups:[{join:"And", conds:[{field:"plat", op:"Equals", value:"Linux"},
                                {field:"env",  op:"Equals", value:"Production"}]}]},
-  /* Deliberately a superset of SC-1's servers: two policies pointed at these two
-     scopes overlap, which is what the precedence model exists to settle. */
-  {id:"SC-3", name:"All Windows Servers",
+  {id:"BP-3", name:"All Windows Servers",
    desc:"Every Windows server in the estate, whichever department owns it.",
    on:true, updated:"Jul 22, 2026",
    groups:[{join:"And", conds:[{field:"type", op:"Equals", value:"Windows Server"}]}]},
-  {id:"SC-4", name:"Finance Endpoints",
+  {id:"BP-4", name:"Retired Workstations",
+   desc:"Windows desktops that have stopped reporting.",
+   on:true, updated:"Jul 10, 2026",
+   groups:[{join:"And", conds:[{field:"type", op:"Equals", value:"Windows Desktop"},
+                               {field:"status", op:"Equals", value:"Inactive"}]}]},
+  /* Referenced by no rule — so the delete path has an honest subject. */
+  {id:"BP-5", name:"Finance Endpoints",
    desc:"Workstations belonging to Finance.",
    on:true, updated:"Jul 19, 2026",
    groups:[{join:"And", conds:[{field:"dept", op:"Equals", value:"Finance"},
                                {field:"type", op:"Equals", value:"Windows Desktop"}]}]}
 ];
 
-const scopeOf       = id => SCOPES.find(s=>s.id===id) || null;
-/* Against the whole CMDB, not the enrolled subset — the audience is a fact about
-   the estate; enrolment is a separate decision a capability makes about it. */
-const scopeCis      = s => s ? matchIn(ALL_CIS, s.groups) : [];
-const scopeEnrolled = s => scopeCis(s).filter(c=>c.enrolled);
-const scopeSummary  = s => ruleSummary(s);           // same words the rules use
-const scopeNextId   = () => "SC-" + (SCOPES.reduce((m,s)=>Math.max(m,+(s.id.split("-")[1]||0)),0)+1);
-/* Which policies point at this scope — the reason a scope edit is never local. */
-const scopeUsers    = id => POLICIES.filter(p=>p.scopeId===id);
-
-/* ══════════════════════════════════════════════════════════════
-   BOM POLICIES — what BOM Management does for a scope
-   A policy names ONE scope and switches on any combination of the three
-   capabilities. It is not a master rule: it owns no conditions of its own, it
-   only attaches behaviour to an audience someone else defined.
-   TODO(api): GET/PUT /admin/bom/policies
-   ══════════════════════════════════════════════════════════════ */
-/* The three things BOM Management can do. Everything that iterates capabilities
-   reads this list, so adding a fourth is a data change, not a UI rewrite. */
-const CAPS = [
-  {id:"lic", key:"Licensing", verb:"Auto-enrol matching CIs",
-   icon:`<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="8" width="11" height="7.5" rx="1.8"/><path d="M6.3 8V5.9a2.7 2.7 0 015.4 0V8"/></svg>`},
-  {id:"bs",  key:"Scheduler", verb:"Generate BOMs on a schedule",
-   icon:`<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.8" y="3.8" width="12.4" height="11.4" rx="2"/><path d="M2.8 7.4h12.4M6.2 2.2v3M11.8 2.2v3"/></svg>`},
-  {id:"rt",  key:"Retention", verb:"Keep BOM versions for a set time",
-   icon:`<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.2 3v12M9 3v12M12.8 3v12"/><circle cx="5.2" cy="6.2" r="1.7" fill="#fff"/><circle cx="9" cy="11" r="1.7" fill="#fff"/><circle cx="12.8" cy="7.6" r="1.7" fill="#fff"/></svg>`}
-];
-const CAP_NAME = {lic:"Licensing", bs:"Scheduler", rt:"Retention"};
-
-/* A scheduler capability is shaped exactly like a BS_POLICIES entry minus its
-   own targeting, so bsNext / bsTrigger / bsClock / bsEcho read it unchanged.
-   `startAt` carries the run time; its date only matters for a One Time run. */
-const newSchedCap = () => ({on:false, kind:"Recurring", freq:"Daily", days:["Sun"],
-  mMode:"date", mDate:"1", mOcc:"First", mDow:"Monday", mMonth:"Every month",
-  startAt:"2026-01-04T02:00", startDate:"", endDate:"", tz:"Asia/Kolkata (IST)"});
-
-let POLICIES = [
-  {id:"BP-1", name:"Design Windows BOM Policy", desc:"BOM coverage for the Design department's Windows fleet.",
-   scopeId:"SC-1", on:true, priority:1, updated:"Aug 04, 2026",
-   caps:{
-     lic:{on:true},
-     bs: {...newSchedCap(), on:true, freq:"Weekly", days:["Sun"], startAt:"2026-01-04T13:00"},
-     rt: {on:true, keep:"20 versions", period:"45 days"}
-   }},
-  {id:"BP-2", name:"Linux Production Policy", desc:"Nightly coverage for production Linux servers.",
-   scopeId:"SC-2", on:true, priority:1, updated:"Jul 28, 2026",
-   caps:{
-     lic:{on:true},
-     bs: {...newSchedCap(), on:true, freq:"Daily", startAt:"2026-01-04T02:00"},
-     rt: {on:true, keep:"15 versions", period:"60 days"}
-   }},
-  /* Overlaps BP-1 on Design's six Windows servers. It sets retention differently,
-     so those CIs need precedence to settle — while its scheduler capability is off,
-     which is why the overlap is a conflict on Retention ALONE. */
-  {id:"BP-3", name:"Windows Server Baseline", desc:"Estate-wide retention floor for Windows servers.",
-   scopeId:"SC-3", on:true, priority:2, updated:"Jul 22, 2026",
-   caps:{
-     lic:{on:true},
-     bs: {...newSchedCap()},
-     rt: {on:true, keep:"10 versions", period:"90 days"}
-   }},
-  /* Licensing only — the shape the spec insists must be possible. */
-  {id:"BP-4", name:"Finance Endpoint Enrolment", desc:"Enrol Finance workstations; cadence and retention stay on the defaults.",
-   scopeId:"SC-4", on:false, priority:3, updated:"Jul 19, 2026",
-   caps:{lic:{on:true}, bs:{...newSchedCap()}, rt:{on:false, keep:"10 versions", period:"90 days"}}}
-];
-
-const policyOf     = id => POLICIES.find(p=>p.id===id) || null;
-const capOn        = (p,c) => !!(p && p.caps && p.caps[c] && p.caps[c].on);
-const policyCaps   = p => CAPS.filter(c=>capOn(p,c.id)).map(c=>c.id);
-const policyCis    = p => scopeCis(scopeOf(p.scopeId));
-const policyNextId = () => "BP-" + (POLICIES.reduce((m,p)=>Math.max(m,+(p.id.split("-")[1]||0)),0)+1);
-
-/* What a capability is SET TO, reduced to something comparable — "same" and
-   "different" have to be decidable before overlap can mean anything. */
-function capValue(p, c){
-  const v = p.caps[c] || {};
-  if(c === "lic") return "auto-enrol";                    // one behaviour, today
-  if(c === "bs")  return [v.kind, v.freq, (v.days||[]).join(","), bsTime(v), v.tz,
-                          v.mMode, v.mDate, v.mOcc, v.mDow, v.mMonth].join("|");
-  return `${v.keep}|${v.period}`;
+const bpOf       = id => BOM_POLICIES.find(s=>s.id===id) || null;
+/* Against the whole CMDB, not the enrolled subset — WHO a policy names is a fact
+   about the estate; what to do about a licence is each module's own business. */
+const bpCis      = s => s ? matchIn(ALL_CIS, s.groups) : [];
+const bpEnrolled = s => bpCis(s).filter(c=>c.enrolled);
+const bpSummary  = s => ruleSummary(s);           // same words the rules use
+const bpNextId   = () => "BP-" + (BOM_POLICIES.reduce((m,s)=>Math.max(m,+(s.id.split("-")[1]||0)),0)+1);
+/* Every module rule that references this policy. The policy owns WHO; each entry
+   here is a module owning its own WHAT — auto-enrolment, a cadence, a retention
+   window — which is exactly what an edit to the conditions is about to affect. */
+function bpUsers(id){
+  const out = [];
+  LIC_RULES.forEach(r=>{ if(r.policyId===id) out.push({mod:"Licensing", name:r.name, on:r.on,
+    what:"Auto-enrol matching CIs"}); });
+  BS_POLICIES.forEach(p=>{ if(p.policyId===id) out.push({mod:"Scheduler", name:p.name, on:p.on,
+    what:`${bsTrigger(p)} · ${bsClock(p)}`}); });
+  RT_RULES.forEach(r=>{ if(r.policyId===id) out.push({mod:"Retention", name:r.name, on:r.on,
+    what:`Keep ${r.keep} · ${r.period === "Never delete" ? "never deleted" : `delete after ${r.period.toLowerCase()}`}`}); });
+  return out;
 }
-/* The same setting in words, for anywhere it has to be read rather than compared. */
-function capPhrase(p, c){
-  const v = p.caps[c] || {};
-  if(c === "lic") return "Auto-enrol";
-  if(c === "bs")  return `${bsTrigger(v)} · ${bsClock(v)}`;
-  return `${v.keep} / ${v.period === "Never delete" ? "never deleted" : v.period}`;
-}
-
-/* ── precedence ───────────────────────────────────────────────
-   Priority 1 is highest. Ties fall to the more specific scope (the one naming
-   fewer CIs), then to id — so "which policy wins" always has an answer, and the
-   same answer every time it is asked. */
-function policyRank(a, b){
-  return (a.priority - b.priority)
-      || (policyCis(a).length - policyCis(b).length)
-      || a.id.localeCompare(b.id, undefined, {numeric:true});
-}
-/* CI id → {cap: winning policy}. Built once per render and passed down, rather
-   than resolved per row: every screen that says "governed by" reads THIS, so the
-   list, the drawer and the policy page cannot disagree about who wins. */
-function governanceMap(){
-  const m = new Map();
-  POLICIES.filter(p=>p.on).slice().sort(policyRank).forEach(p=>{
-    const caps = policyCaps(p);
-    if(!caps.length) return;
-    policyCis(p).forEach(ci=>{
-      const e = m.get(ci.id) || {};
-      caps.forEach(c=>{ if(!e[c]) e[c] = p; });          // sorted ⇒ first writer wins
-      m.set(ci.id, e);
-    });
-  });
-  return m;
-}
-const governs = (p, c) => {                              // CIs this policy actually decides
-  const g = governanceMap();
-  return policyCis(p).filter(ci=>{ const e = g.get(ci.id); return e && e[c] === p; });
-};
-
-/* ── overlap ──────────────────────────────────────────────────
-   Two policies overlap when their scopes share CIs. That is NOT a conflict on its
-   own: one policy scheduling and another retaining the same CI is exactly what the
-   model is for. It is a conflict only where both configure the SAME capability to
-   DIFFERENT values — then precedence decides, and the admin has to be told. */
-function policyOverlaps(p, opts){
-  const draftId = (opts && opts.selfId) || p.id;
-  const mine = new Set(policyCis(p).map(c=>c.id));
-  if(!mine.size) return [];
-  return POLICIES.filter(o => o.id !== draftId && o.on).map(o=>{
-    const cis = policyCis(o).filter(c => mine.has(c.id));
-    if(!cis.length) return null;
-    const caps = CAPS.map(c=>c.id)
-      .filter(c => capOn(p,c) && capOn(o,c))
-      .map(c => ({cap:c, mine:capPhrase(p,c), theirs:capPhrase(o,c),
-                  clash: capValue(p,c) !== capValue(o,c)}));
-    const clashes = caps.filter(c=>c.clash);
-    return {other:o, cis, caps, clashes,
-            /* Who wins each clashing capability, by the same rank the runtime uses. */
-            winner: policyRank(p, o) <= 0 ? "mine" : "theirs"};
-  }).filter(Boolean);
-}
-const policyConflicts = (p, opts) => policyOverlaps(p, opts).filter(x=>x.clashes.length);
+const bpMods = users => [...new Set(users.map(u=>u.mod))];
 
 let RT_DEFAULT = {keep:"10 versions", period:"90 days"};
 /* The pending edit to the default policy, or null when there is none. This one
@@ -2646,7 +2422,11 @@ let RT_AFFECTED = false;
 let RT_DEF_EDIT = false;
 let RT_RULES = [
   {id:"RR-1", name:"Payments host", keep:"5 versions", period:"30 days",
-   on:true, auto:false, groups:[], manual:["CI-5"]}
+   on:true, auto:false, groups:[], manual:["CI-5"]},
+  /* References the same BOM Policy the weekly schedule uses — targeting defined
+     once, two different behaviours attached to it by two different modules. */
+  {id:"RR-2", name:"Design device history", keep:"20 versions", period:"45 days",
+   on:true, auto:false, groups:[], manual:[], policyId:"BP-1"}
 ];
 let RT_MENU = null;   // which exception's overflow menu is open
 let RT_DRAFT = null;     // the rule being created or edited
@@ -2659,88 +2439,57 @@ let RT_CONFIRM = null;   // id of the rule whose delete is confirming
    the parent once something is applied. */
 let PICK = null, COND = null;
 
-/* ══ Target CI Selection ═══════════════════════════════════════
-   ONE component for "which enrolled CIs does this policy cover", shared by
-   Retention exceptions and Scheduler policies. Layout, badges, counts, empty
-   states, the View-CIs link and its nested drawer are defined here once — only
-   the copy and the ids differ per module, so the two screens cannot drift.
+/* ══ Applies to ════════════════════════════════════════════════
+   ONE component for "which CIs does this rule cover", shared by the Scheduler
+   and Retention drawers; Licensing mounts the policy card alone, because its
+   hand-picked path is the separate Add-manually flow. Two ways to target, and
+   they are deliberately not equivalents:
 
-   The automatic option leads everywhere: a condition keeps covering CIs enrolled
-   later, where a hand-picked list is a snapshot that goes stale without saying so.
-   Both cards keep identical anatomy so that reads as a recommendation, not a
-   restriction. */
-/* ── reuse an audience instead of retyping it ─────────────────
-   The band above the two cards. It is the adoption path: a rule created here
-   can point at a scope that already exists, or make one, without anybody having
-   to learn "BOM Policies" first. Choosing a scope hides the ad-hoc condition
-   card, because two live sources of dynamic targeting in one rule is a question
-   with no good answer — the scope IS the conditions, held somewhere reusable. */
-function scopeBandHTML(o){
-  if(!o.scopeKey) return "";
-  const s = o.scopeId ? scopeOf(o.scopeId) : null;
-  const cis = s ? scopeCis(s) : [], enr = cis.filter(c=>c.enrolled).length;
-  return `<div class="scband${s?" on":""}">
-    <div class="scband-h">
-      <span class="scband-i"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="6.4"/><circle cx="9" cy="9" r="2.5"/></svg></span>
-      <span class="tile-hd">
-        <span class="scband-t">Use a CI Scope <span class="tile-tag rec">Reusable</span></span>
-        <span class="scband-d">${s
-          ? `Targeting follows <b style="color:var(--ink)">${esc(s.name)}</b> — ${esc(scopeSummary(s) || "no conditions")}. Change the scope once and everything pointed at it follows.`
-          : o.scopeReq
-            ? "Every policy points at one scope. Choose one that already exists, or create it now."
-            : "Point at an audience that already exists instead of writing the same conditions here again."}</span>
-      </span>
-    </div>
-    <div class="scband-x">
-      ${SCOPES.length ? ddHTML("tgScope", s?s.name:"", SCOPES.map(x=>x.name), 244, "Select existing scope") : ""}
-      <button class="btn sm" id="tgScopeNew">${SCOPES.length ? "Create new scope" : "Create the first scope"}</button>
-      ${s ? `<span class="scband-n"><b>${cis.length}</b> matching · ${enr} enrolled</span>
-             <button class="lnk" id="tgScopeView">View scope →</button>
-             <span style="flex:1"></span>
-             <button class="lnk danger" id="tgScopeClear">Clear</button>` : ""}
-    </div>
-  </div>`;
-}
-function wireScopeBand(o, rerender){
-  const $ = i => document.getElementById(i);
-  /* Creating a scope from inside a rule stacks over it and hands the id back, so
-     the rule the admin was writing is still there when they return. */
-  if($("tgScopeNew")) $("tgScopeNew").onclick = ()=>scOpen(null, {stack:true, back:id=>{
-    if(id) o.scopeId = id;
-    rerender();
-  }});
-  if($("tgScopeClear")) $("tgScopeClear").onclick = ()=>{ o.scopeId = null; rerender(); };
-  if($("tgScopeView"))  $("tgScopeView").onclick  = ()=>scView(o.scopeId, true);
-}
-function scopeBandDdSet(o, id, v){
-  if(id !== "tgScope") return;
-  const s = SCOPES.find(x=>x.name === v);
-  o.scopeId = s ? s.id : null;
-}
+   — a BOM POLICY: reusable, named conditions resolved live, so coverage follows
+     the estate — and the same policy can drive Licensing, Scheduler and
+     Retention at once.
+   — a HAND-PICKED list: fixed until edited, for what no condition expresses.
 
+   Conditions are never built inside a rule. Building conditions IS creating a
+   BOM Policy, so the work is reusable the moment it is done — that is the whole
+   feature. Creating one from here saves it and attaches it in the same flow. */
+const IC_POLICY = `<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.4 2.6h9.2a1 1 0 011 1v10.8a1 1 0 01-1 1H4.4a1 1 0 01-1-1V3.6a1 1 0 011-1z"/><path d="M6.2 6.4h5.6M6.2 9h5.6M6.2 11.6h3.2"/></svg>`;
 function targetCardsHTML(o){
   const N = ENROLLED_CIS.length;
-  const scoped = !!(o.scopeKey && o.scopeId && scopeOf(o.scopeId));
-  return `${scopeBandHTML(o)}
-  <div class="tiles${scoped?" one":""}">
-    ${scoped ? "" : `<div class="tile dyn${o.auto && o.autoCount ? " act" : ""}">
+  const pol = o.policyId ? bpOf(o.policyId) : null;
+  /* Licensing enrols, so its policy counts against the discovered estate; the
+     Scheduler and Retention can only touch licensed CIs, so they count enrolled. */
+  const hit  = pol ? (o.discovered ? bpCis(pol).length : bpEnrolled(pol).length) : 0;
+  const of   = o.discovered ? ALL_CIS.length : N;
+  const noun = o.discovered ? "discovered CI" : "enrolled CI";
+  const polCard = `
+    <div class="tile dyn${pol ? " act" : ""}">
       <div class="tile-top">
-        <span class="tile-i"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
+        <span class="tile-i">${IC_POLICY}</span>
         <span class="tile-hd">
-          <span class="tile-t">Auto-include by condition <span class="tile-tag rec">Recommended</span></span>
-          <span class="tile-d">${o.autoDesc}</span>
+          <span class="tile-t">Target by BOM Policy <span class="tile-tag rec">Dynamic</span></span>
+          <span class="tile-d">${o.polDesc}</span>
         </span>
       </div>
       <div class="tile-x">
-        <div class="tile-stat${o.autoCount?"":" zero"}"><b>${o.autoCount}</b> of ${N} enrolled CI${N===1?"":"s"}</div>
-        <div class="tile-state">${
-          !o.groups ? "No conditions built yet"
-          : !o.auto ? `Turned off · ${o.groups} group${o.groups===1?"":"s"} kept`
-          : o.autoCount ? `${o.autoCount} CI${o.autoCount===1?"":"s"} currently match`
-          : "No CIs match this condition yet."}</div>
+        <div class="tile-stat${hit?"":" zero"}"><b>${hit}</b> of ${of} ${noun}${of===1?"":"s"}</div>
+        <div class="tile-state">${pol
+          ? `<b style="color:var(--ink)">${esc(pol.name)}</b> — ${esc(bpSummary(pol) || "no conditions yet")}`
+          : BOM_POLICIES.length
+            ? "No policy chosen yet. Reuse one that exists, or create it right here."
+            : "No BOM Policies exist yet — create the first one right here."}</div>
       </div>
-      <div class="tile-b"><button class="btn sm pri" id="${o.condId}">${o.groups ? "Edit conditions" : "Build conditions"}</button></div>
-    </div>`}
+      <div class="tile-b polpick">
+        ${BOM_POLICIES.length ? ddHTML("tgPol", pol ? pol.name : "", BOM_POLICIES.map(x=>x.name), 206, "Use existing BOM Policy") : ""}
+        <button class="btn sm${pol ? "" : " pri"}" id="tgPolNew">+ Create new BOM Policy</button>
+        ${pol ? `<button class="lnk" id="tgPolView">View policy →</button>
+                 <span class="gap"></span>
+                 <button class="lnk danger" id="tgPolClear">Clear</button>` : ""}
+      </div>
+    </div>`;
+  if(o.noManual) return `<div class="tiles one">${polCard}</div>`;
+  return `<div class="tiles">
+    ${polCard}
 
     <div class="tile${o.manualCount?" act":""}">
       <div class="tile-top">
@@ -2759,11 +2508,29 @@ function targetCardsHTML(o){
           : o.manualCount === N ? "Every enrolled CI is selected"
           : `${o.manualCount} selected CI${o.manualCount===1?"":"s"}`}</div>
 <!-- No per-card link: the preview block below owns the one way in, so the
-             count is never offered twice at two different scopes. -->
+             count is never offered twice at two different levels. -->
       </div>
       <div class="tile-b"><button class="btn sm" id="${o.pickId}">${o.manualCount ? "Edit selection" : "Choose CIs"}</button></div>
     </div>
   </div>`;
+}
+/* The chooser's buttons. Its dropdown routes through ddSet / polDdSet from
+   whichever drawer hosts it. Creating a policy stacks the editor over the rule
+   and hands the new id back — created and attached in one flow, no round trip
+   through the BOM Policies page. */
+function wirePolChooser(o, rerender){
+  const $ = i => document.getElementById(i);
+  if($("tgPolNew"))   $("tgPolNew").onclick   = ()=>bpOpen(null, {stack:true, back:id=>{
+    if(id) o.policyId = id;
+    rerender();
+  }});
+  if($("tgPolClear")) $("tgPolClear").onclick = ()=>{ o.policyId = null; rerender(); };
+  if($("tgPolView"))  $("tgPolView").onclick  = ()=>bpView(o.policyId, true);
+}
+function polDdSet(o, id, v){
+  if(id !== "tgPol") return;
+  const s = BOM_POLICIES.find(x=>x.name === v);
+  o.policyId = s ? s.id : null;
 }
 
 /* ══ Live preview ══════════════════════════════════════════════
@@ -2821,48 +2588,28 @@ const TP_MODS = {
       return r ? {t:r.keep, s:esc(r.name)} : {t:RT_DEFAULT.keep, s:"Default policy"};
     }},
   },
-  /* A scope names an audience across the whole CMDB, so its evidence is the only
+  /* A BOM Policy names CIs across the whole CMDB, so its evidence is the only
      one of the four that can list a CI which is not enrolled — that is the point:
-     the audience exists before anything decides what to do with it. */
-  sc: {
+     WHO exists before any module decides WHAT to do about it. */
+  bp: {
     title:  "Matching CIs",
     line:   n => `<b>${n}</b> CI${n===1?"":"s"} match these conditions`,
     cta:    "View matching CIs",
-    drawer: "CIs in this scope",
+    drawer: "CIs matching this policy",
     sub:    n => `${n} CI${n===1?"":"s"} match right now — membership is recalculated, never stored.`,
-    foot:   "A scope performs no action on its own.",
+    foot:   "A BOM Policy performs no action on its own.",
     emptyT: "Nothing matches yet.",
     emptyD: "Add a condition to start naming an audience.",
     col4:   { head:"Licensing", cell:c => c.enrolled
       ? {t:"Enrolled", s: c.by === "Auto" ? "By rule" : "By hand"}
       : {t:DASH, s:"Not enrolled"} },
   },
-  /* A policy's audience is its scope's, so this lists the same CIs — but read from
-     the policy's side, where what matters is who ALREADY governs each one. */
-  pl: {
-    title:  "This policy applies to",
-    line:   n => `<b>${n}</b> CI${n===1?"":"s"} are in the selected scope`,
-    cta:    "View matching CIs",
-    drawer: "CIs this policy applies to",
-    sub:    n => `${n} CI${n===1?"":"s"} are in scope right now, and membership keeps up on its own.`,
-    foot:   "This policy is not saved yet.",
-    emptyT: "No CIs in scope yet.",
-    emptyD: "Choose a scope above, or create one.",
-    col4:   { head:"Governed by", cell:c => {
-      const g = governanceMap().get(c.id), d = PL_DRAFT;
-      const ps = g ? [...new Set(Object.values(g))].filter(p=>!d || p.id !== d.id) : [];
-      return ps.length ? {t: ps.length===1 ? esc(ps[0].name) : `${ps.length} policies`,
-                          s: ps.length===1 ? `Priority ${ps[0].priority}` : "See Policies"}
-                       : {t:DASH, s:"No other policy"};
-    }},
-  },
 };
 
 /* Which CIs the draft in each module currently resolves to. Read live rather than
    snapshotted, so a preview can never describe a state its drawer has left. */
 function tpTargets(mod){
-  if(mod === "sc"){  const d = SC_DRAFT;   return d ? matchIn(ALL_CIS, d.groups) : []; }
-  if(mod === "pl"){  const d = PL_DRAFT;   return d ? scopeCis(scopeOf(d.scopeId)) : []; }
+  if(mod === "bp"){  const d = BP_DRAFT;   return d ? matchIn(ALL_CIS, d.groups) : []; }
   if(mod === "lic"){ const d = LIC_DRAWER; return d ? licPending(d) : []; }
   if(mod === "bs"){
     const d = BS_DRAFT; if(!d) return [];
@@ -2892,17 +2639,17 @@ let TP = null, TP_MOUNTED = false, TP_Q = "", TP_SORT = "id";
 const tpOpen = mod => { TP = {mod}; TP_MOUNTED = false; TP_Q = ""; TP_SORT = "id"; renderStack(); };
 
 /* ── what a rule actually targets ─────────────────────────────
-   Three sources, unioned: a named CI Scope, ad-hoc conditions, and a hand-picked
-   list. The first two stay in sync as the CMDB grows; the hand-picked list never
-   does, which is the distinction the two cards are there to make. A scope names
+   Sources, unioned: a referenced BOM Policy, legacy ad-hoc conditions, and a
+   hand-picked list. The first two stay in sync as the CMDB grows; the hand-picked
+   list never does — the distinction the two cards exist to make. A policy names
    CIs across the whole estate, so it is intersected with enrolment here — nothing
    unlicensed can be scanned or retained, and a rule must not pretend otherwise. */
 function targetIds(o, manualKey){
   const s = new Set(o[manualKey || "manual"] || []);
   if(o.auto) autoMatches(o.groups).forEach(c=>s.add(c.id));
-  if(o.scopeId){
-    const sc = scopeOf(o.scopeId);
-    if(sc) scopeCis(sc).forEach(c=>{ if(c.enrolled) s.add(c.id); });
+  if(o.policyId){
+    const sc = bpOf(o.policyId);
+    if(sc) bpCis(sc).forEach(c=>{ if(c.enrolled) s.add(c.id); });
   }
   return s;
 }
@@ -2910,7 +2657,7 @@ const rtTargets = r => targetIds(r, "manual");
 const bsTargets = p => targetIds(p, "cis");
 /* Coverage as a list, for everywhere the scheduler counts or scans it. Reading
    p.cis directly would report only the hand-picked part — a schedule targeted by
-   condition or by scope would have claimed to cover nothing. */
+   condition or by policy would have claimed to cover nothing. */
 const bsCis = p => [...bsTargets(p)];
 const rtNextId = () =>
   "RR-" + (RT_RULES.reduce((m,r)=>Math.max(m, +(r.id.split("-")[1]||0)), 0) + 1);
@@ -2944,14 +2691,14 @@ function ddSet(id, val){
   }
   if(id==="mKeep")     RT_DRAFT.keep = val;
   if(id==="mPeriod")   RT_DRAFT.period = val;
-  /* The scope band renders in whichever rule drawer is open; only one can be. */
-  if(id==="tgScope"){ const o = LIC_DRAWER || RT_DRAFT; if(o) scopeBandDdSet(o, id, val); }
+  /* The policy chooser renders in whichever rule drawer is open; only one can be. */
+  if(id==="tgPol"){ const o = LIC_DRAWER || RT_DRAFT; if(o) polDdSet(o, id, val); }
   /* Condition selects belong to whichever surface is showing the group
      editor: the stacked builder when it is open, else the Auto-enrol Rule
      drawer, which mounts the same editor inline. */
-  /* Topmost first: the scope editor can be stacked over the Auto-enrol Rule drawer,
-     and the selects the reader is looking at are the ones in front of them. */
-  const CG = COND ? COND.groups : SC_DRAFT ? SC_DRAFT.groups : LIC_DRAWER ? LIC_DRAWER.groups : null;
+  /* Topmost first: the policy editor can be stacked over a rule drawer, and the
+     selects the reader is looking at are the ones in front of them. */
+  const CG = COND ? COND.groups : BP_DRAFT ? BP_DRAFT.groups : LIC_DRAWER ? LIC_DRAWER.groups : null;
   if(CG && /^c[fov]-/.test(id)){
     const [kind, gi, ri] = id.split("-");
     const c = CG[+gi].conds[+ri];
@@ -2970,8 +2717,7 @@ function ddSet(id, val){
   /* LAST on purpose: renderRetention() binds [data-dd] document-wide, so the
      drawer must re-wire after it or its own selects answer to Retention. */
   if(LIC_DRAWER && !COND) renderLicDrawer();
-  if(SC_DRAFT || SC_VIEW) renderScopeDrawer();
-  if(PL_DRAFT) renderPolicyDrawer();
+  if(BP_DRAFT || BP_VIEW) renderPolicyDrawer();
 }
 
 /* Either limit can be switched off, so the note is composed from the
@@ -2989,9 +2735,11 @@ function rtNote(keep, period){
 }
 /* A rule's targets, and how it targets them — a fixed hand-picked list
    never grows; a rule-based one keeps matching as the estate changes. */
-const rtKind    = r => r.auto && (r.groups||[]).length ? "Rule Based" : "Fixed List";
+const rtKind    = r => r.policyId ? "BOM Policy"
+                     : r.auto && (r.groups||[]).length ? "Rule Based" : "Fixed List";
 const rtApplies = r => {
   const n = rtTargets(r).size;
+  if(r.policyId){ const p = bpOf(r.policyId); if(p) return esc(p.name); }
   if(r.auto && (r.groups||[]).length){
     const sum = r.groups.map(g=>groupSummary(g)).filter(Boolean)[0];
     return sum ? esc(sum) : `${n} CI${n===1?"":"s"}`;
@@ -3044,7 +2792,6 @@ function renderRetention(){
       <button class="kcta" id="rtViewCis"${aff?"":" disabled"}><span class="lb">View affected</span><span class="ar">→</span></button>
     </article>`;
 
-  document.getElementById("rtPolSec").innerHTML = policySectionHTML("rt");
   document.getElementById("rtCount").textContent = RT_RULES.length;
   const wrap = document.getElementById("rtWrap");
 
@@ -3058,8 +2805,8 @@ function renderRetention(){
       return `<tr class="${r.on?"":"off"}">
         <td><div class="sc-name">${esc(r.name)}</div><div class="sc-id">${r.id} · overrides default</div></td>
         <td><div class="sc-when">${rtApplies(r)}</div>
-          <div class="sc-sub"><span class="pill ${r.auto&&r.groups.length?"teal":"ghost"}">${rtKind(r)}</span>
-            ${r.auto&&r.groups.length?`<span style="margin-left:6px">${n} CI${n===1?"":"s"} today</span>`:""}</div></td>
+          <div class="sc-sub"><span class="pill ${r.policyId || (r.auto&&r.groups.length)?"teal":"ghost"}">${rtKind(r)}</span>
+            ${r.policyId || (r.auto&&r.groups.length)?`<span style="margin-left:6px">${n} CI${n===1?"":"s"} today</span>`:""}</div></td>
         <td><div class="sc-trig">Keep last ${esc(r.keep)}</div>
           <div class="sc-sub">${r.period==="Never delete" ? "Never deleted" : `Delete after ${esc(r.period.toLowerCase())}`}</div></td>
         <td><span class="sc-stat ${r.on?"on":"paused"}"><span class="d" style="background:${
@@ -3136,7 +2883,6 @@ function renderRetention(){
     RT_CONFIRM=null; renderRetention();
     toast(`Deleted "${r.name}" — its CIs now follow the default policy`);
   });
-  wirePolicySection();
 }
 
 /* ── create / edit dialog ────────────────────────────────────── */
@@ -3148,7 +2894,7 @@ function rtOpen(id){
   RT_DRAFT = r ? {...r, groups:(r.groups||[]).map(g=>({conds:g.conds.map(c=>({...c}))})),
                   manual:[...r.manual], editing:true, err:false}
                : {id:null, name:"", keep:RT_DEFAULT.keep, period:RT_DEFAULT.period,
-                  auto:false, groups:[], manual:[], scopeId:null, editing:false, err:false};
+                  auto:false, groups:[], manual:[], policyId:null, editing:false, err:false};
   PICK = null; COND = null; RT_CONFIRM = null;
   renderModal();
 }
@@ -3646,9 +3392,7 @@ function renderModal(){
   if(RT_AFFECTED && !RT_DRAFT){ renderAffected(); return; }
   const d = RT_DRAFT;
   if(!d) return;
-  const autoCount = d.auto ? autoMatches(d.groups).length : 0;
-  const nGroups   = (d.groups || []).length;
-  const total     = rtTargets(d).size;
+  const total = rtTargets(d).size;
 
 
   /* Keep the reader where they were: the panel is re-rendered wholesale
@@ -3689,12 +3433,11 @@ function renderModal(){
 
       <hr class="dw-div">
 
-      <div class="sechead">Applies to CIs <span>— a scope, conditions, by hand, or a mix</span></div>
+      <div class="sechead">Applies to <span>— a reusable BOM Policy, hand-picked CIs, or both</span></div>
 
       ${targetCardsHTML({
-        auto:d.auto, autoCount, groups:nGroups, manualCount:d.manual.length,
-        condId:"mCond", pickId:"mAdd", scopeId:d.scopeId, scopeKey:"rt",
-        autoDesc:"Every enrolled CI matching your conditions is targeted automatically — including new CIs that match later.",
+        policyId:d.policyId, manualCount:d.manual.length, pickId:"mAdd",
+        polDesc:"Enrolled CIs matching the policy follow this retention automatically — including ones that start matching later.",
         manDesc:"Pick specific enrolled CIs. The list stays fixed until you update it manually."
       })}
 
@@ -3702,8 +3445,7 @@ function renderModal(){
     </div>
 
     <div class="dw-foot">
-      <span class="avail">Applies to <b style="color:var(--ink)">${total}</b> of ${ENROLLED_CIS.length} enrolled CIs${
-        d.auto && autoCount ? ` · ${d.manual.length} by hand, ${autoCount} by rule` : ""}</span>
+      <span class="avail">Applies to <b style="color:var(--ink)">${total}</b> of ${ENROLLED_CIS.length} enrolled CIs</span>
       <span class="gap"></span>
       <button class="btn lg" id="mCancel">Cancel</button>
       <button class="btn pri lg" id="mSave">${d.editing ? "Save changes" : "Create exception"}</button>
@@ -3722,9 +3464,8 @@ function renderModal(){
   $("mCancel").onclick = rtClose;
   $("mScrim").onclick  = ()=>{ if(!PICK && !COND) rtClose(); };
   $("mName").oninput   = e => { d.name = e.target.value; };
-  if($("mAdd"))  $("mAdd").onclick  = ()=>openPick(d, renderModal, "manual");
-  if($("mCond")) $("mCond").onclick = ()=>openCond(d, renderModal);
-  wireScopeBand(d, renderModal);
+  $("mAdd").onclick    = ()=>openPick(d, renderModal, "manual");
+  wirePolChooser(d, renderModal);
   /* Evidence for the preview's claim — stacked over the draft, never instead of
      it, so the rule stays visible while it is being checked. */
   if($("tpView-rt")) $("tpView-rt").onclick = ()=>tpOpen("rt");
@@ -3742,7 +3483,7 @@ function renderModal(){
     if(!d.name.trim()){ d.err = true; renderModal(); $("mName").focus(); return; }
     const rule = {id:d.id || rtNextId(), name:d.name.trim(), keep:d.keep, period:d.period,
                   auto:d.auto, groups:(d.groups||[]).map(g=>({join:g.join, conds:g.conds.map(c=>({...c}))})),
-                  manual:[...d.manual], scopeId:d.scopeId || null};
+                  manual:[...d.manual], policyId:d.policyId || null};
     if(d.editing) RT_RULES = RT_RULES.map(r=>r.id===rule.id ? rule : r);
     else RT_RULES.push(rule);
     const n = rtTargets(rule).size;
@@ -3764,10 +3505,9 @@ document.addEventListener("keydown", e=>{
   if(COND) closeCond();
   else if(PICK) closePick();
   else if(TP){ TP=null; TP_MOUNTED=false; renderStack(); }
-  else if(SC_IMPACT){ SC_IMPACT=false; renderScopeDrawer(); }
-  else if(SC_VIEW){ SC_VIEW=null; SC_VIEW_STACK=false; renderScopeDrawer(); }
-  else if(SC_DRAFT) scClose();
-  else if(PL_DRAFT) plClose();
+  else if(BP_IMPACT){ BP_IMPACT=false; renderPolicyDrawer(); }
+  else if(BP_VIEW){ BP_VIEW=null; BP_VIEW_STACK=false; renderPolicyDrawer(); }
+  else if(BP_DRAFT) bpClose();
   else if(RT_DRAFT) rtClose();
   else if(BS_DRAFT) bsClose();
   else if(LIC_VIEW){ LIC_VIEW=null; renderLicDrawer(); }
@@ -3779,10 +3519,9 @@ document.addEventListener("keydown", e=>{
 });
 document.addEventListener("click", ()=>{
   if(DD_OPEN){ DD_OPEN=null; renderRetention(); if(RT_DRAFT || RT_DEF_EDIT) renderModal();
-               if(SC_DRAFT || SC_VIEW) renderScopeDrawer(); if(PL_DRAFT) renderPolicyDrawer(); }
+               if(BP_DRAFT || BP_VIEW) renderPolicyDrawer(); }
   if(RT_CONFIRM){ RT_CONFIRM=null; renderRetention(); }
-  if(SC_CONFIRM){ SC_CONFIRM=null; renderScopes(); }
-  if(PL_CONFIRM){ PL_CONFIRM=null; renderPolicies(); }
+  if(BP_CONFIRM){ BP_CONFIRM=null; renderPolicies(); }
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -3824,7 +3563,12 @@ let BS_POLICIES = [
    cis:["CI-1","CI-2","CI-6"], auto:false, groups:[]},
   {id:"BS-3", name:"Payments host — daily", kind:"Recurring", freq:"Daily",
    startAt:isoLocal(atTime(new Date(),"23:30")), tz:BS_TZ[1], on:false,
-   cis:["CI-5"], auto:false, groups:[]}
+   cis:["CI-5"], auto:false, groups:[]},
+  /* Targeted through a BOM Policy rather than a fixed list — the same policy a
+     Retention rule below references, which is the whole point of the model. */
+  {id:"BS-4", name:"Design fleet — weekly", kind:"Recurring", freq:"Weekly", days:["Sun"],
+   startAt:isoLocal(atTime(new Date(),"13:00")), tz:BS_TZ[0], on:true,
+   cis:[], auto:false, groups:[], policyId:"BP-1"}
 ];
 let BS_Q="", BS_FILT=new Set(), BS_FOPEN=false, BS_MENU=null, BS_CONFIRM=null,
     BS_COV=null, BS_DRAFT=null;
@@ -4062,7 +3806,6 @@ function renderScheduler(){
     </span>`;
 
   /* ── policy list ───────────────────────────────────────── */
-  document.getElementById("bsPolSec").innerHTML = policySectionHTML("bs");
   const list = bsVisible();
   document.getElementById("bsCount").textContent = BS_POLICIES.length;
   const wrap = document.getElementById("bsWrap");
@@ -4100,7 +3843,8 @@ function renderScheduler(){
         const justDone = !run && done && (Date.now() - done.finishedAt) < 8000;
         return `<tr class="${p.on?"":"off"}">
           <td><div class="sc-name">${esc(p.name)}</div><div class="sc-id">${p.id}</div></td>
-          <td><button class="sc-cov" data-bscov="${p.id}">${bsCis(p).length} Enrolled CI${bsCis(p).length===1?"":"s"}</button></td>
+          <td><button class="sc-cov" data-bscov="${p.id}">${bsCis(p).length} Enrolled CI${bsCis(p).length===1?"":"s"}</button>
+            ${p.policyId && bpOf(p.policyId) ? `<div class="sc-sub">via ${esc(bpOf(p.policyId).name)}</div>` : ""}</td>
           <td><div class="sc-trig">${bsTrigger(p)}</div><div class="sc-sub">${bsClock(p)}</div></td>
           <td>${n
             ? `<div class="sc-when">${bsWhen(n)}</div><div class="sc-sub">${bsClock(p)}</div>`
@@ -4186,7 +3930,6 @@ function renderScheduler(){
     BS_CONFIRM=null; renderScheduler();
     toast(`Deleted "${p.name}"`);
   });
-  wirePolicySection();
 }
 document.addEventListener("click", ()=>{
   if(BS_MENU || BS_FOPEN || BS_CONFIRM){ BS_MENU=null; BS_FOPEN=false; BS_CONFIRM=null; renderScheduler(); }
@@ -4206,7 +3949,7 @@ function bsOpen(id){
     : {id:null, name:"", kind:"Recurring", freq:"Daily", days:["Mon"],
        mMode:"date", mDate:"1", mOcc:"First", mDow:"Monday", mMonth:"Every month",
        startAt:isoLocal(soon), startDate:dateOnly(new Date()), endDate:"",
-       tz:BS_TZ[0], on:true, cis:[], auto:false, scopeId:null, groups:[], editing:false, err:false};
+       tz:BS_TZ[0], on:true, cis:[], auto:false, policyId:null, groups:[], editing:false, err:false};
   PICK = null; COND = null; BS_MENU = null;
   renderBsDrawers(); renderStack();
 }
@@ -4224,10 +3967,10 @@ function bsEcho(d){
   if(d.freq === "Custom")  return d.startDate && d.endDate
     ? `Runs daily between ${d.startDate} and ${d.endDate} at ${t}`
     : "Pick a start and end date";
-  const scope = d.mMonth && d.mMonth !== "Every month" ? ` in ${d.mMonth}` : " every month";
+  const when = d.mMonth && d.mMonth !== "Every month" ? ` in ${d.mMonth}` : " every month";
   return d.mMode === "day"
-    ? `Runs on the ${(d.mOcc||"First").toLowerCase()} ${d.mDow}${scope} at ${t}`
-    : `Runs on day ${d.mDate}${scope} at ${t}`;
+    ? `Runs on the ${(d.mOcc||"First").toLowerCase()} ${d.mDow}${when} at ${t}`
+    : `Runs on day ${d.mDate}${when} at ${t}`;
 }
 
 /* ── the schedule fields, as ONE component ────────────────────
@@ -4351,15 +4094,13 @@ function renderBsDrawers(){
   if(BS_DRAFT){
     const d = BS_DRAFT;
     const dwIn = d._mounted ? "" : " in"; d._mounted = true;
-    const autoCount = d.auto ? autoMatches(d.groups).length : 0;
-    const nGroups   = (d.groups || []).length;
-    const total     = bsTargets(d).size;
+    const total = bsTargets(d).size;
 
     main = `<div class="dw-scrim${dwIn}" id="bsScrim"></div>
     <aside class="dw${dwIn}" style="width:${DW_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Schedule scan">
       <div class="dw-head">
         <div><h3>Schedule Scan</h3>
-          <p>Choose when BOM scans should run and which CIs should be included — pick CIs manually or let rules include them automatically.</p></div>
+          <p>Choose when BOM scans should run and which CIs they cover — through a reusable BOM Policy, or hand-picked.</p></div>
         <button class="x" id="bsDClose" aria-label="Close">${IC_X}</button>
       </div>
 
@@ -4370,11 +4111,10 @@ function renderBsDrawers(){
 
         <hr class="dw-div">
 
-        <div class="sechead">Apply to CIs <span>— a scope, conditions, by hand, or a mix</span></div>
+        <div class="sechead">Applies to <span>— a reusable BOM Policy, hand-picked CIs, or both</span></div>
         ${targetCardsHTML({
-          auto:d.auto, autoCount, groups:nGroups, manualCount:d.cis.length,
-          condId:"bsCond", pickId:"bsPick", scopeId:d.scopeId, scopeKey:"bs",
-          autoDesc:"Automatically schedules every enrolled CI matching your conditions — including new CIs that match later.",
+          policyId:d.policyId, manualCount:d.cis.length, pickId:"bsPick",
+          polDesc:"Enrolled CIs matching the policy are scanned on this cadence automatically — including ones that start matching later.",
           manDesc:"Choose specific enrolled CIs. The list stays fixed until you update it manually."
         })}
 
@@ -4412,13 +4152,11 @@ function renderBsDrawers(){
   $("bsDCancel").onclick = bsClose;
   $("bsScrim").onclick   = ()=>{ if(!PICK && !COND) bsClose(); };
   $("bsName").oninput    = e => { d.name = e.target.value; };
-  /* The condition card is absent while a scope is chosen — the scope holds them. */
-  if($("bsPick")) $("bsPick").onclick = ()=>openPick(d, renderBsDrawers, "cis");
-  if($("bsCond")) $("bsCond").onclick = ()=>openCond(d, renderBsDrawers);
+  $("bsPick").onclick    = ()=>openPick(d, renderBsDrawers, "cis");
   /* The same evidence link Retention has, from the same component. */
   if($("tpView-bs")) $("tpView-bs").onclick = ()=>tpOpen("bs");
   wireSchedFields(d, "bs", renderBsDrawers);
-  wireScopeBand(d, renderBsDrawers);
+  wirePolChooser(d, renderBsDrawers);
 
   document.querySelectorAll("#bsHost [data-dd]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd; renderBsDrawers();
@@ -4426,7 +4164,7 @@ function renderBsDrawers(){
   document.querySelectorAll("#bsHost [data-ddpick]").forEach(b=>b.onclick=e=>{
     e.stopPropagation();
     schedDdSet(d, "bs", b.dataset.ddpick, b.dataset.ddval);
-    scopeBandDdSet(d, b.dataset.ddpick, b.dataset.ddval);
+    polDdSet(d, b.dataset.ddpick, b.dataset.ddval);
     DD_OPEN = null; renderBsDrawers();
   });
   document.querySelectorAll("#bsHost [data-ddclose]").forEach(b=>b.onclick=e=>{
@@ -4440,7 +4178,7 @@ function renderBsDrawers(){
     const p = {id:d.id||bsNextId(), name:(d.name.trim() || bsEcho(d)), kind:d.kind, freq:d.freq,
                days:[...d.days], mMode:d.mMode, mDate:d.mDate, mOcc:d.mOcc, mDow:d.mDow, mMonth:d.mMonth,
                startAt:d.startAt, startDate:d.startDate, endDate:d.endDate, tz:d.tz, on:d.on,
-               cis:[...d.cis], auto:d.auto, scopeId:d.scopeId || null,
+               cis:[...d.cis], auto:d.auto, policyId:d.policyId || null,
                groups:(d.groups||[]).map(g=>({join:g.join, conds:g.conds.map(c=>({...c}))}))};
     if(d.editing) BS_POLICIES = BS_POLICIES.map(x=>x.id===p.id?p:x); else BS_POLICIES.push(p);
     bsClose(); renderScheduler();
@@ -4462,12 +4200,15 @@ function renderBsDrawers(){
               GET/PUT /admin/bom-licensing/rules
    ══════════════════════════════════════════════════════════════ */
 const LIC_SEATS = 128;
+/* Each rule names its BOM Policy — the conditions live THERE, once, and the rule
+   carries only the reference plus its own behaviour (enabled or not). `groups`
+   remains as a legacy shape the engine still resolves, but no rule authored in
+   this UI writes it: building conditions IS creating a policy. */
 let LIC_RULES = [
   {id:"AR-1", name:"Windows Servers", on:true, updated:"Jul 14, 2026",
-   groups:[{join:"And", conds:[{field:"type", op:"Equals", value:"Windows Server"}]}]},
+   policyId:"BP-3", groups:[]},
   {id:"AR-2", name:"Retired workstations", on:false, updated:"Jun 28, 2026",
-   groups:[{join:"And", conds:[{field:"type", op:"Equals", value:"Windows Desktop"},
-                               {field:"status", op:"Equals", value:"Inactive"}]}]}
+   policyId:"BP-4", groups:[]}
 ];
 let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM=null,
     LIC_SEL=new Set(), LIC_MENU=null, LIC_RCONF=null, LIC_DRAWER=null, LIC_VIEW=null,
@@ -4482,11 +4223,11 @@ let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM
 const licUsed = () => ENROLLED_CIS.length;
 const licLeft = () => LIC_SEATS - licUsed();
 const licPool = () => ALL_CIS.filter(c=>!c.enrolled);
-/* A rule pointed at a CI Scope takes its membership from there; otherwise it uses
-   the conditions written on the rule itself. Either way the pool is the DISCOVERED
+/* A rule reads its membership from the BOM Policy it references; legacy rules with
+   conditions of their own still resolve. Either way the pool is the DISCOVERED
    estate — an auto-enrol rule has to be able to name a CI that is not enrolled yet. */
 const ruleHits = r => {
-  if(r.scopeId){ const s = scopeOf(r.scopeId); if(s) return scopeCis(s); }
+  if(r.policyId){ const s = bpOf(r.policyId); if(s) return bpCis(s); }
   return ALL_CIS.filter(c => (r.groups||[]).some(g=>groupMatch(g,c)));
 };
 
@@ -4518,6 +4259,10 @@ const licStamp = ms => {
    if you must open the drawer to learn what a policy does, the drawer
    has become the management screen. */
 function ruleSummary(r){
+  /* A rule that references a BOM Policy reads as that policy's conditions — the
+     one place they are defined. (Policies themselves have no policyId, so this
+     recurses exactly once.) */
+  if(r.policyId){ const p = bpOf(r.policyId); if(p) return ruleSummary(p); }
   const gs = (r.groups||[]).filter(g=>g.conds.some(condDone));
   if(!gs.length) return "";
   return gs.map((g,i)=> (i ? ` ${(g.join||"And").toLowerCase()} ` : "") +
@@ -4621,10 +4366,8 @@ function renderLicensing(){
              <span class="pill ghost" style="margin-left:2px">${LIC_RULES.length}</span></button>`}
     </div>`;
 
-  document.getElementById("licPolSec").innerHTML = policySectionHTML("lic");
   document.getElementById("licWrap").innerHTML = manual ? licManualHTML() : licAutoHTML();
   licWire();
-  wirePolicySection();
 }
 
 /* ── shared CI table ──────────────────────────────────────────
@@ -4653,8 +4396,7 @@ function licCiTable(rows, opts){
         <td><span class="pill ghost">${esc(c.type)}</span></td>
         <td><span class="ver">${c.ip}</span></td>
         <td>${c.by==="Auto"
-          ? `<span class="pill teal">Auto-enrolled</span>${c.byPolicy && policyOf(c.byPolicy)
-              ? `<div class="govby"><a href="#" data-licpol="${c.byPolicy}">${esc(policyOf(c.byPolicy).name)}</a></div>` : ""}`
+          ? `<span class="pill teal">Auto-enrolled</span>`
           : `<span class="src">${c.origin==="Agent"?"Agent":"Manual ingest"}</span>`}</td>
         <td><span class="sc-stat ${c.status==="Active"?"on":"paused"}"><span class="d" style="background:${
               c.status==="Active"?"var(--ok-dot)":"var(--neu-dot)"}"></span>${c.status}</span></td>
@@ -4736,8 +4478,6 @@ function licWire(){
     LIC_FILT.clear(); LIC_FILT.add(b.dataset.licf); LIC_FOPEN=false; renderLicensing();
     document.getElementById("licWrap").scrollIntoView({behavior:"smooth", block:"center"});
   });
-  /* A seat held by a policy names the policy, and the name goes there. */
-  document.querySelectorAll("[data-licpol]").forEach(a=>a.onclick=e=>{ e.preventDefault(); plOpen(a.dataset.licpol); });
 
   const q = $("licQ");
   if(q) q.oninput = e=>{ LIC_Q=e.target.value; renderLicensing();
@@ -4845,9 +4585,9 @@ function licRuleOpen(id, fromRules){
      ready to edit — the last one open when editing, a blank one when new.
      There is no "build conditions" step to click through. */
   LIC_DRAWER = r
-    ? {id:r.id, name:r.name, auto:r.on, editing:true, err:false, fromRules:!!fromRules, scopeId:r.scopeId||null,
+    ? {id:r.id, name:r.name, auto:r.on, editing:true, err:false, fromRules:!!fromRules, policyId:r.policyId||null,
        groups:r.groups.map((g,i,a)=>({join:g.join||"And", open:i===a.length-1, conds:g.conds.map(c=>({...c}))}))}
-    : {id:null, name:"", auto:true, editing:false, err:false, fromRules:!!fromRules, scopeId:null, groups:[newGroup()]};
+    : {id:null, name:"", auto:true, editing:false, err:false, fromRules:!!fromRules, policyId:null, groups:[newGroup()]};
   LIC_VIEW = null; COND = null; LIC_RULESPANEL = false; TP = null; TP_MOUNTED = false;
   renderLicDrawer();
 }
@@ -5062,10 +4802,9 @@ function renderLicDrawer(){
     const fresh = ruleHits(d).filter(c=>!c.enrolled);
     const over  = (d.auto ? fresh.length : 0) - licLeft();
 
-    /* One straight read: name → enabled → the condition builder itself →
-       a compact live preview. The builder is the same component the
-       stacked drawers use, mounted inline — every rule needs conditions,
-       so there is nothing to click through to reach them. */
+    /* One straight read: name → enabled → the BOM Policy that decides WHO →
+       a compact live preview. The rule owns no conditions — they live on the
+       policy, defined once and reusable by the Scheduler and Retention too. */
     main = `<div class="dw-scrim${dwIn}" id="licScrim"></div>
     <aside class="dw${dwIn}" style="width:${DW_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Auto-enrol rule">
       <div class="dw-head">
@@ -5084,12 +4823,13 @@ function renderLicDrawer(){
           <button class="sw${d.auto?" on":""}" id="licDSw" role="switch" aria-checked="${d.auto}" aria-label="Rule status"></button>
           <div><div class="cb-power-t">Rule is ${d.auto?"enabled":"disabled"}</div>
             <div class="cb-power-d">${d.auto
-              ? "Every discovered CI matching the conditions below is enrolled and consumes a seat."
-              : "Conditions are kept, but nothing is enrolled by this rule."}</div></div>
+              ? "Every discovered CI matching the policy below is enrolled and consumes a seat."
+              : "The policy reference is kept, but nothing is enrolled by this rule."}</div></div>
         </div>
-        <div class="sechead">Which CIs to enrol <span>— a reusable scope, or conditions written here</span></div>
-        ${scopeBandHTML({scopeKey:"lic", scopeId:d.scopeId})}
-        ${d.scopeId && scopeOf(d.scopeId) ? "" : cbGroupsHTML(d.groups)}
+        <div class="sechead">Applies to <span>— the BOM Policy that decides who gets enrolled</span></div>
+        ${targetCardsHTML({policyId:d.policyId, noManual:true, discovered:true,
+          polDesc:"Every discovered CI matching the policy is enrolled automatically — now, and as new CIs appear. One-off enrolments live under Add manually."})}
+        ${d.err && !d.policyId ? `<div class="ferr" style="margin:-4px 0 12px">Choose or create a BOM Policy — the rule has to know who to enrol.</div>` : ""}
         <div class="cb-prev" id="licPrev">${licPrevInner(d)}</div>
       </div>
       <div class="dw-foot">
@@ -5245,8 +4985,7 @@ function renderLicDrawer(){
     const v = $("tpView-lic"); if(v) v.onclick = ()=>tpOpen("lic");
   };
   const pv = $("tpView-lic"); if(pv) pv.onclick = ()=>tpOpen("lic");
-  wireScopeBand(d, renderLicDrawer);
-  wireCbGroups(d.groups, renderLicDrawer, licSync);
+  wirePolChooser(d, renderLicDrawer);
   /* The builder's selects live in this drawer, not the stack — bind them
      here so #stackHost's own wiring is never involved. */
   document.querySelectorAll("#licHost [data-dd]").forEach(b=>b.onclick=e=>{
@@ -5260,15 +4999,17 @@ function renderLicDrawer(){
   });
 
   $("licDSave").onclick = ()=>{
-    if(!d.name.trim()){ d.err = true; renderLicDrawer(); $("licRName").focus(); return; }
+    /* A rule needs a name AND a policy — with neither conditions of its own nor a
+       policy to read them from, it would enrol nothing and mean nothing. */
+    if(!d.name.trim() || !d.policyId){
+      d.err = true; renderLicDrawer();
+      if(!d.name.trim()){ const el=$("licRName"); if(el) el.focus(); }
+      return;
+    }
     const fresh = ruleHits(d).filter(c=>!c.enrolled);
     if((d.auto ? fresh.length : 0) - licLeft() > 0) return;
-    /* Same contract the stacked builder's Apply enforced: half-written
-       conditions never make it into a saved rule. */
     const rule = {id:d.id || licNextRuleId(), name:d.name.trim(), on:d.auto, updated:todayLabel(),
-                  scopeId:d.scopeId || null,
-                  groups:d.groups.filter(g=>g.conds.some(condDone))
-                         .map(g=>({join:g.join, conds:g.conds.filter(condDone).map(c=>({...c}))}))};
+                  policyId:d.policyId, groups:[]};
     if(d.editing) LIC_RULES = LIC_RULES.map(x=>x.id===rule.id ? rule : x);
     else LIC_RULES.push(rule);
     if(rule.on) ruleFresh(rule).forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=rule.id; c.ruleAt=Date.now(); });
@@ -5281,18 +5022,18 @@ function renderLicDrawer(){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   CI SCOPES — admin sub-screen
+   CI BOM_POLICIES — admin sub-screen
    The audience, managed on its own. Nothing here performs an action, so
-   the screen is about membership and about who depends on it: a scope
-   with three policies pointed at it cannot be edited privately, and this
-   is where that is made obvious.
+   the screen is about membership and about who depends on it: a policy
+   three rules reference cannot be edited privately, and this is where
+   that is made obvious.
    ══════════════════════════════════════════════════════════════ */
-let SC_Q = "", SC_DRAFT = null, SC_VIEW = null, SC_CONFIRM = null, SC_IMPACT = false;
+let BP_Q = "", BP_DRAFT = null, BP_VIEW = null, BP_CONFIRM = null, BP_IMPACT = false;
 
 /* Conditions as they read, not as they are stored. Same phrasing the rules use. */
 function condReadHTML(groups){
   const gs = (groups||[]).filter(g=>g.conds.some(condDone));
-  if(!gs.length) return `<div class="avail">No conditions yet — a scope with none matches nothing.</div>`;
+  if(!gs.length) return `<div class="avail">No conditions yet — a policy with none matches nothing.</div>`;
   return `<div class="cread">${gs.map((g,i)=>`
     ${i ? `<div class="cread-j">${esc((g.join||"And").toUpperCase())}</div>` : ""}
     <div class="cread-g">${g.conds.filter(condDone)
@@ -5301,12 +5042,12 @@ function condReadHTML(groups){
 }
 
 /* A read-only CI table, used wherever a list of CIs is the evidence for a count. */
-const SC_COLS = "70px minmax(0,1fr) 128px 120px 108px";
+const BP_COLS = "70px minmax(0,1fr) 128px 120px 108px";
 function ciListHTML(rows, extra){
-  return `<div class="pk-hd vhd" style="grid-template-columns:${SC_COLS}">
+  return `<div class="pk-hd vhd" style="grid-template-columns:${BP_COLS}">
       <span>CI ID</span><span>Host Name</span><span>CI Type</span>
       <span>${extra ? extra.head : "Department"}</span><span>Licensing</span></div>
-    ${rows.length ? rows.map(c=>`<div class="pk-row vrow" style="grid-template-columns:${SC_COLS};cursor:default">
+    ${rows.length ? rows.map(c=>`<div class="pk-row vrow" style="grid-template-columns:${BP_COLS};cursor:default">
         <span class="id">${c.id}</span>
         <span class="vhost"><span class="hn" title="${esc(c.host)}">${esc(c.host)}</span><span class="ip">${c.ip}</span></span>
         <span><span class="pill ghost">${esc(c.type)}</span></span>
@@ -5317,162 +5058,162 @@ function ciListHTML(rows, extra){
       : `<div class="pk-empty">No CIs match these conditions right now.</div>`}`;
 }
 
-/* What changing a scope's conditions would do — computed against the SAVED scope,
-   so it describes the edit rather than the draft. Never silent: policies inherit
-   membership, so a condition change is a change to whatever they do. */
-function scopeImpact(d){
-  const base = d.id && scopeOf(d.id);
+/* What changing the conditions would do — computed against the SAVED policy, so
+   it describes the edit rather than the draft. Never silent: every referencing
+   rule inherits membership, so a condition change is a change to what they do. */
+function bpImpact(d){
+  const base = d.id && bpOf(d.id);
   if(!base) return null;
-  const before = new Set(scopeCis(base).map(c=>c.id));
+  const before = new Set(bpCis(base).map(c=>c.id));
   const after  = matchIn(ALL_CIS, d.groups);
   const afterIds = new Set(after.map(c=>c.id));
   const added   = after.filter(c=>!before.has(c.id));
-  const removed = scopeCis(base).filter(c=>!afterIds.has(c.id));
-  const users   = scopeUsers(d.id);
-  const caps    = [...new Set(users.filter(p=>p.on).flatMap(policyCaps))];
-  return {added, removed, users, caps, total:after.length, was:before.size};
+  const removed = bpCis(base).filter(c=>!afterIds.has(c.id));
+  const users   = bpUsers(d.id);
+  return {added, removed, users, mods:bpMods(users), total:after.length, was:before.size};
 }
 
-function renderScopes(){
-  const active = SCOPES.filter(s=>s.on);
-  const covered = new Set(active.flatMap(s=>scopeCis(s).map(c=>c.id))).size;
-  const used = SCOPES.filter(s=>scopeUsers(s.id).length).length;
+function renderPolicies(){
+  const active = BOM_POLICIES.filter(s=>s.on);
+  const covered = new Set(active.flatMap(s=>bpCis(s).map(c=>c.id))).size;
+  const used = BOM_POLICIES.filter(s=>bpUsers(s.id).length).length;
 
-  document.getElementById("scSummary").innerHTML = `
-    <div class="sumcell"><div class="suml">Scopes</div>
-      <div class="sumv">${SCOPES.length}<span class="u">${active.length} active</span></div></div>
+  const refs = BOM_POLICIES.reduce((n,s)=>n + bpUsers(s.id).length, 0);
+  document.getElementById("bpSum").innerHTML = `
+    <div class="sumcell"><div class="suml">BOM Policies</div>
+      <div class="sumv">${BOM_POLICIES.length}<span class="u">${active.length} active</span></div></div>
     <div class="sumcell"><div class="suml">CIs covered</div>
       <div class="sumv">${covered}<span class="u">of ${ALL_CIS.length} discovered</span></div>
-      <div class="sums">${covered ? "In at least one active scope" : "No scope matches anything yet"}</div></div>
+      <div class="sums">${covered ? "Matching at least one active policy" : "No policy matches anything yet"}</div></div>
     <div class="sumcell"><div class="suml">Reused by</div>
-      <div class="sumv${used?"":" quiet"}">${POLICIES.length}<span class="u">BOM ${POLICIES.length===1?"policy":"policies"}</span></div>
-      <div class="sums">${used ? `${used} of ${SCOPES.length} scopes are in use` : "No policy points at a scope yet"}</div></div>`;
+      <div class="sumv${refs?"":" quiet"}">${refs}<span class="u">rule${refs===1?"":"s"}</span></div>
+      <div class="sums">${refs ? `${used} of ${BOM_POLICIES.length} policies in use — across Licensing, Scheduler and Retention` : "No rule references a policy yet"}</div></div>`;
 
-  const q = SC_Q.trim().toLowerCase();
-  const shown = SCOPES.filter(s => !q ||
-    [s.name, s.desc, scopeSummary(s)].join(" ").toLowerCase().includes(q));
-  document.getElementById("scCount").textContent = SCOPES.length;
+  const q = BP_Q.trim().toLowerCase();
+  const shown = BOM_POLICIES.filter(s => !q ||
+    [s.name, s.desc, bpSummary(s)].join(" ").toLowerCase().includes(q));
+  document.getElementById("bpCount").textContent = BOM_POLICIES.length;
 
-  const wrap = document.getElementById("scWrap");
-  wrap.innerHTML = SCOPES.length ? (shown.length ? `<div style="overflow-x:auto"><table class="sc-table">
+  const wrap = document.getElementById("bpWrap");
+  wrap.innerHTML = BOM_POLICIES.length ? (shown.length ? `<div style="overflow-x:auto"><table class="sc-table">
     <thead><tr>
-      <th style="width:22%">Scope Name</th><th>Conditions</th><th style="width:118px">Matching CIs</th>
+      <th style="width:22%">Policy Name</th><th>Conditions</th><th style="width:118px">Matching CIs</th>
       <th style="width:130px">Used By</th><th style="width:104px">Status</th>
       <th style="width:120px">Last Updated</th><th style="width:150px">Actions</th>
     </tr></thead>
     <tbody>${shown.map(s=>{
-      const cis = scopeCis(s), enr = cis.filter(c=>c.enrolled).length;
-      const users = scopeUsers(s.id);
+      const cis = bpCis(s), enr = cis.filter(c=>c.enrolled).length;
+      const users = bpUsers(s.id);
       return `<tr class="${s.on?"":"off"}">
         <td><div class="sc-name">${esc(s.name)}</div>
           <div class="sc-id">${s.id}${s.desc?` · ${esc(s.desc)}`:""}</div></td>
-        <td><div class="rulesum${scopeSummary(s)?"":" none"}">${scopeSummary(s) ? esc(scopeSummary(s)) : "No conditions"}</div></td>
+        <td><div class="rulesum${bpSummary(s)?"":" none"}">${bpSummary(s) ? esc(bpSummary(s)) : "No conditions"}</div></td>
         <td><div class="sc-when">${cis.length} CI${cis.length===1?"":"s"}</div>
           <div class="sc-sub">${enr} enrolled</div></td>
         <td>${users.length
-          ? `<button class="lnk" data-scusers="${s.id}">${users.length} BOM polic${users.length===1?"y":"ies"}</button>`
+          ? `<button class="lnk" data-bpusers="${s.id}">Used by ${users.length} rule${users.length===1?"":"s"}</button>
+             <div class="sc-sub">${bpMods(users).join(" · ")}</div>`
           : `<span class="avail">Not used yet</span>`}</td>
         <td><span class="sc-stat ${s.on?"on":"paused"}"><span class="d" style="background:${
               s.on?"var(--ok-dot)":"var(--neu-dot)"}"></span>${s.on?"Active":"Disabled"}</span></td>
         <td><div class="sc-sub" style="margin:0">${esc(s.updated)}</div></td>
         <td><div class="sc-acts">
-          <button class="iact" data-scview="${s.id}">View</button>
-          <button class="iact" data-scedit="${s.id}">Edit</button>
-          <button class="iact sq del" data-scdel="${s.id}" aria-label="Delete ${esc(s.name)}">
+          <button class="iact" data-bpview="${s.id}">View</button>
+          <button class="iact" data-bpedit="${s.id}">Edit</button>
+          <button class="iact sq del" data-bpdel="${s.id}" aria-label="Delete ${esc(s.name)}">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.8 4.4h10.4M6.4 4.4V3.2a1 1 0 011-1h1.2a1 1 0 011 1v1.2M4.2 4.4l.6 8a1.2 1.2 0 001.2 1.1h4a1.2 1.2 0 001.2-1.1l.6-8"/></svg></button>
-          ${SC_CONFIRM===s.id ? `<div class="confirm">
-            ${users.length ? `<p>${esc(s.name)} is in use.</p>
-              <p>${users.length} BOM polic${users.length===1?"y points":"ies point"} at this scope — ${
-                users.map(p=>esc(p.name)).join(", ")}. Point them at another scope first, or the policies would be left with no audience.</p>
-              <div class="row"><button class="btn sm" data-scdelno="1">Close</button></div>`
+          ${BP_CONFIRM===s.id ? `<div class="confirm">
+            ${users.length ? `<p>This policy is currently used by ${users.length} rule${users.length===1?"":"s"}.</p>
+              <p>${users.map(u=>`${u.mod} — ${esc(u.name)}`).join(" · ")}. Point ${users.length===1?"it":"them"} at
+                 another BOM Policy or delete ${users.length===1?"it":"them"} first — deleting now would leave
+                 ${users.length===1?"a rule":"rules"} targeting nothing.</p>
+              <div class="row"><button class="btn sm" data-bpdelno="1">Close</button></div>`
             : `<p>Delete ${esc(s.name)}?</p>
-              <p>No policy uses it, so nothing changes for any CI. The conditions are lost.</p>
-              <div class="row"><button class="btn sm" data-scdelno="1">Cancel</button>
-                <button class="btn sm danger" data-scdelyes="${s.id}">Delete scope</button></div>`}
+              <p>No rule uses it, so nothing changes for any CI. The conditions are lost.</p>
+              <div class="row"><button class="btn sm" data-bpdelno="1">Cancel</button>
+                <button class="btn sm danger" data-bpdelyes="${s.id}">Delete policy</button></div>`}
           </div>` : ""}
         </div></td></tr>`;
     }).join("")}</tbody></table></div>`
     : `<div class="estate"><span class="ic">${IC_FUNNEL}</span>
-        <div class="t">No scope matches “${esc(SC_Q.trim())}”.</div>
-        <div class="d">${SCOPES.length} scope${SCOPES.length===1?"":"s"} exist — clear the search to see them.</div></div>`)
+        <div class="t">No policy matches “${esc(BP_Q.trim())}”.</div>
+        <div class="d">${BOM_POLICIES.length} polic${BOM_POLICIES.length===1?"y":"ies"} exist — clear the search to see them.</div></div>`)
   : `<div class="estate">
       <span class="ic"><svg width="26" height="26" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="9" r="6.4"/><circle cx="9" cy="9" r="2.5"/></svg></span>
-      <div class="t">No CI scopes yet.</div>
-      <div class="d">A scope is a named set of conditions — “Windows devices owned by Design”. Define one here and every BOM policy can point at it instead of repeating the conditions.</div>
-      <div class="cta"><button class="btn pri lg" id="scEmptyNew">New Scope</button></div></div>`;
+      <div class="t">No BOM Policies yet.</div>
+      <div class="d">A BOM Policy is a named set of conditions — “Windows devices owned by Design”. Define it once, and rules in Licensing, Scheduler and Retention can all target it instead of rebuilding the conditions.</div>
+      <div class="cta"><button class="btn pri lg" id="bpEmptyNew">New BOM Policy</button></div></div>`;
 
-  const en = document.getElementById("scEmptyNew");
-  if(en) en.onclick = ()=>scOpen(null);
-  document.querySelectorAll("[data-scview]").forEach(b=>b.onclick=()=>scView(b.dataset.scview));
-  document.querySelectorAll("[data-scusers]").forEach(b=>b.onclick=()=>scView(b.dataset.scusers));
-  document.querySelectorAll("[data-scedit]").forEach(b=>b.onclick=()=>scOpen(b.dataset.scedit));
-  document.querySelectorAll("[data-scdel]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation(); SC_CONFIRM = SC_CONFIRM===b.dataset.scdel ? null : b.dataset.scdel; renderScopes();
+  const en = document.getElementById("bpEmptyNew");
+  if(en) en.onclick = ()=>bpOpen(null);
+  document.querySelectorAll("[data-bpview]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpview));
+  document.querySelectorAll("[data-bpusers]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpusers));
+  document.querySelectorAll("[data-bpedit]").forEach(b=>b.onclick=()=>bpOpen(b.dataset.bpedit));
+  document.querySelectorAll("[data-bpdel]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation(); BP_CONFIRM = BP_CONFIRM===b.dataset.bpdel ? null : b.dataset.bpdel; renderPolicies();
   });
-  document.querySelectorAll("[data-scdelno]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); SC_CONFIRM=null; renderScopes(); });
-  document.querySelectorAll("[data-scdelyes]").forEach(b=>b.onclick=e=>{
+  document.querySelectorAll("[data-bpdelno]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); BP_CONFIRM=null; renderPolicies(); });
+  document.querySelectorAll("[data-bpdelyes]").forEach(b=>b.onclick=e=>{
     e.stopPropagation();
-    const s = scopeOf(b.dataset.scdelyes);
-    SCOPES = SCOPES.filter(x=>x.id!==b.dataset.scdelyes);
-    SC_CONFIRM=null; renderScopes();
-    toast(`Deleted scope "${s.name}"`);
+    const s = bpOf(b.dataset.bpdelyes);
+    BOM_POLICIES = BOM_POLICIES.filter(x=>x.id!==b.dataset.bpdelyes);
+    BP_CONFIRM=null; renderPolicies();
+    toast(`Deleted BOM Policy "${s.name}"`);
   });
 }
 
-function scOpen(id, opts){
-  const s = id && scopeOf(id);
-  SC_DRAFT = s
+function bpOpen(id, opts){
+  const s = id && bpOf(id);
+  BP_DRAFT = s
     ? {id:s.id, name:s.name, desc:s.desc||"", on:s.on, err:false,
        groups:s.groups.map((g,i,a)=>({join:g.join||"And", open:i===a.length-1, conds:g.conds.map(c=>({...c}))})),
        ...(opts||{})}
     : {id:null, name:"", desc:"", on:true, err:false, groups:[newGroup()], ...(opts||{})};
-  SC_VIEW = null; SC_IMPACT = false; renderScopeDrawer();
+  BP_VIEW = null; BP_IMPACT = false; renderPolicyDrawer();
 }
 /* `stacked` when it is opened from a rule or policy drawer — the same detail
    surface either way, just layered rather than replacing what is behind it. */
-let SC_VIEW_STACK = false;
-function scView(id, stacked){ SC_VIEW = id; SC_VIEW_STACK = !!stacked; if(!stacked) SC_DRAFT = null; renderScopeDrawer(); }
-function scClose(){
-  const back = SC_DRAFT && SC_DRAFT.back;
-  SC_DRAFT = null; SC_VIEW = null; SC_IMPACT = false; renderScopeDrawer();
+let BP_VIEW_STACK = false;
+function bpView(id, stacked){ BP_VIEW = id; BP_VIEW_STACK = !!stacked; if(!stacked) BP_DRAFT = null; renderPolicyDrawer(); }
+function bpClose(){
+  const back = BP_DRAFT && BP_DRAFT.back;
+  BP_DRAFT = null; BP_VIEW = null; BP_IMPACT = false; renderPolicyDrawer();
   if(back) back(null);
 }
 
-function renderScopeDrawer(){
-  const host = document.getElementById("scHost");
-  if(!SC_DRAFT && !SC_VIEW){ host.innerHTML = ""; return; }
+function renderPolicyDrawer(){
+  const host = document.getElementById("bpHost");
+  if(!BP_DRAFT && !BP_VIEW){ host.innerHTML = ""; return; }
   const keep = [...host.querySelectorAll(".dw-body")].map(el=>el.scrollTop);
   const $ = i => document.getElementById(i);
 
-  /* ── read-only scope detail ─────────────────────────────── */
+  /* ── read-only policy detail ─────────────────────────────── */
   let view = "";
-  if(SC_VIEW){
-    const s = scopeOf(SC_VIEW);
+  if(BP_VIEW){
+    const s = bpOf(BP_VIEW);
     if(s){
-      const cis = scopeCis(s), enr = cis.filter(c=>c.enrolled).length;
-      const users = scopeUsers(s.id);
-      const vst = SC_VIEW_STACK ? " stack" : "";
-      view = `<div class="dw-scrim${SC_VIEW_STACK?" lite":""} in" id="scVScrim"></div>
-      <aside class="dw${vst} in" style="width:${SC_VIEW_STACK?DW2_W:DW_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Scope detail">
+      const cis = bpCis(s), enr = cis.filter(c=>c.enrolled).length;
+      const users = bpUsers(s.id);
+      const vst = BP_VIEW_STACK ? " stack" : "";
+      view = `<div class="dw-scrim${BP_VIEW_STACK?" lite":""} in" id="bpVScrim"></div>
+      <aside class="dw${vst} in" style="width:${BP_VIEW_STACK?DW2_W:DW_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="BOM Policy detail">
         <div class="dw-head"><div><h3>${esc(s.name)}</h3>
           <p>${s.id} · ${cis.length} matching CI${cis.length===1?"":"s"} · ${enr} enrolled${s.desc?` · ${esc(s.desc)}`:""}</p></div>
-          <button class="x" id="scVClose" aria-label="Close">${IC_X}</button></div>
+          <button class="x" id="bpVClose" aria-label="Close">${IC_X}</button></div>
         <div class="dw-body">
           <div class="sechead">Conditions</div>
           ${condReadHTML(s.groups)}
-          <div class="rt-note">Worked out from the CMDB every time it is read — a CI that starts matching is in this scope without anyone editing it.</div>
+          <div class="rt-note">Worked out from the CMDB every time it is read — a CI that starts matching is covered by this policy without anyone editing it.</div>
 
           <hr class="dw-div">
-          <div class="sechead">Used by <span>— what changing this scope would affect</span></div>
-          ${users.length ? users.map(p=>`
+          <div class="sechead">Used by <span>— rules targeting this policy; the behaviour stays with each module</span></div>
+          ${users.length ? users.map(u=>`
             <div class="ovitem">
-              <div class="ovitem-h">${esc(p.name)}
-                <span class="n">${p.on?"Active":"Disabled"} · priority ${p.priority}</span></div>
-              <div class="ovitem-d">${policyCaps(p).length
-                ? policyCaps(p).map(c=>`${CAP_NAME[c]} — ${esc(capPhrase(p,c))}`).join(" · ")
-                : "No capability switched on yet."}</div>
+              <div class="ovitem-h"><span class="pill ghost">${u.mod}</span> ${esc(u.name)}
+                <span class="n">${u.on?"Active":"Disabled"}</span></div>
+              <div class="ovitem-d">${esc(u.what)}</div>
             </div>`).join("")
-          : `<div class="avail">No BOM policy points at this scope yet, so it currently changes nothing. A scope on its own performs no action — it only names an audience.</div>`}
+          : `<div class="avail">No rule uses this policy yet. On its own it does nothing — it only names WHICH CIs, for Licensing, Scheduler or Retention to act on.</div>`}
 
           <hr class="dw-div">
           <div class="sechead">Matching CIs <span>— ${cis.length} now, live</span></div>
@@ -5481,8 +5222,8 @@ function renderScopeDrawer(){
         <div class="dw-foot">
           <span class="avail">${enr} of ${cis.length} enrolled — only enrolled CIs can be scanned or retained.</span>
           <span class="gap"></span>
-          <button class="btn lg" id="scVDone">Close</button>
-          <button class="btn pri lg" id="scVEdit">Edit scope</button>
+          <button class="btn lg" id="bpVDone">Close</button>
+          <button class="btn pri lg" id="bpVEdit">Edit policy</button>
         </div>
       </aside>`;
     }
@@ -5490,35 +5231,35 @@ function renderScopeDrawer(){
 
   /* ── create / edit ───────────────────────────────────────── */
   let main = "";
-  if(SC_DRAFT){
-    const d = SC_DRAFT;
+  if(BP_DRAFT){
+    const d = BP_DRAFT;
     const dwIn = d._mounted ? "" : " in"; d._mounted = true;
     const hits = matchIn(ALL_CIS, d.groups);
     const enr  = hits.filter(c=>c.enrolled).length;
-    const imp  = scopeImpact(d);
+    const imp  = bpImpact(d);
     const changed = imp && (imp.added.length || imp.removed.length);
     /* Stacked when it was opened from the policy drawer, so the policy stays behind it. */
     const st = d.stack ? " stack" : "";
 
-    main = `<div class="dw-scrim${d.stack?" lite":""}${dwIn}" id="scScrim"></div>
+    main = `<div class="dw-scrim${d.stack?" lite":""}${dwIn}" id="bpScrim"></div>
     <aside class="dw${st}${dwIn}" style="width:${d.stack?DW2_W:DW_W}px;max-width:95vw" role="dialog" aria-modal="true"
-           aria-label="${d.id?"Edit":"New"} CI scope">
+           aria-label="${d.id?"Edit":"New"} BOM Policy">
       <div class="dw-head">
-        <div><h3>${d.id ? "Edit CI scope" : "New CI scope"}</h3>
+        <div><h3>${d.id ? "Edit BOM Policy" : "New BOM Policy"}</h3>
           <p>Name a set of conditions once. Every BOM policy can then point at it instead of repeating them.</p></div>
-        <button class="x" id="scDClose" aria-label="Close">${IC_X}</button>
+        <button class="x" id="bpDClose" aria-label="Close">${IC_X}</button>
       </div>
 
       <div class="dw-body">
         <div class="fld">
-          <label class="flab" for="scName">Scope name<span class="req">*</span></label>
-          <input class="finput${d.err && !d.name.trim() ? " err":""}" id="scName" type="text"
+          <label class="flab" for="bpName">Policy name<span class="req">*</span></label>
+          <input class="finput${d.err && !d.name.trim() ? " err":""}" id="bpName" type="text"
                  value="${esc(d.name)}" placeholder="e.g. Design Windows Devices" autocomplete="off">
-          ${d.err && !d.name.trim() ? `<div class="ferr">Give the scope a name — policies will refer to it by this.</div>` : ""}
+          ${d.err && !d.name.trim() ? `<div class="ferr">Give the policy a name — rules will refer to it by this.</div>` : ""}
         </div>
         <div class="fld">
-          <label class="flab" for="scDesc">Description <span style="color:var(--faint)">— optional</span></label>
-          <input class="finput" id="scDesc" type="text" value="${esc(d.desc)}"
+          <label class="flab" for="bpDesc">Description <span style="color:var(--faint)">— optional</span></label>
+          <input class="finput" id="bpDesc" type="text" value="${esc(d.desc)}"
                  placeholder="What this audience is, in a line" autocomplete="off">
         </div>
 
@@ -5530,610 +5271,120 @@ function renderScopeDrawer(){
           <div class="tprev-h">Matching CIs</div>
           ${hits.length
             ? `<div class="tprev-l"><b>${hits.length}</b> CI${hits.length===1?"":"s"} match right now · ${enr} enrolled</div>
-               <button class="tprev-cta" id="scViewCis">View matching CIs<span class="ar">→</span></button>`
-            : `<div class="tprev-none">Nothing matches yet.<div class="tprev-sub">An incomplete condition matches nothing, so a half-written scope never sweeps in the estate by accident.</div></div>`}
+               <button class="tprev-cta" id="bpViewCis">View matching CIs<span class="ar">→</span></button>`
+            : `<div class="tprev-none">Nothing matches yet.<div class="tprev-sub">An incomplete condition matches nothing, so a half-written policy never sweeps in the estate by accident.</div></div>`}
         </div>
 
-        ${imp ? `<div class="scimp${changed?"":" none"}">
-          <div class="scimp-t">${changed ? "This edit changes who is in the scope" : "Membership is unchanged so far"}</div>
-          ${changed ? `<div class="scimp-r">
-            <div><div class="scimp-v up">+${imp.added.length}</div><div class="scimp-l">CI${imp.added.length===1?"":"s"} now match</div></div>
-            <div><div class="scimp-v dn">−${imp.removed.length}</div><div class="scimp-l">CI${imp.removed.length===1?"":"s"} no longer match</div></div>
-            <div><div class="scimp-v">${imp.total}</div><div class="scimp-l">total, was ${imp.was}</div></div>
+        ${imp ? `<div class="polimp${changed?"":" none"}">
+          <div class="polimp-t">${changed ? "This edit changes who the policy covers" : "Membership is unchanged so far"}</div>
+          ${changed ? `<div class="polimp-r">
+            <div><div class="polimp-v up">+${imp.added.length}</div><div class="polimp-l">CI${imp.added.length===1?"":"s"} now match</div></div>
+            <div><div class="polimp-v dn">−${imp.removed.length}</div><div class="polimp-l">CI${imp.removed.length===1?"":"s"} no longer match</div></div>
+            <div><div class="polimp-v">${imp.total}</div><div class="polimp-l">total, was ${imp.was}</div></div>
           </div>` : ""}
-          <div class="scimp-d">${
+          <div class="polimp-d">${
             !imp.users.length
-              ? "No policy points at this scope, so nothing downstream is affected."
+              ? "No rule uses this policy, so nothing downstream is affected."
               : changed
-                ? `These changes take effect for ${imp.users.length} polic${imp.users.length===1?"y":"ies"} pointing at this scope${
-                    imp.caps.length ? ` — affecting <b style="color:var(--ink)">${imp.caps.map(c=>CAP_NAME[c]).join(", ")}</b>` : ""}.`
-                : `${imp.users.length} polic${imp.users.length===1?"y points":"ies point"} at this scope, so any change here reaches them.`}
-            ${changed ? `<button class="lnk" id="scImpView" style="margin-left:6px">View affected CIs →</button>` : ""}</div>
+                ? `These changes take effect for ${imp.users.length} rule${imp.users.length===1?"":"s"} using this policy${
+                    imp.mods.length ? ` — <b style="color:var(--ink)">${imp.mods.join(", ")}</b>` : ""}.`
+                : `${imp.users.length} rule${imp.users.length===1?" uses":"s use"} this policy — across ${imp.mods.join(", ") || "no module yet"} — so any change here reaches ${imp.users.length===1?"it":"them all"}.`}
+            ${changed ? `<button class="lnk" id="bpImpView" style="margin-left:6px">View affected CIs →</button>` : ""}</div>
         </div>` : ""}
       </div>
 
       <div class="dw-foot">
-        <span class="avail">${hits.length} CI${hits.length===1?"":"s"} in scope · ${enr} enrolled</span>
+        <span class="avail">${hits.length} matching CI${hits.length===1?"":"s"} · ${enr} enrolled</span>
         <span class="gap"></span>
-        <button class="btn lg" id="scDCancel">Cancel</button>
-        <button class="btn pri lg" id="scDSave">${d.id ? "Save scope" : "Create scope"}</button>
+        <button class="btn lg" id="bpDCancel">Cancel</button>
+        <button class="btn pri lg" id="bpDSave">${d.id ? "Save policy" : "Create policy"}</button>
       </div>
     </aside>`;
   }
 
   /* ── the affected-CI read-out, stacked over the editor ───── */
   let impv = "";
-  if(SC_IMPACT && SC_DRAFT){
-    const imp = scopeImpact(SC_DRAFT);
+  if(BP_IMPACT && BP_DRAFT){
+    const imp = bpImpact(BP_DRAFT);
     const rows = [...imp.added.map(c=>({c, j:true})), ...imp.removed.map(c=>({c, j:false}))];
-    impv = `<div class="dw-scrim lite in" id="scIScrim"></div>
+    impv = `<div class="dw-scrim lite in" id="bpIScrim"></div>
     <aside class="dw stack in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Affected CIs">
       <div class="dw-head"><div><h3>Affected CIs</h3>
         <p>${imp.added.length} joining · ${imp.removed.length} leaving. Read-only, and not saved yet.</p></div>
-        <button class="x" id="scIClose" aria-label="Close">${IC_X}</button></div>
+        <button class="x" id="bpIClose" aria-label="Close">${IC_X}</button></div>
       <div class="dw-body" style="padding:0">
         ${ciListHTML(rows.map(r=>r.c), {head:"Change", cell:c =>
           imp.added.some(x=>x.id===c.id)
-            ? `<span style="color:var(--ok)">Joins the scope</span>`
-            : `<span style="color:var(--crit)">Leaves the scope</span>`})}
+            ? `<span style="color:var(--ok)">Starts matching</span>`
+            : `<span style="color:var(--crit)">Stops matching</span>`})}
       </div>
-      <div class="dw-foot"><span class="avail">Nothing changes until the scope is saved.</span>
-        <span class="gap"></span><button class="btn lg" id="scIDone">Close</button></div>
+      <div class="dw-foot"><span class="avail">Nothing changes until the policy is saved.</span>
+        <span class="gap"></span><button class="btn lg" id="bpIDone">Close</button></div>
     </aside>`;
   }
 
   host.innerHTML = main + view + impv;
   [...host.querySelectorAll(".dw-body")].forEach((el,i)=>{ if(keep[i]!=null) el.scrollTop = keep[i]; });
 
-  if(SC_VIEW && $("scVClose")){
-    const close = ()=>{ SC_VIEW=null; SC_VIEW_STACK=false; renderScopeDrawer(); };
-    $("scVClose").onclick = close; $("scVDone").onclick = close; $("scVScrim").onclick = close;
-    $("scVEdit").onclick = ()=>{ const id = SC_VIEW; SC_VIEW=null; SC_VIEW_STACK=false; scOpen(id); };
+  if(BP_VIEW && $("bpVClose")){
+    const close = ()=>{ BP_VIEW=null; BP_VIEW_STACK=false; renderPolicyDrawer(); };
+    $("bpVClose").onclick = close; $("bpVDone").onclick = close; $("bpVScrim").onclick = close;
+    $("bpVEdit").onclick = ()=>{ const id = BP_VIEW; BP_VIEW=null; BP_VIEW_STACK=false; bpOpen(id); };
   }
-  if(SC_IMPACT && $("scIClose")){
-    const close = ()=>{ SC_IMPACT=false; renderScopeDrawer(); };
-    $("scIClose").onclick = close; $("scIDone").onclick = close; $("scIScrim").onclick = close;
+  if(BP_IMPACT && $("bpIClose")){
+    const close = ()=>{ BP_IMPACT=false; renderPolicyDrawer(); };
+    $("bpIClose").onclick = close; $("bpIDone").onclick = close; $("bpIScrim").onclick = close;
   }
-  if(!SC_DRAFT) return;
-  const d = SC_DRAFT;
-  $("scDClose").onclick  = scClose;
-  $("scDCancel").onclick = scClose;
-  $("scScrim").onclick   = ()=>{ if(!SC_IMPACT) scClose(); };
-  $("scName").oninput = e => { d.name = e.target.value; };
-  $("scDesc").oninput = e => { d.desc = e.target.value; };
-  if($("scImpView")) $("scImpView").onclick = ()=>{ SC_IMPACT = true; renderScopeDrawer(); };
-  if($("scViewCis")) $("scViewCis").onclick = ()=>scPreviewOpen();
+  if(!BP_DRAFT) return;
+  const d = BP_DRAFT;
+  $("bpDClose").onclick  = bpClose;
+  $("bpDCancel").onclick = bpClose;
+  $("bpScrim").onclick   = ()=>{ if(!BP_IMPACT) bpClose(); };
+  $("bpName").oninput = e => { d.name = e.target.value; };
+  $("bpDesc").oninput = e => { d.desc = e.target.value; };
+  if($("bpImpView")) $("bpImpView").onclick = ()=>{ BP_IMPACT = true; renderPolicyDrawer(); };
+  if($("bpViewCis")) $("bpViewCis").onclick = ()=>bpPreviewOpen();
 
-  wireCbGroups(d.groups, renderScopeDrawer);
-  document.querySelectorAll("#scHost [data-dd]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd; renderScopeDrawer();
-  });
-  document.querySelectorAll("#scHost [data-ddpick]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation(); ddSet(b.dataset.ddpick, b.dataset.ddval);
-  });
-  document.querySelectorAll("#scHost [data-ddclose]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation(); DD_OPEN=null; renderScopeDrawer();
-  });
-
-  $("scDSave").onclick = ()=>{
-    if(!d.name.trim()){ d.err = true; renderScopeDrawer(); $("scName").focus(); return; }
-    const s = {id:d.id || scopeNextId(), name:d.name.trim(), desc:d.desc.trim(), on:d.on,
-               updated:todayLabel(),
-               groups:(d.groups||[]).map(g=>({join:g.join, conds:g.conds.map(c=>({...c}))}))};
-    const imp = scopeImpact(d);
-    if(d.id) SCOPES = SCOPES.map(x=>x.id===s.id ? s : x); else SCOPES.push(s);
-    const back = d.back;
-    const n = scopeCis(s).length;
-    SC_DRAFT = null; SC_IMPACT = false; renderScopeDrawer();
-    renderScopes(); renderPolicies();
-    if(back) back(s.id);
-    toast(imp && (imp.added.length || imp.removed.length)
-      ? `Saved "${s.name}" — ${n} CI${n===1?"":"s"} in scope (+${imp.added.length} / −${imp.removed.length})`
-      : `${d.id?"Saved":"Created"} "${s.name}" — ${n} CI${n===1?"":"s"} in scope`);
-  };
-
-  if(!d._focused){ d._focused = true; setTimeout(()=>{ const el=$("scName"); if(el && !d.id) el.focus(); },0); }
-}
-
-/* The scope editor borrows the shared preview drawer rather than growing its own. */
-function scPreviewOpen(){ TP = {mod:"sc"}; TP_MOUNTED = false; TP_Q = ""; TP_SORT = "id"; renderStack(); }
-
-/* ══════════════════════════════════════════════════════════════
-   BOM POLICIES — admin sub-screen
-   Where behaviour is attached to an audience. The page has to be readable
-   without opening a row: name, who it covers, what it does, and who wins
-   where two policies want the same thing.
-   ══════════════════════════════════════════════════════════════ */
-let PL_Q = "", PL_DRAFT = null, PL_CONFIRM = null;
-
-/* Every clash across the whole set, deduplicated per pair — the page-level
-   reading, so the banner and the rows cannot disagree about how many there are. */
-function allPolicyClashes(){
-  const seen = new Set(), out = [];
-  POLICIES.filter(p=>p.on).forEach(p=>{
-    policyConflicts(p).forEach(x=>{
-      const k = [p.id, x.other.id].sort().join("|");
-      if(seen.has(k)) return;
-      seen.add(k); out.push({a:p, b:x.other, cis:x.cis, clashes:x.clashes});
-    });
-  });
-  return out;
-}
-
-function renderPolicies(){
-  const active = POLICIES.filter(p=>p.on);
-  const gov = governanceMap();
-  const clashes = allPolicyClashes();
-
-  document.getElementById("plSummary").innerHTML = `
-    <div class="sumcell"><div class="suml">Policies</div>
-      <div class="sumv">${POLICIES.length}<span class="u">${active.length} active</span></div></div>
-    <div class="sumcell"><div class="suml">CIs governed</div>
-      <div class="sumv">${gov.size}<span class="u">of ${ALL_CIS.length} discovered</span></div>
-      <div class="sums">${gov.size ? "Covered by at least one active policy" : "No policy covers anything yet"}</div></div>
-    <div class="sumcell"><div class="suml">Overlaps needing precedence</div>
-      <div class="sumv${clashes.length?"":" quiet"}">${clashes.length}</div>
-      <div class="sums${clashes.length?" warn":""}">${clashes.length
-        ? "Same capability, different values — priority decides"
-        : "No two policies set the same capability differently"}</div></div>`;
-
-  /* Calm and aggregate: the count, and a way in. Never a red wall on load. */
-  document.getElementById("plBanner").innerHTML = clashes.length ? `
-    <div class="ovl">
-      <span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2.4l6 10.4H2L8 2.4z"/><path d="M8 6.6v3M8 11.3h.01"/></svg></span>
-      <div>
-        <div class="ovl-t">${clashes.length} policy overlap${clashes.length===1?"":"s"} need${clashes.length===1?"s":""} precedence</div>
-        <div class="ovl-d">${clashes.map(c=>`<b style="color:var(--ink)">${esc(c.a.name)}</b> and <b style="color:var(--ink)">${esc(c.b.name)}</b> both set
-          ${c.clashes.map(x=>CAP_NAME[x.cap]).join(" and ")} for ${c.cis.length} shared CI${c.cis.length===1?"":"s"}`).join("<br>")}.
-          Priority decides which value applies — nothing is applied twice.</div>
-      </div>
-    </div>` : "";
-
-  const q = PL_Q.trim().toLowerCase();
-  const shown = POLICIES.filter(p=>{
-    if(!q) return true;
-    const s = scopeOf(p.scopeId);
-    return [p.name, p.desc, s?s.name:"", s?scopeSummary(s):""].join(" ").toLowerCase().includes(q);
-  });
-  document.getElementById("plCount").textContent = POLICIES.length;
-
-  const wrap = document.getElementById("plWrap");
-  wrap.innerHTML = POLICIES.length ? (shown.length ? `<div style="overflow-x:auto"><table class="sc-table">
-    <thead><tr>
-      <th style="width:21%">Policy</th><th style="width:19%">Scope</th><th style="width:108px">Matching CIs</th>
-      <th>Capabilities</th><th style="width:84px">Priority</th><th style="width:104px">Status</th>
-      <th style="width:116px">Last Updated</th><th style="width:150px">Actions</th>
-    </tr></thead>
-    <tbody>${shown.map(p=>{
-      const s = scopeOf(p.scopeId), cis = policyCis(p);
-      const enr = cis.filter(c=>c.enrolled).length;
-      const caps = policyCaps(p);
-      const conf = p.on ? policyConflicts(p) : [];
-      return `<tr class="${p.on?"":"off"}">
-        <td><div class="sc-name">${esc(p.name)}</div>
-          <div class="sc-id">${p.id}${p.desc?` · ${esc(p.desc)}`:""}</div></td>
-        <td>${s ? `<div class="scref">
-              <a class="nm" href="#" data-plscope="${s.id}">${esc(s.name)}</a>
-              <span class="cd" title="${esc(scopeSummary(s))}">${esc(scopeSummary(s) || "No conditions")}</span>
-            </div>` : `<span class="avail">No scope</span>`}</td>
-        <td><div class="sc-when">${cis.length} CI${cis.length===1?"":"s"}</div>
-          <div class="sc-sub">${enr} enrolled</div></td>
-        <td><div class="caps">${caps.length
-          ? caps.map(c=>`<span class="capchip">${CAPS.find(x=>x.id===c).icon}${CAP_NAME[c]}
-              <span class="v">${esc(capPhrase(p,c))}</span></span>`).join("")
-          : `<span class="capnone">Nothing switched on — this policy does nothing yet</span>`}</div>
-          ${conf.length ? `<div class="sc-sub" style="margin-top:6px"><button class="lnk" data-plovl="${p.id}" style="color:var(--warn)">
-            Overlaps ${conf.length} polic${conf.length===1?"y":"ies"} on ${
-              [...new Set(conf.flatMap(x=>x.clashes.map(y=>CAP_NAME[y.cap])))].join(", ")}</button></div>` : ""}</td>
-        <td><span class="prio${p.priority===1?" top":""}">${p.priority}</span></td>
-        <td><span class="sc-stat ${p.on?"on":"paused"}"><span class="d" style="background:${
-              p.on?"var(--ok-dot)":"var(--neu-dot)"}"></span>${p.on?"Active":"Disabled"}</span></td>
-        <td><div class="sc-sub" style="margin:0">${esc(p.updated)}</div></td>
-        <td><div class="sc-acts">
-          <button class="iact" data-pltoggle="${p.id}">${p.on?"Disable":"Enable"}</button>
-          <button class="iact" data-pledit="${p.id}">Edit</button>
-          <button class="iact sq del" data-pldel="${p.id}" aria-label="Delete ${esc(p.name)}">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.8 4.4h10.4M6.4 4.4V3.2a1 1 0 011-1h1.2a1 1 0 011 1v1.2M4.2 4.4l.6 8a1.2 1.2 0 001.2 1.1h4a1.2 1.2 0 001.2-1.1l.6-8"/></svg></button>
-          ${PL_CONFIRM===p.id ? `<div class="confirm">
-            <p>Delete ${esc(p.name)}?</p>
-            <p>The ${cis.length} CI${cis.length===1?"":"s"} it covers stop following it. The scope itself is kept —
-               other policies may still use it — and BOMs already generated are untouched.</p>
-            <div class="row"><button class="btn sm" data-pldelno="1">Cancel</button>
-              <button class="btn sm danger" data-pldelyes="${p.id}">Delete policy</button></div>
-          </div>` : ""}
-        </div></td></tr>`;
-    }).join("")}</tbody></table></div>`
-    : `<div class="estate"><span class="ic">${IC_FUNNEL}</span>
-        <div class="t">No policy matches “${esc(PL_Q.trim())}”.</div>
-        <div class="d">${POLICIES.length} polic${POLICIES.length===1?"y exists":"ies exist"} — clear the search to see them.</div></div>`)
-  : `<div class="estate">
-      <span class="ic"><svg width="26" height="26" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.4 2.6h9.2a1 1 0 011 1v10.8a1 1 0 01-1 1H4.4a1 1 0 01-1-1V3.6a1 1 0 011-1z"/><path d="M6.2 6.4h5.6M6.2 9h5.6M6.2 11.6h3.2"/></svg></span>
-      <div class="t">No BOM policies yet.</div>
-      <div class="d">A policy points at a CI scope and switches on licensing, scanning, retention — or any combination. Create one and the same audience serves all three.</div>
-      <div class="cta"><button class="btn pri lg" id="plEmptyNew">New BOM Policy</button></div></div>`;
-
-  const en = document.getElementById("plEmptyNew");
-  if(en) en.onclick = ()=>plOpen(null);
-  document.querySelectorAll("[data-plscope]").forEach(a=>a.onclick=e=>{ e.preventDefault(); scView(a.dataset.plscope); });
-  document.querySelectorAll("[data-pledit]").forEach(b=>b.onclick=()=>plOpen(b.dataset.pledit));
-  document.querySelectorAll("[data-plovl]").forEach(b=>b.onclick=()=>plOpen(b.dataset.plovl, {jump:"overlap"}));
-  document.querySelectorAll("[data-pltoggle]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation();
-    const p = policyOf(b.dataset.pltoggle); p.on = !p.on; p.updated = todayLabel();
-    renderPolicies(); renderScopes(); renderScheduler(); renderRetention(); renderLicensing();
-    toast(p.on
-      ? `"${p.name}" enabled — it applies to its scope again`
-      : `"${p.name}" disabled — it stops applying. Existing BOMs, scans and enrolments are kept.`);
-  });
-  document.querySelectorAll("[data-pldel]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation(); PL_CONFIRM = PL_CONFIRM===b.dataset.pldel ? null : b.dataset.pldel; renderPolicies();
-  });
-  document.querySelectorAll("[data-pldelno]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); PL_CONFIRM=null; renderPolicies(); });
-  document.querySelectorAll("[data-pldelyes]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation();
-    const p = policyOf(b.dataset.pldelyes);
-    POLICIES = POLICIES.filter(x=>x.id!==b.dataset.pldelyes);
-    PL_CONFIRM=null; renderPolicies(); renderScopes(); renderScheduler(); renderRetention(); renderLicensing();
-    toast(`Deleted "${p.name}" — its scope is kept`);
-  });
-}
-
-/* ══ the policy layer, seen from inside a module ═══════════════
-   Licensing, Scheduler and Retention each keep their own screen and their own
-   direct configuration — nothing was taken away. What each gained is a reading of
-   the policies that reach into it: which ones, pointed at which audience, set to
-   what. The targeting is NOT repeated here; it belongs to the scope, and the link
-   goes there. One renderer, three column specs, so the three cannot drift. */
-const POLSEC = {
-  lic: {title:"Policy-driven enrolment",
-        note:"These BOM policies enrol their scope automatically. The conditions live in the scope, so they are not repeated here — and a CI that starts matching is enrolled without an edit.",
-        head:"Enrolment", cell:p=>{
-          const cis = policyCis(p), got = cis.filter(c=>c.enrolled).length;
-          return `<div class="sc-trig">Auto-enrol</div>
-                  <div class="sc-sub">${got} of ${cis.length} enrolled${cis.length-got?` · ${cis.length-got} waiting`:""}</div>`;
-        }},
-  bs:  {title:"Policy-driven schedules",
-        note:"These BOM policies generate BOMs on a schedule for their scope. Edit the cadence from the policy — the audience stays where it was defined.",
-        head:"Schedule", cell:p=>{
-          const v = p.caps.bs, nx = p.on ? bsNext({...v, on:true, kind:v.kind}) : null;
-          return `<div class="sc-trig">${esc(bsTrigger(v))}</div>
-                  <div class="sc-sub">${esc(bsClock(v))}${nx?` · next ${bsWhen(nx)}`:""}</div>`;
-        }},
-  rt:  {title:"Policy-driven retention",
-        note:"These BOM policies set how long BOM versions survive for their scope, overriding the default policy for those CIs.",
-        head:"Retention", cell:p=>`<div class="sc-trig">Keep last ${esc(p.caps.rt.keep)}</div>
-          <div class="sc-sub">${p.caps.rt.period==="Never delete" ? "Never deleted" : `Delete after ${esc(p.caps.rt.period.toLowerCase())}`}</div>`}
-};
-function policySectionHTML(cap){
-  const ps = POLICIES.filter(p=>capOn(p,cap));
-  const m = POLSEC[cap];
-  if(!ps.length) return `<div class="polsec">
-    <div class="sechd"><h2>${m.title}</h2><span class="n">0</span></div>
-    <div class="ovl calm" style="margin-bottom:0">
-      <span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 7.4v3.4M8 5.2h.01"/></svg></span>
-      <div><div class="ovl-t">No BOM policy uses ${CAP_NAME[cap].toLowerCase()} yet</div>
-        <div class="ovl-d">A policy points at a reusable CI scope and switches on any combination of licensing, scanning and retention — so the same audience does not have to be described here as well.</div></div>
-      <span class="ovl-a"><button class="btn sm" data-plnew="1">New BOM Policy</button></span>
-    </div></div>`;
-  return `<div class="polsec">
-    <div class="sechd"><h2>${m.title}</h2><span class="n">${ps.length}</span>
-      <div class="r"><button class="btn sm" data-plall="1">Manage policies →</button></div></div>
-    <div class="polsec-note">${m.note}</div>
-    <section class="sc-wrap"><div style="overflow-x:auto"><table class="sc-table">
-      <thead><tr><th style="width:24%">Policy</th><th style="width:24%">Scope</th>
-        <th style="width:112px">In scope</th><th>${m.head}</th>
-        <th style="width:84px">Priority</th><th style="width:104px">Status</th>
-        <th style="width:92px">Actions</th></tr></thead>
-      <tbody>${ps.map(p=>{
-        const sc = scopeOf(p.scopeId), cis = policyCis(p);
-        const won = p.on ? governs(p, cap).length : 0;
-        return `<tr class="${p.on?"":"off"}">
-          <td><div class="sc-name">${esc(p.name)}</div><div class="sc-id">${p.id}</div></td>
-          <td>${sc ? `<div class="scref"><a class="nm" href="#" data-plsc="${sc.id}">${esc(sc.name)}</a>
-                <span class="cd" title="${esc(scopeSummary(sc))}">${esc(scopeSummary(sc) || "No conditions")}</span></div>`
-                : `<span class="avail">No scope</span>`}</td>
-          <td><div class="sc-when">${cis.length} CI${cis.length===1?"":"s"}</div>
-            <div class="sc-sub">${p.on && won < cis.length
-              ? `${won} decided here` : `${cis.filter(c=>c.enrolled).length} enrolled`}</div></td>
-          <td>${m.cell(p)}</td>
-          <td><span class="prio${p.priority===1?" top":""}">${p.priority}</span></td>
-          <td><span class="sc-stat ${p.on?"on":"paused"}"><span class="d" style="background:${
-                p.on?"var(--ok-dot)":"var(--neu-dot)"}"></span>${p.on?"Active":"Disabled"}</span></td>
-          <td><div class="sc-acts"><button class="iact" data-plgo="${p.id}">Edit</button></div></td>
-        </tr>`;
-      }).join("")}</tbody></table></div></section></div>`;
-}
-function wirePolicySection(){
-  document.querySelectorAll("[data-plgo]").forEach(b=>b.onclick=()=>plOpen(b.dataset.plgo));
-  document.querySelectorAll("[data-plsc]").forEach(a=>a.onclick=e=>{ e.preventDefault(); scView(a.dataset.plsc); });
-  document.querySelectorAll("[data-plnew]").forEach(b=>b.onclick=()=>plOpen(null));
-  document.querySelectorAll("[data-plall]").forEach(b=>b.onclick=()=>setView("policies"));
-}
-
-/* A draft read as if it were saved, so overlap and precedence are answered by the
-   SAME functions the list uses — a policy cannot be told one thing while it is
-   being written and another the moment it is saved. */
-const plAsPolicy = d => ({id:d.id || "__draft", name:d.name.trim() || "This policy",
-                          desc:d.desc, scopeId:d.scopeId, on:true,
-                          priority:d.priority, caps:d.caps, updated:todayLabel()});
-
-function plOpen(id, opts){
-  const p = id && policyOf(id);
-  PL_DRAFT = p
-    ? {id:p.id, name:p.name, desc:p.desc||"", scopeId:p.scopeId, on:p.on, priority:p.priority,
-       editing:true, err:false,
-       caps:{lic:{...p.caps.lic}, bs:{...p.caps.bs, days:[...(p.caps.bs.days||[])]}, rt:{...p.caps.rt}},
-       ...(opts||{})}
-    : {id:null, name:"", desc:"", scopeId:null, on:true, priority:2, editing:false, err:false,
-       caps:{lic:{on:false}, bs:newSchedCap(), rt:{on:false, keep:RT_DEFAULT.keep, period:RT_DEFAULT.period}},
-       ...(opts||{})};
-  PL_CONFIRM = null; TP = null; TP_MOUNTED = false;
-  renderPolicyDrawer();
-}
-function plClose(){ PL_DRAFT=null; TP=null; TP_MOUNTED=false; DD_OPEN=null;
-                    renderPolicyDrawer(); renderPolicies(); }
-
-/* Enrolling what a policy's licensing capability promises. Seats are the gate, so
-   a policy can only enrol what there is room for — and has to say so when it cannot. */
-function plApplyLicensing(p){
-  if(!p.on || !capOn(p,"lic")) return {enrolled:0, short:0};
-  const want = policyCis(p).filter(c=>!c.enrolled);
-  const room = Math.max(0, licLeft());
-  const take = want.slice(0, room);
-  take.forEach(c=>{ c.enrolled = true; c.by = "Auto"; c.byPolicy = p.id; c.byRule = null; c.ruleAt = Date.now(); });
-  syncEnrolled();
-  return {enrolled:take.length, short:want.length - take.length};
-}
-
-function renderPolicyDrawer(){
-  const host = document.getElementById("plHost");
-  if(!PL_DRAFT){ host.innerHTML = ""; return; }
-  const d = PL_DRAFT;
-  const keep = [...host.querySelectorAll(".dw-body")].map(el=>el.scrollTop);
-  const dwIn = d._mounted ? "" : " in"; d._mounted = true;
-  const $ = i => document.getElementById(i);
-
-  const s = d.scopeId ? scopeOf(d.scopeId) : null;
-  const cis = s ? scopeCis(s) : [];
-  const unenrolled = cis.filter(c=>!c.enrolled).length;
-  const on = policyCaps(d);
-  const overlaps = d.scopeId ? policyOverlaps(plAsPolicy(d), {selfId: d.id || "__draft"}) : [];
-  const clashing = overlaps.filter(x=>x.clashes.length);
-  /* Read at save time, not render time: the name field updates the draft without a
-     re-render (so the caret is never yanked), which would leave a render-time list
-     one keystroke stale — and refuse to save a policy that is complete. */
-  /* A capability that is switched on but cannot fire is worse than one that is off:
-     the policy claims coverage it will never deliver. Only what the chosen shape
-     actually requires is enforced — the same rule the Scheduler's own drawer applies. */
-  const schedGap = () => {
-    const v = d.caps.bs;
-    if(!capOn(d,"bs") || v.kind !== "Recurring") return null;
-    if(v.freq === "Weekly" && !(v.days||[]).length) return "a day for the weekly schedule";
-    if(v.freq === "Custom" && !v.endDate)          return "an end date for the schedule";
-    return null;
-  };
-  const whatsMissing = () => [!d.name.trim() && "a name", !d.scopeId && "a scope",
-                              !policyCaps(d).length && "at least one capability",
-                              schedGap()].filter(Boolean);
-  const missing = whatsMissing();
-
-  /* ── one capability card ─────────────────────────────────── */
-  const capCard = (c, body) => {
-    const meta = CAPS.find(x=>x.id===c), live = capOn(d, c);
-    return `<div class="capcard${live?" on":""}">
-      <div class="capcard-h">
-        <span class="capcard-i">${meta.icon}</span>
-        <span class="tile-hd">
-          <span class="capcard-t">${meta.key}</span>
-          <span class="capcard-d">${meta.verb}</span>
-        </span>
-        <span class="capcard-sw"><button class="sw${live?" on":""}" data-plcap="${c}" role="switch"
-          aria-checked="${live}" aria-label="${meta.key} capability"></button></span>
-      </div>
-      ${live ? `<div class="capcard-b" id="capb-${c}">${body}</div>` : ""}
-    </div>`;
-  };
-
-  const licBody = `
-    <div class="avail" style="line-height:1.6">Every CI in the scope is enrolled for BOM generation, and CIs that
-      start matching later are enrolled too — that is what makes the scope worth defining once.</div>
-    <div class="scband-x" style="margin-top:10px">
-      <span class="scband-n"><b>${unenrolled}</b> of ${cis.length} not enrolled yet</span>
-      <span class="scband-n" style="margin-left:14px"><b>${Math.max(0,licLeft())}</b> seats available</span>
-    </div>
-    ${unenrolled > licLeft() ? `<div class="ferr" style="margin-top:10px;padding:11px 13px;background:var(--crit-soft);border-radius:6px;line-height:1.55">
-      <b>Not enough seats.</b> ${unenrolled} CI${unenrolled===1?"":"s"} would need enrolling but only
-      ${Math.max(0,licLeft())} seat${licLeft()===1?"":"s"} remain — the rest stay unenrolled until seats are freed.</div>` : ""}`;
-
-  const rtBody = `
-    <div class="polstack">
-      <div class="polline">Keep the latest ${ddHTML("plKeep", d.caps.rt.keep, KEEP_OPTS, 168)}</div>
-      <div class="polline">or delete versions older than ${ddHTML("plPeriod", d.caps.rt.period, PERIOD_OPTS, 150)}</div>
-    </div>
-    <div class="polrow-note">${rtNote(d.caps.rt.keep, d.caps.rt.period)}</div>`;
-
-  host.innerHTML = `
-  <div class="dw-scrim${dwIn}" id="plScrim"></div>
-  <aside class="dw${dwIn}" style="width:${DW_W}px;max-width:95vw" role="dialog" aria-modal="true"
-         aria-label="${d.editing?"Edit":"New"} BOM policy">
-    <div class="dw-head">
-      <div><h3>${d.editing ? "Edit BOM policy" : "New BOM Policy"}</h3>
-        <p>Point at a CI scope, then switch on what BOM Management should do for it. Any combination — one capability is a valid policy.</p></div>
-      <button class="x" id="plDClose" aria-label="Close">${IC_X}</button>
-    </div>
-
-    <div class="dw-body">
-      <div class="sechead">Policy details</div>
-      <div class="fld">
-        <label class="flab" for="plName">Policy name<span class="req">*</span></label>
-        <input class="finput${d.err && !d.name.trim() ? " err":""}" id="plName" type="text"
-               value="${esc(d.name)}" placeholder="e.g. Design Windows BOM Policy" autocomplete="off">
-        ${d.err && !d.name.trim() ? `<div class="ferr">Give the policy a name.</div>` : ""}
-      </div>
-      <div class="fld">
-        <label class="flab" for="plDesc">Description <span style="color:var(--faint)">— optional</span></label>
-        <input class="finput" id="plDesc" type="text" value="${esc(d.desc)}"
-               placeholder="What this policy is for, in a line" autocomplete="off">
-      </div>
-
-      <hr class="dw-div">
-      <div class="sechead">Target CIs <span>— the audience this policy acts on</span></div>
-      ${scopeBandHTML({scopeKey:"pl", scopeId:d.scopeId, scopeReq:true})}
-      ${d.err && !d.scopeId ? `<div class="ferr" style="margin-top:-4px">Choose a scope — a policy has to know who it applies to.</div>` : ""}
-      ${previewBlockHTML("pl")}
-
-      <hr class="dw-div">
-      <div class="sechead">BOM capabilities <span>— switch on any combination</span></div>
-      ${capCard("lic", licBody)}
-      ${capCard("bs", schedFieldsHTML({...d.caps.bs, err:d.err}, "pls"))}
-      ${capCard("rt", rtBody)}
-      ${d.err && !on.length ? `<div class="ferr">Switch on at least one capability, or this policy would do nothing.</div>` : ""}
-
-      <hr class="dw-div">
-      <div class="sechead">Precedence <span>— who wins when two policies want the same thing</span></div>
-      <div class="grid2">
-        <div class="fld" style="margin-bottom:0">
-          <span class="flab">Priority</span>
-          ${ddHTML("plPrio", String(d.priority), ["1","2","3","4","5"], "full")}
-          <div class="rt-note" style="margin-top:6px">1 is highest. Where two policies set the same capability differently, the higher priority applies — never both.</div>
-        </div>
-      </div>
-
-      <div id="plOvl">${d.scopeId ? (overlaps.length ? `
-        <div class="ovl${clashing.length?"":" calm"}" style="margin-top:18px;margin-bottom:0">
-          <span class="ic">${clashing.length
-            ? `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2.4l6 10.4H2L8 2.4z"/><path d="M8 6.6v3M8 11.3h.01"/></svg>`
-            : `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 7.4v3.4M8 5.2h.01"/></svg>`}</span>
-          <div style="min-width:0">
-            <div class="ovl-t">${clashing.length
-              ? `Policy overlap detected`
-              : `Overlaps ${overlaps.length} polic${overlaps.length===1?"y":"ies"} — no conflict`}</div>
-            <div class="ovl-d">${clashing.length
-              ? `This policy shares CIs with ${overlaps.length} other${overlaps.length===1?"":"s"}, and ${clashing.length===1?"one sets":`${clashing.length} set`} the same capability differently. Priority decides which value applies.`
-              : `Sharing CIs is not a conflict on its own — these policies configure different capabilities, so the same CI safely receives both.`}</div>
-          </div>
-        </div>
-        ${overlaps.map((x,i)=>`
-          <div class="ovitem${x.clashes.length?" clash":""}">
-            <div class="ovitem-h">${esc(x.other.name)}
-              <span class="n">${x.cis.length} shared CI${x.cis.length===1?"":"s"} · priority ${x.other.priority}</span></div>
-            <div class="ovitem-d">${x.clashes.length
-              ? `Conflicting capabilit${x.clashes.length===1?"y":"ies"}: <b style="color:var(--ink)">${x.clashes.map(c=>CAP_NAME[c.cap]).join(", ")}</b>`
-              : x.caps.length
-                ? `Both set ${x.caps.map(c=>CAP_NAME[c.cap]).join(", ")} to the same value — nothing to settle.`
-                : `Different capabilities. The shared CIs receive both, which is the point of the model.`}</div>
-            ${x.clashes.map(c=>{
-              const mineWins = x.winner === "mine";
-              return `<div class="ovcap">
-                <span class="ovcap-l">${CAP_NAME[c.cap]}</span>
-                <span class="ovside${mineWins?" win":""}"><b>${mineWins?"Applies · this policy":"This policy"}</b>${esc(c.mine)}</span>
-                <span class="ovside${mineWins?"":" win"}"><b>${mineWins?esc(x.other.name):`Applies · ${esc(x.other.name)}`}</b>${esc(c.theirs)}</span>
-              </div>`;
-            }).join("")}
-            ${x.clashes.length ? `<div class="ovacts">
-              ${!(x.winner === "mine") ? `<button class="btn sm" data-plwin="${x.other.id}">Make this policy win</button>` : ""}
-              <button class="btn sm" data-plyield="${x.other.id}">Let ${esc(x.other.name)} win</button>
-              <button class="btn sm" data-pledscope="1">Edit scope</button>
-              <button class="btn sm" data-pledcap="${x.clashes[0].cap}">Edit ${CAP_NAME[x.clashes[0].cap].toLowerCase()}</button>
-            </div>` : ""}
-          </div>`).join("")}` : "") : ""}</div>
-    </div>
-
-    <div class="dw-foot">
-      <span class="avail">${s
-        ? `Applies to <b style="color:var(--ink)">${cis.length}</b> CI${cis.length===1?"":"s"} · ${on.length
-            ? on.map(c=>CAP_NAME[c]).join(", ") : "no capability yet"}`
-        : "No scope chosen yet"}</span>
-      <span class="gap"></span>
-      <button class="btn lg" id="plDCancel">Cancel</button>
-      <button class="btn pri lg" id="plDSave">${d.editing ? "Save policy" : "Create policy"}</button>
-    </div>
-  </aside>`;
-
-  [...host.querySelectorAll(".dw-body")].forEach((el,i)=>{ if(keep[i]!=null) el.scrollTop = keep[i]; });
-
-  $("plDClose").onclick  = plClose;
-  $("plDCancel").onclick = plClose;
-  $("plScrim").onclick   = ()=>{ if(!SC_DRAFT && !SC_VIEW && !TP) plClose(); };
-  $("plName").oninput = e => { d.name = e.target.value; };
-  $("plDesc").oninput = e => { d.desc = e.target.value; };
-  if($("tpView-pl")) $("tpView-pl").onclick = ()=>tpOpen("pl");
-  wireScopeBand(d, renderPolicyDrawer);
-  wireSchedFields(d.caps.bs, "pls", renderPolicyDrawer);
-
-  document.querySelectorAll("[data-plcap]").forEach(b=>b.onclick=()=>{
-    const c = b.dataset.plcap; d.caps[c].on = !d.caps[c].on; renderPolicyDrawer();
-  });
-  document.querySelectorAll("[data-plwin]").forEach(b=>b.onclick=()=>{
-    const o = policyOf(b.dataset.plwin);
-    d.priority = Math.max(1, o.priority - 1); renderPolicyDrawer();
-    toast(`Priority ${d.priority} — this policy now wins over "${o.name}"`);
-  });
-  document.querySelectorAll("[data-plyield]").forEach(b=>b.onclick=()=>{
-    const o = policyOf(b.dataset.plyield);
-    d.priority = Math.min(5, o.priority + 1); renderPolicyDrawer();
-    toast(`Priority ${d.priority} — "${o.name}" now wins`);
-  });
-  document.querySelectorAll("[data-pledscope]").forEach(b=>b.onclick=()=>{
-    if(d.scopeId) scOpen(d.scopeId, {stack:true, back:()=>renderPolicyDrawer()});
-  });
-  document.querySelectorAll("[data-pledcap]").forEach(b=>b.onclick=()=>{
-    const el = document.getElementById("capb-"+b.dataset.pledcap);
-    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
-  });
-
-  document.querySelectorAll("#plHost [data-dd]").forEach(b=>b.onclick=e=>{
+  wireCbGroups(d.groups, renderPolicyDrawer);
+  document.querySelectorAll("#bpHost [data-dd]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd; renderPolicyDrawer();
   });
-  document.querySelectorAll("#plHost [data-ddpick]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation();
-    const id = b.dataset.ddpick, v = b.dataset.ddval;
-    if(id === "plKeep")   d.caps.rt.keep = v;
-    if(id === "plPeriod") d.caps.rt.period = v;
-    if(id === "plPrio")   d.priority = +v;
-    schedDdSet(d.caps.bs, "pls", id, v);
-    scopeBandDdSet(d, id, v);
-    DD_OPEN = null; renderPolicyDrawer();
+  document.querySelectorAll("#bpHost [data-ddpick]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation(); ddSet(b.dataset.ddpick, b.dataset.ddval);
   });
-  document.querySelectorAll("#plHost [data-ddclose]").forEach(b=>b.onclick=e=>{
+  document.querySelectorAll("#bpHost [data-ddclose]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN=null; renderPolicyDrawer();
   });
 
-  $("plDSave").onclick = ()=>{
-    const gaps = whatsMissing();
-    if(gaps.length){ d.err = true; renderPolicyDrawer();
-      toast(`Needs ${gaps.join(", ")} before it can be saved`); return; }
-    const p = {id:d.id || policyNextId(), name:d.name.trim(), desc:d.desc.trim(),
-               scopeId:d.scopeId, on:d.on, priority:d.priority, updated:todayLabel(),
-               caps:{lic:{...d.caps.lic}, bs:{...d.caps.bs, days:[...(d.caps.bs.days||[])]}, rt:{...d.caps.rt}}};
-    if(d.editing) POLICIES = POLICIES.map(x=>x.id===p.id ? p : x); else POLICIES.push(p);
-    /* Licensing is the one capability that changes the estate the moment it is
-       saved — the other two describe what happens to CIs that are already enrolled. */
-    const lic = plApplyLicensing(p);
-    const n = policyCis(p).length;
-    plClose();
-    renderScopes(); renderScheduler(); renderRetention(); renderLicensing();
-    toast(lic.short
-      ? `Saved "${p.name}" — ${lic.enrolled} CI${lic.enrolled===1?"":"s"} enrolled, ${lic.short} could not (no seats)`
-      : `${d.editing?"Saved":"Created"} "${p.name}" — ${n} CI${n===1?"":"s"} in scope${
-          lic.enrolled ? `, ${lic.enrolled} newly enrolled` : ""}`);
+  $("bpDSave").onclick = ()=>{
+    if(!d.name.trim()){ d.err = true; renderPolicyDrawer(); $("bpName").focus(); return; }
+    const s = {id:d.id || bpNextId(), name:d.name.trim(), desc:d.desc.trim(), on:d.on,
+               updated:todayLabel(),
+               groups:(d.groups||[]).map(g=>({join:g.join, conds:g.conds.map(c=>({...c}))}))};
+    const imp = bpImpact(d);
+    if(d.id) BOM_POLICIES = BOM_POLICIES.map(x=>x.id===s.id ? s : x); else BOM_POLICIES.push(s);
+    const back = d.back;
+    const n = bpCis(s).length;
+    BP_DRAFT = null; BP_IMPACT = false; renderPolicyDrawer();
+    renderPolicies();
+    if(back) back(s.id);
+    toast(imp && (imp.added.length || imp.removed.length)
+      ? `Saved "${s.name}" — now matching ${n} CI${n===1?"":"s"} (+${imp.added.length} / −${imp.removed.length})`
+      : `${d.id?"Saved":"Created"} "${s.name}" — matching ${n} CI${n===1?"":"s"}`);
   };
 
-  if(!d._focused){
-    d._focused = true;
-    setTimeout(()=>{
-      if(d.jump === "overlap"){ const el = $("plOvl"); if(el) el.scrollIntoView({behavior:"smooth", block:"center"}); return; }
-      const el = $("plName"); if(el && !d.editing) el.focus();
-    },0);
-  }
+  if(!d._focused){ d._focused = true; setTimeout(()=>{ const el=$("bpName"); if(el && !d.id) el.focus(); },0); }
 }
+
+/* The policy editor borrows the shared preview drawer rather than growing its own. */
+function bpPreviewOpen(){ TP = {mod:"bp"}; TP_MOUNTED = false; TP_Q = ""; TP_SORT = "id"; renderStack(); }
 
 /* ── view switching ───────────────────────────────────────────
    The rail owns two destinations: the inventory overview and the BOM
    admin hub. Admin is where participation, cadence and retention are
    decided, so it gates everything the inventory can report. */
 const ROUTES = {inventory:"#/bom/components", admin:"#/admin",
-                policies:"#/admin/bom-policies", scopes:"#/admin/bom-scopes",
+                policies:"#/admin/bom-policies",
                 retention:"#/admin/bom-retention", scheduler:"#/admin/bom-scheduler",
                 licensing:"#/admin/bom-licensing"};
 /* Longest prefix first — "#/admin" is a prefix of every admin sub-route, so
@@ -6143,8 +5394,7 @@ function viewFromHash(h){
   if(h.indexOf(ROUTES.licensing) === 0) return "licensing";
   if(h.indexOf(ROUTES.retention) === 0) return "retention";
   if(h.indexOf(ROUTES.scheduler) === 0) return "scheduler";
-  if(h.indexOf(ROUTES.policies)  === 0) return "policies";
-  if(h.indexOf(ROUTES.scopes)    === 0) return "scopes";
+  if(h.indexOf(ROUTES.policies)    === 0) return "policies";
   if(h.indexOf(ROUTES.admin)     === 0) return "admin";
   if(h.indexOf(ROUTES.inventory) === 0) return "inventory";
   /* This copy is the BOM ADMIN hand-off — with no route in the address it
@@ -6159,8 +5409,7 @@ function setView(v){
   document.getElementById("viewRetention").hidden = v!=="retention";
   document.getElementById("viewScheduler").hidden = v!=="scheduler";
   document.getElementById("viewLicensing").hidden = v!=="licensing";
-  document.getElementById("viewPolicies").hidden  = v!=="policies";
-  document.getElementById("viewScopes").hidden    = v!=="scopes";
+  document.getElementById("viewPolicies").hidden    = v!=="policies";
   VIEW = v;
   location.hash = ROUTES[v] || ROUTES.inventory;
   window.scrollTo(0,0);
@@ -6172,8 +5421,7 @@ function setView(v){
     if(v==="retention") renderRetention();
     if(v==="scheduler") renderScheduler();
     if(v==="licensing") renderLicensing();
-    if(v==="policies")  renderPolicies();
-    if(v==="scopes")    renderScopes();
+    if(v==="policies")    renderPolicies();
   } catch(err){ console.error("BOM: painting " + v + " failed —", err); }
 }
 document.getElementById("crumbBom").onclick  = e=>{ e.preventDefault(); setView("inventory"); };
@@ -6190,16 +5438,13 @@ document.querySelectorAll(".adcard").forEach(c=>c.onclick=()=>{
   if(c.dataset.route === ROUTES.retention) setView("retention");
   else if(c.dataset.route === ROUTES.scheduler) setView("scheduler");
   else if(c.dataset.route === ROUTES.licensing) setView("licensing");
-  else if(c.dataset.route === ROUTES.policies)  setView("policies");
-  else if(c.dataset.route === ROUTES.scopes)    setView("scopes");
+  else if(c.dataset.route === ROUTES.policies)    setView("policies");
   else go({route:c.dataset.route, desc:c.dataset.desc});
 });
 document.getElementById("bsQ").addEventListener("input", e=>{ BS_Q=e.target.value; renderScheduler(); });
 document.getElementById("bsNew").onclick = ()=>bsOpen(null);
-document.getElementById("plQ").addEventListener("input", e=>{ PL_Q=e.target.value; renderPolicies(); });
-document.getElementById("scQ").addEventListener("input", e=>{ SC_Q=e.target.value; renderScopes(); });
-document.getElementById("plNew").onclick = ()=>plOpen(null);
-document.getElementById("scNew").onclick = ()=>scOpen(null);
+document.getElementById("bpQ").addEventListener("input", e=>{ BP_Q=e.target.value; renderPolicies(); });
+document.getElementById("bpNew").onclick = ()=>bpOpen(null);
 
 /* ── the licensing page's one CTA ─────────────────────────────
    Wired once, here, because it lives in the static page head rather than in a
@@ -6233,7 +5478,7 @@ document.getElementById("scNew").onclick = ()=>scOpen(null);
    painting is isolated so one failure cannot take the rest of the screen with it. */
 setView(viewFromHash(location.hash));
 [renderKpis, renderChips, render, renderRetention, renderScheduler, renderLicensing,
- renderPolicies, renderScopes]
+ renderPolicies]
   .forEach(fn=>{ try { fn(); } catch(err){ console.error("BOM: " + fn.name + "() failed —", err); } });
 
 /* Routing used to happen once, here, so arriving at a second route without a
