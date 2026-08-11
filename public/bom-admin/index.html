@@ -682,16 +682,30 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .rt-def-scope{margin-left:auto;font-size:12px;color:var(--dim)}
 .rt-sentence{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;color:var(--ink);line-height:1.5}
 .rt-sentence .j{color:var(--dim);font-size:14px}
-/* Reach — the policy's own overview, secondary to the control it qualifies. */
-.rt-reach{margin-top:13px;padding-top:12px;border-top:1px solid var(--line-soft);
-  display:flex;align-items:flex-start;gap:16px}
-.rt-reach-l{flex:none;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
-  color:var(--dim);padding-top:1px}
-.rt-reach ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 22px;min-width:0}
-.rt-reach li{position:relative;padding-left:12px;font-size:12px;color:var(--dim);line-height:1.5}
-.rt-reach li::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:9999px;
+/* ── the default policy card ──────────────────────────────────
+   A KPI card that is also the only place this policy is edited. It is the one
+   control on these screens that does not apply on change, so it shows its pending
+   state plainly and commits from its own footer. */
+.rtcfg.dirty{border-color:var(--brand)}
+.rt-scope{font-size:12px;color:var(--dim);margin:-4px 0 12px}
+.rtc-field{display:flex;flex-direction:column;gap:5px}
+.rtc-lab{font-size:12px;color:var(--dim)}
+.rtc-or{display:flex;align-items:center;gap:8px;margin:9px 0;color:var(--faint);
+  font-size:11px;font-weight:600;letter-spacing:.06em}
+.rtc-or::before,.rtc-or::after{content:"";flex:1;height:1px;background:var(--line-soft)}
+.rtc-note{margin-top:11px;font-size:12px;color:var(--dim);line-height:1.5}
+.rtc-sum{margin:11px 0 0;padding:11px 0 0;border-top:1px solid var(--line-soft);list-style:none;
+  display:flex;flex-direction:column;gap:4px}
+.rtc-sum li{position:relative;padding-left:12px;font-size:12px;color:var(--dim);line-height:1.5}
+.rtc-sum li::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:9999px;
   background:var(--line)}
-.rt-reach li b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.rtc-sum li b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.rtc-foot{margin-top:auto;padding-top:12px;display:flex;align-items:center;gap:8px}
+.rtc-dirty{margin-right:auto;font-size:12px;font-weight:500;color:var(--warn)}
+.knum .ku{font-size:15px;font-weight:500;letter-spacing:0;color:var(--dim);margin-left:6px}
+.kcta[disabled]{color:var(--faint);cursor:default}
+.kcta[disabled]:hover{background:none}
+.kcta[disabled] .ar{display:none}
 /* Policy row — a grouped statement rather than a pair of loose selects.
    Shared: Retention uses it for keep/delete, and it is the pattern any
    module should use when two controls form one sentence. */
@@ -1079,10 +1093,10 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
       </div>
     </div>
 
-    <!-- The default policy is the page: it governs every enrolled CI, and the
-         exceptions below are departures from it. It carries its own reach, so the
-         KPI strip that restated the same three numbers is gone. -->
-    <section class="card rt-def" id="rtDefault"></section>
+    <!-- The overview row is where the default policy is EDITED: card one is the
+         only place it can be changed, so the figures beside it and the control that
+         moves them are the same surface. There is no second copy below. -->
+    <section class="kpis" id="rtCards"></section>
 
     <div class="sechd">
       <h2>Retention Exceptions</h2><span class="n" id="rtCount">0</span>
@@ -2148,6 +2162,12 @@ const newCond  = () => ({field:"", op:"", value:""});
 const newGroup = () => ({join:"And", open:true, conds:[newCond()]});
 
 let RT_DEFAULT = {keep:"10 versions", period:"90 days"};
+/* The pending edit to the default policy, or null when there is none. This one
+   control does not apply on change: it governs every enrolled CI, so it commits
+   deliberately and RT_DEFAULT stays the truth until Save. */
+let RT_DEF_DRAFT = null;
+/* Whether the read-only "CIs on an exception" list is open. */
+let RT_AFFECTED = false;
 let RT_RULES = [
   {id:"RR-1", name:"Payments host", keep:"5 versions", period:"30 days",
    on:true, auto:false, groups:[], manual:["CI-5"]}
@@ -2195,8 +2215,15 @@ function ddHTML(id, value, opts, width, placeholder){
 /* Every select routes through here, so adding one never adds wiring.
    Condition selects encode their address in the id: kind-group-row. */
 function ddSet(id, val){
-  if(id==="defKeep")   { RT_DEFAULT.keep = val;   toast(`Default retention: keep last ${val}`); }
-  if(id==="defPeriod") { RT_DEFAULT.period = val; toast(`Default retention: delete after ${val.toLowerCase()}`); }
+  /* Into the draft, not the policy — and no toast, because nothing has happened
+     yet. The card's own footer is what reports the pending change. */
+  if(id==="defKeep" || id==="defPeriod"){
+    RT_DEF_DRAFT = RT_DEF_DRAFT || {keep:RT_DEFAULT.keep, period:RT_DEFAULT.period};
+    if(id==="defKeep") RT_DEF_DRAFT.keep = val; else RT_DEF_DRAFT.period = val;
+    /* Back to the saved values by hand is not a change — drop the draft so the
+       footer does not linger over an edit that no longer differs. */
+    if(RT_DEF_DRAFT.keep === RT_DEFAULT.keep && RT_DEF_DRAFT.period === RT_DEFAULT.period) RT_DEF_DRAFT = null;
+  }
   if(id==="mKeep")     RT_DRAFT.keep = val;
   if(id==="mPeriod")   RT_DRAFT.period = val;
   /* Condition selects belong to whichever surface is showing the group
@@ -2254,37 +2281,62 @@ function renderRetention(){
   const D = RT_DEFAULT;
 
   /* quick overview — not a KPI row, just the three facts */
-  /* The default policy is both the control and the overview: it says what the rule
-     is, and — because "applies to everything except the exceptions" is only half an
-     answer — how far it actually reaches. The KPI strip above it restated those same
-     figures, so the numbers now live once, next to the thing they qualify. */
+  /* ── overview row ─────────────────────────────────────────
+     Card one is the default policy AND the only place it is edited — the figure and
+     the control that moves it are the same surface, so there is no second copy to
+     drift. Cards two and three are readings with a way through to what they count.
+     Unlike every other control on these screens, this one does NOT apply on change:
+     it governs every enrolled CI, so it commits deliberately. RT_DEF_DRAFT holds the
+     pending edit; RT_DEFAULT stays the truth until Save. */
   const nEx = RT_RULES.length, nOn = RT_RULES.filter(r=>r.on).length, aff = rtAffected();
   const rest = ENROLLED_CIS.length - aff;
-  document.getElementById("rtDefault").innerHTML = `
-    <div class="rt-def-head">
-      <span class="rt-eyebrow">Default retention policy</span>
-      <span class="rt-def-scope">Applies to all enrolled CIs</span>
-    </div>
-    <div class="rt-sentence">
-      Keep the latest ${ddHTML("defKeep", D.keep, KEEP_OPTS, 172)}
-      <span class="j">or automatically delete versions older than</span>
-      ${ddHTML("defPeriod", D.period, PERIOD_OPTS, 150)}
-    </div>
-    <div class="rt-note">${rtNote(D.keep, D.period)} Each limit is set on its own — change one without touching the other.</div>
-    <div class="rt-reach">
-      <span class="rt-reach-l">Summary</span>
-      <ul>
+  const dr = RT_DEF_DRAFT || D;
+  const dirty = !!RT_DEF_DRAFT && (RT_DEF_DRAFT.keep !== D.keep || RT_DEF_DRAFT.period !== D.period);
+  document.getElementById("rtCards").innerHTML = `
+    <article class="kpi rtcfg${dirty?" dirty":""}">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.6V8l2.4 1.5"/></svg></span><span class="t">Default Retention Policy</span></div>
+      <div class="rt-scope">Applies to all enrolled CIs</div>
+      <div class="rtc-field">
+        <span class="rtc-lab">Keep latest</span>
+        ${ddHTML("defKeep", dr.keep, KEEP_OPTS, "full")}
+      </div>
+      <div class="rtc-or"><span>OR</span></div>
+      <div class="rtc-field">
+        <span class="rtc-lab">Delete versions older than</span>
+        ${ddHTML("defPeriod", dr.period, PERIOD_OPTS, "full")}
+      </div>
+      <div class="rtc-note">${rtNote(dr.keep, dr.period)}</div>
+      <ul class="rtc-sum">
+        <li>Applies to <b>${rest}</b> enrolled CI${rest===1?"":"s"}</li>
         <li>${nEx
-          ? `<b>${nEx}</b> retention exception${nEx===1?"":"s"}${nEx-nOn ? ` · ${nOn} active, ${nEx-nOn} disabled` : ""}`
-          : `No retention exceptions`}</li>
-        <li>${aff
-          ? `<b>${aff}</b> of ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} use an exception`
-          : `No enrolled CI currently uses an exception`}</li>
-        <li>${rest === ENROLLED_CIS.length
-          ? `All ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} follow this policy`
-          : `The remaining <b>${rest}</b> follow${rest===1?"s":""} this policy`}</li>
+          ? `<b>${nEx}</b> exception rule${nEx===1?"":"s"} override${nEx===1?"s":""} this policy`
+          : `No exception rules override this policy`}</li>
       </ul>
-    </div>`;
+      ${dirty ? `<div class="rtc-foot">
+        <span class="rtc-dirty">Unsaved changes</span>
+        <button class="btn sm" id="rtDefDiscard">Discard</button>
+        <button class="btn sm pri" id="rtDefSave">Save Changes</button>
+      </div>` : ""}
+    </article>
+
+    <article class="kpi">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span><span class="t">Retention Exceptions</span></div>
+      <div class="knum n-neutral">${nOn}</div>
+      <div class="klabel">Active exception rule${nOn===1?"":"s"}</div>
+      <div class="ksec">${aff
+        ? `${aff} CI${aff===1?"":"s"} use${aff===1?"s":""} an exception`
+        : (nEx ? "No CI currently matches them" : "Every CI follows the default policy")}${
+        nEx-nOn ? ` · ${nEx-nOn} disabled` : ""}</div>
+      <button class="kcta" id="rtViewEx"><span class="lb">View exceptions</span><span class="ar">→</span></button>
+    </article>
+
+    <article class="kpi">
+      <div class="kh"><span class="ic">${IC_ASSET}</span><span class="t">Overrides</span></div>
+      <div class="knum n-neutral">${aff}<span class="ku">CI${aff===1?"":"s"}</span></div>
+      <div class="klabel">Following custom retention</div>
+      <div class="ksec">${rest} CI${rest===1?"":"s"} use${rest===1?"s":""} default policy</div>
+      <button class="kcta" id="rtViewCis"${aff?"":" disabled"}><span class="lb">View affected CIs</span><span class="ar">→</span></button>
+    </article>`;
 
   document.getElementById("rtCount").textContent = RT_RULES.length;
   const wrap = document.getElementById("rtWrap");
@@ -2338,6 +2390,27 @@ function renderRetention(){
     e.stopPropagation(); DD_OPEN=null; renderRetention(); if(RT_DRAFT) renderModal();
   });
   if(document.getElementById("rtEmptyNew")) document.getElementById("rtEmptyNew").onclick = ()=>rtOpen(null);
+
+  /* Commit / abandon the pending default. Only this card is in edit mode; nothing
+     else on the page is held up by it. */
+  const rtSave = document.getElementById("rtDefSave");
+  if(rtSave) rtSave.onclick = ()=>{
+    RT_DEFAULT.keep = RT_DEF_DRAFT.keep; RT_DEFAULT.period = RT_DEF_DRAFT.period;
+    RT_DEF_DRAFT = null; renderRetention();
+    toast(`Default retention saved — keep the latest ${RT_DEFAULT.keep.toLowerCase()}, delete after ${RT_DEFAULT.period.toLowerCase()}`);
+  };
+  const rtDisc = document.getElementById("rtDefDiscard");
+  if(rtDisc) rtDisc.onclick = ()=>{ RT_DEF_DRAFT = null; renderRetention(); };
+
+  /* Each reading offers a way through to what it counts. */
+  const rtVE = document.getElementById("rtViewEx");
+  if(rtVE) rtVE.onclick = ()=>{
+    const w = document.getElementById("rtWrap");
+    if(w) w.scrollIntoView({behavior:"smooth", block:"center"});
+  };
+  const rtVC = document.getElementById("rtViewCis");
+  if(rtVC && !rtVC.disabled) rtVC.onclick = ()=>{ RT_AFFECTED = true; renderModal(); };
+
   document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>rtOpen(b.dataset.edit));
   document.querySelectorAll("[data-rttoggle]").forEach(b=>b.onclick=e=>{
     e.stopPropagation();
@@ -2727,7 +2800,42 @@ function renderStack(){
   });
   wireStack();
 }
+/* Read-only: which enrolled CIs are on an exception rather than the default, and
+   which rule takes each one. Opened from the Overrides reading — a count is only
+   useful if you can see what it counts. */
+function renderAffected(){
+  const host = document.getElementById("modalHost");
+  const rows = [];
+  RT_RULES.forEach(r=>{ if(!r.on) return;
+    rtTargets(r).forEach(id=>{ const c = ciOf(id);
+      if(c && c.enrolled && !rows.some(x=>x.c.id===id)) rows.push({c, r}); }); });
+  host.innerHTML = `<div class="dw-scrim in" id="rtAScrim"></div>
+    <aside class="dw in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="CIs on a retention exception">
+      <div class="dw-head"><div><h3>CIs on a retention exception</h3>
+        <p>${rows.length} of ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} · the rest follow the default policy · read-only</p></div>
+        <button class="x" id="rtAClose" aria-label="Close">${IC_X}</button></div>
+      <div class="dw-body" style="padding:0">
+        <div class="pk-hd vhd" style="grid-template-columns:56px minmax(0,1fr) 150px 150px">
+          <span>CI ID</span><span>Host Name</span><span>Exception</span><span>Retention</span></div>
+        ${rows.length ? rows.map(({c,r})=>`
+          <div class="pk-row vrow" style="grid-template-columns:56px minmax(0,1fr) 150px 150px;cursor:default">
+            <span class="id">${c.id}</span>
+            <span class="vhost"><span class="hn" title="${esc(c.host)}">${esc(c.host)}</span><span class="ip">${c.ip}</span></span>
+            <span class="vwhen"><span class="vd">${esc(r.name)}</span><span class="vt">${r.id}</span></span>
+            <span class="vwhen"><span class="vd">${esc(r.keep)}</span><span class="vt">${r.period==="Never delete"?"never deleted":`after ${esc(r.period.toLowerCase())}`}</span></span>
+          </div>`).join("") : `<div class="pk-empty vempty">
+            <div class="t">No CI is on an exception.</div>
+            <div class="d">All ${ENROLLED_CIS.length} enrolled CIs follow the default policy.</div></div>`}
+      </div>
+      <div class="dw-foot"><span class="avail">Change this list by editing the exceptions, not the CIs.</span>
+        <span class="gap"></span><button class="btn lg" id="rtADone">Close</button></div>
+    </aside>`;
+  const close = ()=>{ RT_AFFECTED=false; host.innerHTML=""; };
+  ["rtAClose","rtADone","rtAScrim"].forEach(id=>{ const el=document.getElementById(id); if(el) el.onclick=close; });
+}
+
 function renderModal(){
+  if(RT_AFFECTED && !RT_DRAFT){ renderAffected(); return; }
   const d = RT_DRAFT;
   if(!d) return;
   const autoCount = d.auto ? autoMatches(d.groups).length : 0;
