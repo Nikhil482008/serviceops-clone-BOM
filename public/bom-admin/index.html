@@ -682,6 +682,21 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .rt-def-scope{margin-left:auto;font-size:12px;color:var(--dim)}
 .rt-sentence{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;color:var(--ink);line-height:1.5}
 .rt-sentence .j{color:var(--dim);font-size:14px}
+/* ── retention rule drawer ────────────────────────────────────
+   The policy as one sentence over two lines; a RECOMMENDED tag that guides without
+   making the other option look unavailable; and each targeting card carrying its
+   own way through to the CIs it claims. */
+.polstack{display:flex;flex-direction:column;gap:8px}
+.polline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--ink)}
+.tile-tag.rec{color:var(--brand);background:var(--pill-id)}
+.tile.dyn{border-color:#CFE0F0}
+.tile.dyn:hover{border-color:var(--brand)}
+.tile-view{margin-top:8px;display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:0;
+  font:inherit;font-size:12px;font-weight:500;color:var(--brand);cursor:pointer}
+.tile-view:hover{text-decoration:underline}
+.tile-view .ar{transition:transform .15s}
+.tile-view:hover .ar{transform:translateX(2px)}
+
 /* ── the default policy card ──────────────────────────────────
    It REPORTS the policy — two plain lines where the other cards carry their number,
    so all three keep the same shape and the row stays a dashboard. Changing the
@@ -2172,6 +2187,8 @@ let RT_CONFIRM = null;   // id of the rule whose delete is confirming
    whichever draft opened them. `target` is that draft; `back` re-renders
    the parent once something is applied. */
 let PICK = null, COND = null;
+/* Which affected-CI preview is stacked over the rule drawer: "auto", "manual", or null. */
+let RT_PREVIEW = null, RT_PREVIEW_MOUNTED = false;
 
 /* Which enrolled CIs a rule resolves to. Auto-included types stay in
    sync as the CMDB grows; manual picks never do. */
@@ -2413,7 +2430,7 @@ function rtOpen(id){
   renderModal();
 }
 function rtClose(){
-  RT_DRAFT=null; PICK=null; COND=null; DD_OPEN=null;
+  RT_DRAFT=null; PICK=null; COND=null; DD_OPEN=null; RT_PREVIEW=null; RT_PREVIEW_MOUNTED=false;
   document.getElementById("modalHost").innerHTML=""; renderRetention();
 }
 
@@ -2577,6 +2594,11 @@ function cbPrevLine(hits){
 function wireStack(){
   const $ = i => document.getElementById(i);
 
+  if(RT_PREVIEW){
+    const close = ()=>{ RT_PREVIEW=null; RT_PREVIEW_MOUNTED=false; renderStack(); };
+    ["rtPClose","rtPDone","rtPScrim"].forEach(id=>{ const el=$(id); if(el) el.onclick=close; });
+  }
+
   if(PICK){
     const applyClose = ()=>{ PICK=null; renderStack(); };
     $("pkClose").onclick  = closePick;
@@ -2706,6 +2728,50 @@ function renderStack(){
     </aside>`;
   }
 
+  /* ── affected-CI preview, stacked over the rule being written ──────
+     Same pattern as Licensing's: the count on the card is the claim, this is the
+     evidence. Read-only — the way to change it is the targeting above. "Current
+     policy" is what each CI follows TODAY, so the reader can see what this
+     exception would be overriding. */
+  let rtprev = "";
+  if(RT_PREVIEW && RT_DRAFT){
+    const dd = RT_DRAFT;
+    const ids = RT_PREVIEW === "auto"
+      ? (dd.auto ? autoMatches(dd.groups).map(c=>c.id) : [])
+      : dd.manual.slice();
+    const rows = ENROLLED_CIS.filter(c=>ids.includes(c.id));
+    /* Whichever active exception already takes this CI, ignoring the draft. */
+    const nowPolicy = c => {
+      const r = RT_RULES.find(x=>x.on && x.id!==dd.id && rtTargets(x).has(c.id));
+      return r ? {t:`${r.keep}`, s:esc(r.name)} : {t:RT_DEFAULT.keep, s:"Default policy"};
+    };
+    const PC = "56px minmax(0,1fr) 120px 168px";
+    const pIn = RT_PREVIEW_MOUNTED ? "" : " in"; RT_PREVIEW_MOUNTED = true;
+    rtprev = `<div class="dw-scrim lite${pIn}" id="rtPScrim"></div>
+    <aside class="dw stack${pIn}" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Affected CIs">
+      <div class="dw-head"><div><h3>${RT_PREVIEW==="auto" ? "Matching CIs" : "Selected CIs"}</h3>
+        <p>${esc(dd.name.trim() || "This exception")} · ${rows.length} of ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} · read-only</p></div>
+        <button class="x" id="rtPClose" aria-label="Close">${IC_X}</button></div>
+      <div class="dw-body" style="padding:0">
+        <div class="pk-hd vhd" style="grid-template-columns:${PC}">
+          <span>CI ID</span><span>Host Name</span><span>CI Type</span><span>Current Policy</span></div>
+        ${rows.length ? rows.map(c=>{ const np = nowPolicy(c);
+          return `<div class="pk-row vrow" style="grid-template-columns:${PC};cursor:default">
+            <span class="id">${c.id}</span>
+            <span class="vhost"><span class="hn" title="${esc(c.host)}">${esc(c.host)}</span><span class="ip">${c.ip}</span></span>
+            <span><span class="pill ghost">${esc(c.type)}</span></span>
+            <span class="vwhen"><span class="vd">${esc(np.t)}</span><span class="vt">${np.s}</span></span>
+          </div>`;}).join("") : `<div class="pk-empty vempty">
+            <div class="t">${RT_PREVIEW==="auto" ? "No CIs match this condition yet." : "No CIs selected yet."}</div>
+            <div class="d">${RT_PREVIEW==="auto"
+              ? "Matching CIs will appear here as conditions are built."
+              : "Choose CIs to see them listed here."}</div></div>`}
+      </div>
+      <div class="dw-foot"><span class="avail">This exception is not saved yet.</span>
+        <span class="gap"></span><button class="btn lg" id="rtPDone">Close</button></div>
+    </aside>`;
+  }
+
   /* ── the stacked condition builder ──────────────────────── */
   let conds = "";
   if(COND){
@@ -2759,7 +2825,7 @@ function renderStack(){
 
   const host = document.getElementById("stackHost");
   const keep = [...host.querySelectorAll(".dw-body,.pk-list")].map(el=>el.scrollTop);
-  host.innerHTML = picker + conds;
+  host.innerHTML = picker + conds + rtprev;
   [...host.querySelectorAll(".dw-body,.pk-list")].forEach((el,i)=>{
     if(keep[i] != null) el.scrollTop = keep[i];
   });
@@ -2884,18 +2950,44 @@ function renderModal(){
       </div>
 
       <div class="sechead">Retention policy</div>
-      <div class="polrow">
-        <span class="j">Keep last</span>${ddHTML("mKeep", d.keep, KEEP_OPTS, 168)}
-        <span class="j">or delete after</span>${ddHTML("mPeriod", d.period, PERIOD_OPTS, 150)}
+      <!-- One policy, read as one sentence across two lines, rather than a row of
+           controls the reader has to reassemble. -->
+      <div class="polstack">
+        <div class="polline">Keep the latest ${ddHTML("mKeep", d.keep, KEEP_OPTS, 168)}</div>
+        <div class="polline">or delete versions older than ${ddHTML("mPeriod", d.period, PERIOD_OPTS, 150)}</div>
       </div>
       <div class="polrow-note">${rtNote(d.keep, d.period)}</div>
 
       <hr class="dw-div">
 
-      <div class="sechead">Applies to CIs <span>— by hand, by rule, or both</span></div>
+      <div class="sechead">Applies to CIs <span>— by rule, by hand, or both</span></div>
 
       <div class="tiles">
-        <!-- tile 1 — hand-picked, fixed -->
+        <!-- Conditions come FIRST: a rule keeps working as the estate changes,
+             where a hand-picked list is a snapshot that silently goes stale.
+             The on/off switch lives in the builder, not here. -->
+        <div class="tile dyn${d.auto && autoCount ? " act" : ""}">
+          <div class="tile-top">
+            <span class="tile-i"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
+            <span class="tile-hd">
+              <span class="tile-t">Auto-include by condition <span class="tile-tag rec">Recommended</span></span>
+              <span class="tile-d">Every enrolled CI matching your conditions is targeted automatically — including new CIs that match later.</span>
+            </span>
+          </div>
+          <div class="tile-x">
+            <div class="tile-stat${autoCount?"":" zero"}"><b>${autoCount}</b> of ${ENROLLED_CIS.length} CIs</div>
+            <div class="tile-state">${
+              !nGroups ? "No CIs match this condition yet."
+              : !d.auto ? `Turned off · ${nGroups} group${nGroups===1?"":"s"} kept`
+              : autoCount ? `${autoCount} CI${autoCount===1?"":"s"} currently match`
+              : "No CIs match this condition yet."}</div>
+            ${d.auto && autoCount ? `<button class="tile-view" id="mViewAuto">View matching CIs<span class="ar">→</span></button>` : ""}
+          </div>
+          <div class="tile-b"><button class="btn sm pri" id="mCond">${nGroups ? "Edit conditions" : "Build conditions"}</button></div>
+        </div>
+
+        <!-- Hand-picked, fixed. Structurally identical so the choice reads as a
+             choice — recommended, not the only option. -->
         <div class="tile${d.manual.length?" act":""}">
           <div class="tile-top">
             <span class="tile-i"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.6 14.4c0-2.6 2.2-4.2 4.8-4.2s4.8 1.6 4.8 4.2"/><circle cx="7.4" cy="6" r="2.7"/><path d="M13.4 6.4h3.2M15 4.8v3.2"/></svg></span>
@@ -2907,53 +2999,14 @@ function renderModal(){
           <div class="tile-x">
             <div class="tile-stat${d.manual.length?"":" zero"}"><b>${d.manual.length}</b> of ${ENROLLED_CIS.length} CIs</div>
             <!-- Count only. Listing every CI made the card grow without
-                 bound; the names live one click away in the picker. -->
+                 bound; the names live one click away. -->
             <div class="tile-state">${
-              !d.manual.length ? "No CIs chosen yet"
+              !d.manual.length ? "No CIs selected yet."
               : d.manual.length === ENROLLED_CIS.length ? "Every enrolled CI is selected"
-              : "Fixed list — new CIs are not added automatically"}</div>
+              : `${d.manual.length} CI${d.manual.length===1?"":"s"} selected`}</div>
+            ${d.manual.length ? `<button class="tile-view" id="mViewMan">View selected CIs<span class="ar">→</span></button>` : ""}
           </div>
           <div class="tile-b"><button class="btn sm" id="mAdd">${d.manual.length ? "Edit selection" : "Choose CIs"}</button></div>
-        </div>
-
-        <!-- tile 2 — matched by condition, stays in sync. The on/off
-             switch lives in the builder, not here. -->
-        <div class="tile dyn${d.auto && autoCount ? " act" : ""}">
-          <div class="tile-top">
-            <span class="tile-i"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
-            <span class="tile-hd">
-              <span class="tile-t">Auto-include by condition <span class="tile-tag">Dynamic</span></span>
-              <span class="tile-d">Every enrolled CI matching your conditions is targeted — and stays targeted as new CIs are enrolled.</span>
-            </span>
-          </div>
-          <div class="tile-x">
-            <div class="tile-stat${autoCount?"":" zero"}"><b>${autoCount}</b> of ${ENROLLED_CIS.length} CIs</div>
-            <div class="tile-state">${
-              !nGroups ? "No conditions built yet"
-              : !d.auto ? `Turned off · ${nGroups} group${nGroups===1?"":"s"} kept`
-              : `${nGroups} condition group${nGroups===1?"":"s"} · matching CIs join automatically`}</div>
-          </div>
-          <div class="tile-b"><button class="btn sm" id="mCond">${nGroups ? "Edit conditions" : "Build conditions"}</button></div>
-        </div>
-      </div>
-
-      <hr class="dw-div">
-      <div class="sechead">Impact</div>
-      <div class="impact${total?"":" none"}">
-        <div class="impact-n">${total}</div>
-        <div style="min-width:0">
-          ${total
-            ? `<div class="impact-t">enrolled CI${total===1?"":"s"} will use this exception</div>
-               <div class="impact-d">Kept for <b>${esc(d.keep)}</b> instead of ${esc(RT_DEFAULT.keep)}, deleted after
-                 <b>${esc(d.period.toLowerCase())}</b> instead of ${esc(RT_DEFAULT.period.toLowerCase())}.
-                 The other ${ENROLLED_CIS.length - total} enrolled CI${ENROLLED_CIS.length-total===1?"":"s"} keep the default.</div>
-               <div class="impact-mix">
-                 ${d.manual.length ? `<span class="achip" style="padding-right:8px">${d.manual.length} by hand</span>` : ""}
-                 ${d.auto && autoCount ? `<span class="achip" style="padding-right:8px">${autoCount} by rule</span>` : ""}
-                 ${d.manual.length && d.auto && autoCount ? `<span class="avail">mixed targeting</span>` : ""}
-               </div>`
-            : `<div class="impact-t">This exception affects no CIs yet</div>
-               <div class="impact-d">Choose CIs by hand or build a condition above — until then, it overrides nothing.</div>`}
         </div>
       </div>
     </div>
@@ -2981,6 +3034,10 @@ function renderModal(){
   $("mName").oninput   = e => { d.name = e.target.value; };
   $("mAdd").onclick    = ()=>openPick(d, renderModal, "manual");
   $("mCond").onclick   = ()=>openCond(d, renderModal);
+  /* Evidence for the count on each card — stacked over the draft, never instead
+     of it, so the rule stays visible while it is being checked. */
+  if($("mViewAuto")) $("mViewAuto").onclick = ()=>{ RT_PREVIEW="auto";   RT_PREVIEW_MOUNTED=false; renderStack(); };
+  if($("mViewMan"))  $("mViewMan").onclick  = ()=>{ RT_PREVIEW="manual"; RT_PREVIEW_MOUNTED=false; renderStack(); };
 
   document.querySelectorAll("#modalHost [data-dd]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd; renderModal();
