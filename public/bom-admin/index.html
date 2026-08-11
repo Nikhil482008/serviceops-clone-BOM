@@ -682,6 +682,16 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .rt-def-scope{margin-left:auto;font-size:12px;color:var(--dim)}
 .rt-sentence{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;color:var(--ink);line-height:1.5}
 .rt-sentence .j{color:var(--dim);font-size:14px}
+/* Reach — the policy's own overview, secondary to the control it qualifies. */
+.rt-reach{margin-top:13px;padding-top:12px;border-top:1px solid var(--line-soft);
+  display:flex;align-items:flex-start;gap:16px}
+.rt-reach-l{flex:none;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--dim);padding-top:1px}
+.rt-reach ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 22px;min-width:0}
+.rt-reach li{position:relative;padding-left:12px;font-size:12px;color:var(--dim);line-height:1.5}
+.rt-reach li::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:9999px;
+  background:var(--line)}
+.rt-reach li b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 /* Policy row — a grouped statement rather than a pair of loose selects.
    Shared: Retention uses it for keep/delete, and it is the pattern any
    module should use when two controls form one sentence. */
@@ -1059,19 +1069,23 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
         <h1>BOM Retention</h1>
         <div class="sub">Control how long generated BOM versions are stored. Every enrolled CI follows the default policy unless an exception rule overrides it.</div>
       </div>
-    </div>
-
-    <section class="sumstrip" id="rtSummary"></section>
-    <section class="card rt-def" id="rtDefault"></section>
-
-    <div class="sechd">
-      <h2>Retention Exceptions</h2><span class="n" id="rtCount">0</span>
-      <div class="r">
+      <!-- Same pattern as the Scheduler: creating belongs to the page, the table
+           below manages what already exists. -->
+      <div class="head-actions">
         <button class="btn pri" id="rtNew">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>
           New Exception
         </button>
       </div>
+    </div>
+
+    <!-- The default policy is the page: it governs every enrolled CI, and the
+         exceptions below are departures from it. It carries its own reach, so the
+         KPI strip that restated the same three numbers is gone. -->
+    <section class="card rt-def" id="rtDefault"></section>
+
+    <div class="sechd">
+      <h2>Retention Exceptions</h2><span class="n" id="rtCount">0</span>
     </div>
 
     <section class="sc-wrap" id="rtWrap"></section>
@@ -2240,27 +2254,37 @@ function renderRetention(){
   const D = RT_DEFAULT;
 
   /* quick overview — not a KPI row, just the three facts */
-  document.getElementById("rtSummary").innerHTML = `
-    <div class="sumcell"><div class="suml">Default policy</div>
-      <div class="sumv">${esc(D.keep)}<span class="u">/ ${esc(D.period.toLowerCase())}</span></div></div>
-    <div class="sumcell"><div class="suml">Retention exceptions</div>
-      <div class="sumv${RT_RULES.length?"":" quiet"}">${RT_RULES.length}<span class="u">${
-        RT_RULES.filter(r=>r.on).length} active</span></div></div>
-    <div class="sumcell"><div class="suml">Affected CIs</div>
-      <div class="sumv${rtAffected()?"":" quiet"}">${rtAffected()}<span class="u">of ${ENROLLED_CIS.length} enrolled · the rest follow the default</span></div></div>`;
-
-  /* the default policy, stated rather than filled in */
+  /* The default policy is both the control and the overview: it says what the rule
+     is, and — because "applies to everything except the exceptions" is only half an
+     answer — how far it actually reaches. The KPI strip above it restated those same
+     figures, so the numbers now live once, next to the thing they qualify. */
+  const nEx = RT_RULES.length, nOn = RT_RULES.filter(r=>r.on).length, aff = rtAffected();
+  const rest = ENROLLED_CIS.length - aff;
   document.getElementById("rtDefault").innerHTML = `
     <div class="rt-def-head">
-      <span class="rt-eyebrow">Default policy</span>
-      <span class="rt-def-scope">Applies to every enrolled CI</span>
+      <span class="rt-eyebrow">Default retention policy</span>
+      <span class="rt-def-scope">Applies to all enrolled CIs</span>
     </div>
     <div class="rt-sentence">
       Keep the latest ${ddHTML("defKeep", D.keep, KEEP_OPTS, 172)}
       <span class="j">or automatically delete versions older than</span>
       ${ddHTML("defPeriod", D.period, PERIOD_OPTS, 150)}
     </div>
-    <div class="rt-note">${rtNote(D.keep, D.period)} Each limit is set on its own — change one without touching the other.</div>`;
+    <div class="rt-note">${rtNote(D.keep, D.period)} Each limit is set on its own — change one without touching the other.</div>
+    <div class="rt-reach">
+      <span class="rt-reach-l">Summary</span>
+      <ul>
+        <li>${nEx
+          ? `<b>${nEx}</b> retention exception${nEx===1?"":"s"}${nEx-nOn ? ` · ${nOn} active, ${nEx-nOn} disabled` : ""}`
+          : `No retention exceptions`}</li>
+        <li>${aff
+          ? `<b>${aff}</b> of ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} use an exception`
+          : `No enrolled CI currently uses an exception`}</li>
+        <li>${rest === ENROLLED_CIS.length
+          ? `All ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} follow this policy`
+          : `The remaining <b>${rest}</b> follow${rest===1?"s":""} this policy`}</li>
+      </ul>
+    </div>`;
 
   document.getElementById("rtCount").textContent = RT_RULES.length;
   const wrap = document.getElementById("rtWrap");
