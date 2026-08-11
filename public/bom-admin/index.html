@@ -683,25 +683,13 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .rt-sentence{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;color:var(--ink);line-height:1.5}
 .rt-sentence .j{color:var(--dim);font-size:14px}
 /* ── the default policy card ──────────────────────────────────
-   A KPI card that is also the only place this policy is edited. It is the one
-   control on these screens that does not apply on change, so it shows its pending
-   state plainly and commits from its own footer. */
-.rtcfg.dirty{border-color:var(--brand)}
-.rt-scope{font-size:12px;color:var(--dim);margin:-4px 0 12px}
-.rtc-field{display:flex;flex-direction:column;gap:5px}
-.rtc-lab{font-size:12px;color:var(--dim)}
-.rtc-or{display:flex;align-items:center;gap:8px;margin:9px 0;color:var(--faint);
-  font-size:11px;font-weight:600;letter-spacing:.06em}
-.rtc-or::before,.rtc-or::after{content:"";flex:1;height:1px;background:var(--line-soft)}
-.rtc-note{margin-top:11px;font-size:12px;color:var(--dim);line-height:1.5}
-.rtc-sum{margin:11px 0 0;padding:11px 0 0;border-top:1px solid var(--line-soft);list-style:none;
-  display:flex;flex-direction:column;gap:4px}
-.rtc-sum li{position:relative;padding-left:12px;font-size:12px;color:var(--dim);line-height:1.5}
-.rtc-sum li::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:9999px;
-  background:var(--line)}
-.rtc-sum li b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-.rtc-foot{margin-top:auto;padding-top:12px;display:flex;align-items:center;gap:8px}
-.rtc-dirty{margin-right:auto;font-size:12px;font-weight:500;color:var(--warn)}
+   It REPORTS the policy — two plain lines where the other cards carry their number,
+   so all three keep the same shape and the row stays a dashboard. Changing the
+   policy happens in its own surface, reached from Edit. */
+.rtc-read{display:flex;flex-direction:column;gap:3px;font-size:14px;color:var(--dim);line-height:1.45}
+.rtc-read b{font-weight:600;color:var(--ink)}
+.rtc-act{margin-top:auto;padding-top:12px;display:flex;justify-content:flex-end}
+.rtc-note{margin-top:12px;font-size:12px;color:var(--dim);line-height:1.5}
 .knum .ku{font-size:15px;font-weight:500;letter-spacing:0;color:var(--dim);margin-left:6px}
 .kcta[disabled]{color:var(--faint);cursor:default}
 .kcta[disabled]:hover{background:none}
@@ -2168,6 +2156,8 @@ let RT_DEFAULT = {keep:"10 versions", period:"90 days"};
 let RT_DEF_DRAFT = null;
 /* Whether the read-only "CIs on an exception" list is open. */
 let RT_AFFECTED = false;
+/* Whether the default-policy editor is open. */
+let RT_DEF_EDIT = false;
 let RT_RULES = [
   {id:"RR-1", name:"Payments host", keep:"5 versions", period:"30 days",
    on:true, auto:false, groups:[], manual:["CI-5"]}
@@ -2215,14 +2205,10 @@ function ddHTML(id, value, opts, width, placeholder){
 /* Every select routes through here, so adding one never adds wiring.
    Condition selects encode their address in the id: kind-group-row. */
 function ddSet(id, val){
-  /* Into the draft, not the policy — and no toast, because nothing has happened
-     yet. The card's own footer is what reports the pending change. */
-  if(id==="defKeep" || id==="defPeriod"){
-    RT_DEF_DRAFT = RT_DEF_DRAFT || {keep:RT_DEFAULT.keep, period:RT_DEFAULT.period};
+  /* Into the editor's draft, not the policy — and no toast, because nothing has
+     happened yet. Save is what commits. */
+  if((id==="defKeep" || id==="defPeriod") && RT_DEF_DRAFT){
     if(id==="defKeep") RT_DEF_DRAFT.keep = val; else RT_DEF_DRAFT.period = val;
-    /* Back to the saved values by hand is not a change — drop the draft so the
-       footer does not linger over an edit that no longer differs. */
-    if(RT_DEF_DRAFT.keep === RT_DEFAULT.keep && RT_DEF_DRAFT.period === RT_DEFAULT.period) RT_DEF_DRAFT = null;
   }
   if(id==="mKeep")     RT_DRAFT.keep = val;
   if(id==="mPeriod")   RT_DRAFT.period = val;
@@ -2244,7 +2230,7 @@ function ddSet(id, val){
   }
   DD_OPEN = null;
   if(PICK || COND) renderStack();
-  renderRetention(); if(RT_DRAFT) renderModal(); if(BS_DRAFT) renderBsDrawers();
+  renderRetention(); if(RT_DRAFT || RT_DEF_EDIT) renderModal(); if(BS_DRAFT) renderBsDrawers();
   /* LAST on purpose: renderRetention() binds [data-dd] document-wide, so the
      drawer must re-wire after it or its own selects answer to Retention. */
   if(LIC_DRAWER && !COND) renderLicDrawer();
@@ -2290,52 +2276,34 @@ function renderRetention(){
      pending edit; RT_DEFAULT stays the truth until Save. */
   const nEx = RT_RULES.length, nOn = RT_RULES.filter(r=>r.on).length, aff = rtAffected();
   const rest = ENROLLED_CIS.length - aff;
-  const dr = RT_DEF_DRAFT || D;
-  const dirty = !!RT_DEF_DRAFT && (RT_DEF_DRAFT.keep !== D.keep || RT_DEF_DRAFT.period !== D.period);
   document.getElementById("rtCards").innerHTML = `
-    <article class="kpi rtcfg${dirty?" dirty":""}">
-      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.6V8l2.4 1.5"/></svg></span><span class="t">Default Retention Policy</span></div>
-      <div class="rt-scope">Applies to all enrolled CIs</div>
-      <div class="rtc-field">
-        <span class="rtc-lab">Keep latest</span>
-        ${ddHTML("defKeep", dr.keep, KEEP_OPTS, "full")}
+    <article class="kpi">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.6V8l2.4 1.5"/></svg></span><span class="t">Default Policy</span></div>
+      <div class="rtc-read">
+        <div>Keep <b>${esc(D.keep)}</b></div>
+        <div>Delete after <b>${esc(D.period.toLowerCase())}</b></div>
       </div>
-      <div class="rtc-or"><span>OR</span></div>
-      <div class="rtc-field">
-        <span class="rtc-lab">Delete versions older than</span>
-        ${ddHTML("defPeriod", dr.period, PERIOD_OPTS, "full")}
-      </div>
-      <div class="rtc-note">${rtNote(dr.keep, dr.period)}</div>
-      <ul class="rtc-sum">
-        <li>Applies to <b>${rest}</b> enrolled CI${rest===1?"":"s"}</li>
-        <li>${nEx
-          ? `<b>${nEx}</b> exception rule${nEx===1?"":"s"} override${nEx===1?"s":""} this policy`
-          : `No exception rules override this policy`}</li>
-      </ul>
-      ${dirty ? `<div class="rtc-foot">
-        <span class="rtc-dirty">Unsaved changes</span>
-        <button class="btn sm" id="rtDefDiscard">Discard</button>
-        <button class="btn sm pri" id="rtDefSave">Save Changes</button>
-      </div>` : ""}
+      <div class="ksec">Applies to all enrolled CIs</div>
+      <div class="rtc-act"><button class="btn sm" id="rtDefEdit">Edit</button></div>
     </article>
 
     <article class="kpi">
-      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span><span class="t">Retention Exceptions</span></div>
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span><span class="t">Exception Rules</span></div>
       <div class="knum n-neutral">${nOn}</div>
       <div class="klabel">Active exception rule${nOn===1?"":"s"}</div>
       <div class="ksec">${aff
         ? `${aff} CI${aff===1?"":"s"} use${aff===1?"s":""} an exception`
-        : (nEx ? "No CI currently matches them" : "Every CI follows the default policy")}${
+        : (nEx ? "No CI currently matches them" : "No CI uses an exception")}${
         nEx-nOn ? ` · ${nEx-nOn} disabled` : ""}</div>
-      <button class="kcta" id="rtViewEx"><span class="lb">View exceptions</span><span class="ar">→</span></button>
+      <button class="kcta" id="rtViewEx"><span class="lb">View rules</span><span class="ar">→</span></button>
     </article>
 
     <article class="kpi">
-      <div class="kh"><span class="ic">${IC_ASSET}</span><span class="t">Overrides</span></div>
-      <div class="knum n-neutral">${aff}<span class="ku">CI${aff===1?"":"s"}</span></div>
-      <div class="klabel">Following custom retention</div>
-      <div class="ksec">${rest} CI${rest===1?"":"s"} use${rest===1?"s":""} default policy</div>
-      <button class="kcta" id="rtViewCis"${aff?"":" disabled"}><span class="lb">View affected CIs</span><span class="ar">→</span></button>
+      <div class="kh"><span class="ic">${IC_ASSET}</span><span class="t">Following Default</span></div>
+      <div class="knum n-neutral">${rest}<span class="ku">CI${rest===1?"":"s"}</span></div>
+      <div class="klabel">Following default policy</div>
+      <div class="ksec">${aff ? `${aff} CI${aff===1?"":"s"} overridden` : "No CI is overridden"}</div>
+      <button class="kcta" id="rtViewCis"${aff?"":" disabled"}><span class="lb">View affected</span><span class="ar">→</span></button>
     </article>`;
 
   document.getElementById("rtCount").textContent = RT_RULES.length;
@@ -2381,26 +2349,23 @@ function renderRetention(){
   /* wiring */
   document.querySelectorAll("[data-dd]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd;
-    renderRetention(); if(RT_DRAFT) renderModal();
+    renderRetention(); if(RT_DRAFT || RT_DEF_EDIT) renderModal();
   });
   document.querySelectorAll("[data-ddpick]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); ddSet(b.dataset.ddpick, b.dataset.ddval);
   });
   document.querySelectorAll("[data-ddclose]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation(); DD_OPEN=null; renderRetention(); if(RT_DRAFT) renderModal();
+    e.stopPropagation(); DD_OPEN=null; renderRetention(); if(RT_DRAFT || RT_DEF_EDIT) renderModal();
   });
   if(document.getElementById("rtEmptyNew")) document.getElementById("rtEmptyNew").onclick = ()=>rtOpen(null);
 
-  /* Commit / abandon the pending default. Only this card is in edit mode; nothing
-     else on the page is held up by it. */
-  const rtSave = document.getElementById("rtDefSave");
-  if(rtSave) rtSave.onclick = ()=>{
-    RT_DEFAULT.keep = RT_DEF_DRAFT.keep; RT_DEFAULT.period = RT_DEF_DRAFT.period;
-    RT_DEF_DRAFT = null; renderRetention();
-    toast(`Default retention saved — keep the latest ${RT_DEFAULT.keep.toLowerCase()}, delete after ${RT_DEFAULT.period.toLowerCase()}`);
+  /* The card reports the policy; editing it happens in its own surface, so the
+     overview stays a dashboard and the only way to change the default is here. */
+  const rtEd = document.getElementById("rtDefEdit");
+  if(rtEd) rtEd.onclick = ()=>{
+    RT_DEF_DRAFT = {keep:RT_DEFAULT.keep, period:RT_DEFAULT.period};
+    RT_DEF_EDIT = true; renderModal();
   };
-  const rtDisc = document.getElementById("rtDefDiscard");
-  if(rtDisc) rtDisc.onclick = ()=>{ RT_DEF_DRAFT = null; renderRetention(); };
 
   /* Each reading offers a way through to what it counts. */
   const rtVE = document.getElementById("rtViewEx");
@@ -2834,7 +2799,55 @@ function renderAffected(){
   ["rtAClose","rtADone","rtAScrim"].forEach(id=>{ const el=document.getElementById(id); if(el) el.onclick=close; });
 }
 
+/* The default policy editor. Small, and its own surface — the overview card reports
+   the policy, this changes it. Edits land in RT_DEF_DRAFT; RT_DEFAULT stays the
+   truth until Save, so Cancel costs nothing. */
+function renderDefEditor(){
+  const host = document.getElementById("modalHost");
+  const dr = RT_DEF_DRAFT;
+  host.innerHTML = `<div class="dw-scrim in" id="rtDScrim"></div>
+    <aside class="dw in" style="width:460px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Default retention policy">
+      <div class="dw-head"><div><h3>Default retention policy</h3>
+        <p>Applies to every enrolled CI that no exception overrides.</p></div>
+        <button class="x" id="rtDClose" aria-label="Close">${IC_X}</button></div>
+      <div class="dw-body">
+        <div class="fld">
+          <span class="flab">Keep latest</span>
+          ${ddHTML("defKeep", dr.keep, KEEP_OPTS, "full")}
+        </div>
+        <div class="fld" style="margin-bottom:0">
+          <span class="flab">Delete after</span>
+          ${ddHTML("defPeriod", dr.period, PERIOD_OPTS, "full")}
+        </div>
+        <div class="rtc-note">${rtNote(dr.keep, dr.period)} Each limit is set on its own — change one without touching the other.</div>
+      </div>
+      <div class="dw-foot"><span class="gap"></span>
+        <button class="btn lg" id="rtDCancel">Cancel</button>
+        <button class="btn pri lg" id="rtDSave">Save</button></div>
+    </aside>`;
+  const close = ()=>{ RT_DEF_EDIT=false; RT_DEF_DRAFT=null; DD_OPEN=null; host.innerHTML=""; renderRetention(); };
+  ["rtDClose","rtDCancel","rtDScrim"].forEach(id=>{ const el=document.getElementById(id); if(el) el.onclick=close; });
+  document.getElementById("rtDSave").onclick = ()=>{
+    RT_DEFAULT.keep = dr.keep; RT_DEFAULT.period = dr.period;
+    const k = RT_DEFAULT.keep, p = RT_DEFAULT.period;
+    close();
+    toast(`Default retention saved — keep the latest ${k.toLowerCase()}, delete after ${p.toLowerCase()}`);
+  };
+  /* This surface owns its own selects; #modalHost's other wiring belongs to the
+     exception editor and does not run for this branch. */
+  document.querySelectorAll("#modalHost [data-dd]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd; renderDefEditor();
+  });
+  document.querySelectorAll("#modalHost [data-ddpick]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation(); ddSet(b.dataset.ddpick, b.dataset.ddval);
+  });
+  document.querySelectorAll("#modalHost [data-ddclose]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation(); DD_OPEN=null; renderDefEditor();
+  });
+}
+
 function renderModal(){
+  if(RT_DEF_EDIT && !RT_DRAFT){ renderDefEditor(); return; }
   if(RT_AFFECTED && !RT_DRAFT){ renderAffected(); return; }
   const d = RT_DRAFT;
   if(!d) return;
@@ -3013,7 +3026,7 @@ document.addEventListener("keydown", e=>{
   else if(BS_MENU || BS_CONFIRM){ BS_MENU=null; BS_CONFIRM=null; renderScheduler(); }
 });
 document.addEventListener("click", ()=>{
-  if(DD_OPEN){ DD_OPEN=null; renderRetention(); if(RT_DRAFT) renderModal(); }
+  if(DD_OPEN){ DD_OPEN=null; renderRetention(); if(RT_DRAFT || RT_DEF_EDIT) renderModal(); }
   if(RT_CONFIRM){ RT_CONFIRM=null; renderRetention(); }
 });
 
