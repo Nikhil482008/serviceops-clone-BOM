@@ -691,6 +691,19 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .tile-tag.rec{color:var(--brand);background:var(--pill-id)}
 .tile.dyn{border-color:#CFE0F0}
 .tile.dyn:hover{border-color:var(--brand)}
+/* ── live preview block ───────────────────────────────────────
+   Identical in all three drawers; only the words differ. */
+.tprev{margin-top:16px;padding:12px 14px;border:1px solid var(--line-tbl);border-radius:8px;background:var(--sel-blue)}
+.tprev-h{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+.tprev-l{margin-top:6px;font-size:14px;color:var(--ink);line-height:1.45}
+.tprev-l b{font-weight:600;font-variant-numeric:tabular-nums}
+.tprev-cta{margin-top:8px;display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:0;
+  font:inherit;font-size:13px;font-weight:500;color:var(--brand);cursor:pointer}
+.tprev-cta:hover{text-decoration:underline}
+.tprev-cta .ar{transition:transform .15s}
+.tprev-cta:hover .ar{transform:translateX(2px)}
+.tprev-none{margin-top:6px;font-size:13px;color:var(--ink);line-height:1.5}
+.tprev-none .tprev-sub{margin-top:3px;font-size:12px;color:var(--dim)}
 .tile-view{margin-top:8px;display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:0;
   font:inherit;font-size:12px;font-weight:500;color:var(--brand);cursor:pointer}
 .tile-view:hover{text-decoration:underline}
@@ -2216,7 +2229,6 @@ function targetCardsHTML(o){
           : !o.auto ? `Turned off · ${o.groups} group${o.groups===1?"":"s"} kept`
           : o.autoCount ? `${o.autoCount} CI${o.autoCount===1?"":"s"} currently match`
           : "No CIs match this condition yet."}</div>
-        ${o.auto && o.autoCount ? `<button class="tile-view" id="${o.viewAutoId}">View matching CIs<span class="ar">→</span></button>` : ""}
       </div>
       <div class="tile-b"><button class="btn sm pri" id="${o.condId}">${o.groups ? "Edit conditions" : "Build conditions"}</button></div>
     </div>
@@ -2237,38 +2249,101 @@ function targetCardsHTML(o){
           !o.manualCount ? "No CIs selected"
           : o.manualCount === N ? "Every enrolled CI is selected"
           : `${o.manualCount} selected CI${o.manualCount===1?"":"s"}`}</div>
-        ${o.manualCount ? `<button class="tile-view" id="${o.viewManId}">View selected CIs<span class="ar">→</span></button>` : ""}
+<!-- No per-card link: the preview block below owns the one way in, so the
+             count is never offered twice at two different scopes. -->
       </div>
       <div class="tile-b"><button class="btn sm" id="${o.pickId}">${o.manualCount ? "Edit selection" : "Choose CIs"}</button></div>
     </div>
   </div>`;
 }
 
-/* Which preview is stacked over a draft: {mod:"rt"|"bs", mode:"auto"|"manual"}.
-   Resolved live from the draft at render time rather than snapshotted, so the list
-   can never describe a state the drawer behind it has already left. */
-let TP = null, TP_MOUNTED = false;
-const tpOpen = (mod, mode)=>{ TP = {mod, mode}; TP_MOUNTED = false; renderStack(); };
-function tpResolve(){
-  if(!TP) return null;
-  if(TP.mod === "rt"){
-    const d = RT_DRAFT; if(!d) return null;
-    const ids = TP.mode === "auto" ? (d.auto ? autoMatches(d.groups).map(c=>c.id) : []) : d.manual.slice();
-    return { name:d.name, ids, col4:{ head:"Current Policy", cell:c=>{
-      /* What the CI follows TODAY — what this exception would be overriding. */
-      const r = RT_RULES.find(x=>x.on && x.id!==d.id && rtTargets(x).has(c.id));
-      return r ? {t:r.keep, s:esc(r.name)} : {t:RT_DEFAULT.keep, s:"Default policy"};
-    }}, foot:"This exception is not saved yet." };
-  }
-  const d = BS_DRAFT; if(!d) return null;
-  const ids = TP.mode === "auto" ? (d.auto ? autoMatches(d.groups).map(c=>c.id) : []) : d.cis.slice();
-  return { name:d.name, ids, col4:{ head:"Current Schedule", cell:c=>{
+/* ══ Live preview ══════════════════════════════════════════════
+   One pattern for "which CIs will this do something to", in every module. The
+   interaction, table, search, sorting and read-onlyness are defined once here; each
+   module supplies only its own words and the one column that means something
+   different to it. Terminology differs because the modules differ — enrolment,
+   coverage and inheritance are not the same event — but nothing else does. */
+const TP_MODS = {
+  lic: {
+    title:  "Will be enrolled",
+    line:   n => `<b>${n}</b> CI${n===1?"":"s"} will be newly enrolled`,
+    cta:    "View CIs",
+    drawer: "CIs to be enrolled",
+    sub:    n => `${n} CI${n===1?"":"s"} will be enrolled when this rule is saved.`,
+    foot:   "Nothing is enrolled until the rule is saved.",
+    emptyT: "No new CIs will be enrolled.",
+    emptyD: "All matching CIs are already enrolled.",
+    /* An unenrolled CI has no enrolment moment yet, so discovery is what dates it. */
+    col4:   { head:"Discovered On", cell:c => {
+      const s = licStamp(c.disc).split(" · ");
+      return {t:s[0], s:s[1]};
+    }},
+  },
+  bs: {
+    title:  "Coverage preview",
+    line:   n => `<b>${n}</b> enrolled CI${n===1?"":"s"} match${n===1?"es":""} this schedule`,
+    cta:    "View matching CIs",
+    drawer: "CIs this schedule will run on",
+    sub:    n => `${n} enrolled CI${n===1?"":"s"} will be scanned when this schedule runs.`,
+    foot:   "This schedule is not saved yet.",
+    emptyT: "No CIs are covered yet.",
+    emptyD: "Build a condition or choose CIs above.",
     /* Which other policies already scan it — a CI can be covered more than once. */
-    const ps = BS_POLICIES.filter(p=>p.on && p.id!==d.id && p.cis.includes(c.id));
-    return ps.length ? {t:ps.length===1 ? bsTrigger(ps[0]) : `${ps.length} policies`, s:esc(ps[0].name)}
-                     : {t:DASH, s:"Not scheduled"};
-  }}, foot:"This schedule is not saved yet." };
+    col4:   { head:"Current Schedule", cell:c => {
+      const d = BS_DRAFT;
+      const ps = BS_POLICIES.filter(p=>p.on && (!d || p.id!==d.id) && p.cis.includes(c.id));
+      return ps.length ? {t: ps.length===1 ? bsTrigger(ps[0]) : `${ps.length} policies`, s: esc(ps[0].name)}
+                       : {t: DASH, s:"Not scheduled"};
+    }},
+  },
+  rt: {
+    title:  "Affected CIs",
+    line:   n => `<b>${n}</b> enrolled CI${n===1?"":"s"} will use this retention policy`,
+    cta:    "View affected CIs",
+    drawer: "CIs that will use this policy",
+    sub:    n => `${n} enrolled CI${n===1?"":"s"} will inherit this retention policy.`,
+    foot:   "This exception is not saved yet.",
+    emptyT: "No CIs are affected yet.",
+    emptyD: "Build a condition or choose CIs above.",
+    /* What the CI follows TODAY — what this exception would be overriding. */
+    col4:   { head:"Current Policy", cell:c => {
+      const d = RT_DRAFT;
+      const r = RT_RULES.find(x=>x.on && (!d || x.id!==d.id) && rtTargets(x).has(c.id));
+      return r ? {t:r.keep, s:esc(r.name)} : {t:RT_DEFAULT.keep, s:"Default policy"};
+    }},
+  },
+};
+
+/* Which CIs the draft in each module currently resolves to. Read live rather than
+   snapshotted, so a preview can never describe a state its drawer has left. */
+function tpTargets(mod){
+  if(mod === "lic"){ const d = LIC_DRAWER; return d ? licPending(d) : []; }
+  if(mod === "bs"){
+    const d = BS_DRAFT; if(!d) return [];
+    const ids = new Set([...d.cis, ...(d.auto ? autoMatches(d.groups).map(c=>c.id) : [])]);
+    return ENROLLED_CIS.filter(c=>ids.has(c.id));
+  }
+  const d = RT_DRAFT; if(!d) return [];
+  const ids = new Set([...d.manual, ...(d.auto ? autoMatches(d.groups).map(c=>c.id) : [])]);
+  return ENROLLED_CIS.filter(c=>ids.has(c.id));
 }
+
+/* The inline block: title, what will happen, and the way to check it. */
+function previewBlockHTML(mod, extra){
+  const m = TP_MODS[mod], rows = tpTargets(mod);
+  return `<div class="tprev">
+    <div class="tprev-h">${m.title}</div>
+    ${rows.length
+      ? `<div class="tprev-l">${m.line(rows.length)}</div>
+         <button class="tprev-cta" id="tpView-${mod}">${m.cta}<span class="ar">→</span></button>`
+      : `<div class="tprev-none">${m.emptyT}<div class="tprev-sub">${m.emptyD}</div></div>`}
+    ${extra || ""}
+  </div>`;
+}
+
+/* The nested drawer: {mod}. Same table, search and sorting everywhere. */
+let TP = null, TP_MOUNTED = false, TP_Q = "", TP_SORT = "id";
+const tpOpen = mod => { TP = {mod}; TP_MOUNTED = false; TP_Q = ""; TP_SORT = "id"; renderStack(); };
 
 /* Which enrolled CIs a rule resolves to. Auto-included types stay in
    sync as the CMDB grows; manual picks never do. */
@@ -2677,6 +2752,12 @@ function wireStack(){
   if(TP){
     const close = ()=>{ TP=null; TP_MOUNTED=false; renderStack(); };
     ["rtPClose","rtPDone","rtPScrim"].forEach(id=>{ const el=$(id); if(el) el.onclick=close; });
+    /* The drawer re-renders per keystroke, so the caret is put back at the end —
+       otherwise the second character loses the first. */
+    const q = $("tpQ");
+    if(q) q.oninput = e=>{ TP_Q = e.target.value; renderStack();
+      const el = $("tpQ"); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } };
+    document.querySelectorAll("[data-tpsort]").forEach(b=>b.onclick=()=>{ TP_SORT = b.dataset.tpsort; renderStack(); });
   }
 
   if(PICK){
@@ -2808,37 +2889,46 @@ function renderStack(){
     </aside>`;
   }
 
-  /* ── the shared target preview, stacked over whichever draft opened it ──
-     The count on a card is the claim; this is the evidence. Read-only — the way to
-     change it is the targeting above. Identical for every module; only the last
-     column and one footer line come from the module. */
+  /* ── the shared preview drawer, stacked over whichever draft opened it ──
+     The block above is the claim; this is the evidence. One implementation for all
+     three modules: same table, same search, same sorting, read-only everywhere. */
   let rtprev = "";
-  const tp = tpResolve();
-  if(tp){
-    const rows = ENROLLED_CIS.filter(c=>tp.ids.includes(c.id));
+  if(TP && TP_MODS[TP.mod]){
+    const m = TP_MODS[TP.mod];
+    const all = tpTargets(TP.mod);
+    const q = TP_Q.trim().toLowerCase();
+    const rows = all.filter(c => !q || [c.id,c.host,c.type,c.os,c.ip].join(" ").toLowerCase().includes(q))
+      .slice().sort((a,b) => TP_SORT === "host"
+        ? a.host.localeCompare(b.host)
+        : a.id.localeCompare(b.id, undefined, {numeric:true}));
     const PC = "56px minmax(0,1fr) 120px 168px";
     const pIn = TP_MOUNTED ? "" : " in"; TP_MOUNTED = true;
+    const sortMark = k => TP_SORT === k ? `<span class="ar">▲</span>` : "";
     rtprev = `<div class="dw-scrim lite${pIn}" id="rtPScrim"></div>
-    <aside class="dw stack${pIn}" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Affected CIs">
-      <div class="dw-head"><div><h3>${TP.mode==="auto" ? "Matching CIs" : "Selected CIs"}</h3>
-        <p>${esc(tp.name.trim() || "This policy")} · ${rows.length} of ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} · read-only</p></div>
+    <aside class="dw stack${pIn}" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="${m.drawer}">
+      <div class="dw-head"><div><h3>${m.drawer}</h3>
+        <p>${m.sub(all.length)} Read-only.</p></div>
         <button class="x" id="rtPClose" aria-label="Close">${IC_X}</button></div>
+      <div class="pk-search">
+        <span class="mag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
+        <input id="tpQ" type="search" value="${esc(TP_Q)}" placeholder="Search CIs…" autocomplete="off">
+      </div>
       <div class="dw-body" style="padding:0">
         <div class="pk-hd vhd" style="grid-template-columns:${PC}">
-          <span>CI ID</span><span>Host Name</span><span>CI Type</span><span>${tp.col4.head}</span></div>
-        ${rows.length ? rows.map(c=>{ const np = tp.col4.cell(c);
+          <button class="vsort" data-tpsort="id">CI ID${sortMark("id")}</button>
+          <button class="vsort" data-tpsort="host">Host Name${sortMark("host")}</button>
+          <span>CI Type</span><span>${m.col4.head}</span></div>
+        ${rows.length ? rows.map(c=>{ const np = m.col4.cell(c);
           return `<div class="pk-row vrow" style="grid-template-columns:${PC};cursor:default">
             <span class="id">${c.id}</span>
             <span class="vhost"><span class="hn" title="${esc(c.host)}">${esc(c.host)}</span><span class="ip">${c.ip}</span></span>
             <span><span class="pill ghost">${esc(c.type)}</span></span>
             <span class="vwhen"><span class="vd">${esc(np.t)}</span><span class="vt">${np.s}</span></span>
           </div>`;}).join("") : `<div class="pk-empty vempty">
-            <div class="t">${TP.mode==="auto" ? "No CIs match this condition yet." : "No CIs selected yet."}</div>
-            <div class="d">${TP.mode==="auto"
-              ? "Matching CIs will appear here as conditions are built."
-              : "Choose CIs to see them listed here."}</div></div>`}
+            <div class="t">${all.length ? "No CI matches this search." : m.emptyT}</div>
+            <div class="d">${all.length ? `That is a filter result — ${all.length} CI${all.length===1?"":"s"} in this list.` : m.emptyD}</div></div>`}
       </div>
-      <div class="dw-foot"><span class="avail">${tp.foot}</span>
+      <div class="dw-foot"><span class="avail">${m.foot}</span>
         <span class="gap"></span><button class="btn lg" id="rtPDone">Close</button></div>
     </aside>`;
   }
@@ -3035,10 +3125,12 @@ function renderModal(){
 
       ${targetCardsHTML({
         auto:d.auto, autoCount, groups:nGroups, manualCount:d.manual.length,
-        condId:"mCond", pickId:"mAdd", viewAutoId:"mViewAuto", viewManId:"mViewMan",
+        condId:"mCond", pickId:"mAdd",
         autoDesc:"Every enrolled CI matching your conditions is targeted automatically — including new CIs that match later.",
         manDesc:"Pick specific enrolled CIs. The list stays fixed until you update it manually."
       })}
+
+      ${previewBlockHTML("rt")}
     </div>
 
     <div class="dw-foot">
@@ -3064,10 +3156,9 @@ function renderModal(){
   $("mName").oninput   = e => { d.name = e.target.value; };
   $("mAdd").onclick    = ()=>openPick(d, renderModal, "manual");
   $("mCond").onclick   = ()=>openCond(d, renderModal);
-  /* Evidence for the count on each card — stacked over the draft, never instead
-     of it, so the rule stays visible while it is being checked. */
-  if($("mViewAuto")) $("mViewAuto").onclick = ()=>tpOpen("rt","auto");
-  if($("mViewMan"))  $("mViewMan").onclick  = ()=>tpOpen("rt","manual");
+  /* Evidence for the preview's claim — stacked over the draft, never instead of
+     it, so the rule stays visible while it is being checked. */
+  if($("tpView-rt")) $("tpView-rt").onclick = ()=>tpOpen("rt");
 
   document.querySelectorAll("#modalHost [data-dd]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd; renderModal();
@@ -3670,10 +3761,12 @@ function renderBsDrawers(){
         <div class="sechead">Apply to CIs <span>— by rule, by hand, or both</span></div>
         ${targetCardsHTML({
           auto:d.auto, autoCount, groups:nGroups, manualCount:d.cis.length,
-          condId:"bsCond", pickId:"bsPick", viewAutoId:"bsViewAuto", viewManId:"bsViewMan",
+          condId:"bsCond", pickId:"bsPick",
           autoDesc:"Automatically schedules every enrolled CI matching your conditions — including new CIs that match later.",
           manDesc:"Choose specific enrolled CIs. The list stays fixed until you update it manually."
         })}
+
+        ${previewBlockHTML("bs")}
 
         <hr class="dw-div">
         <div class="fld" style="margin-bottom:0">
@@ -3710,8 +3803,7 @@ function renderBsDrawers(){
   $("bsPick").onclick    = ()=>openPick(d, renderBsDrawers, "cis");
   $("bsCond").onclick    = ()=>openCond(d, renderBsDrawers);
   /* The same evidence link Retention has, from the same component. */
-  if($("bsViewAuto")) $("bsViewAuto").onclick = ()=>tpOpen("bs","auto");
-  if($("bsViewMan"))  $("bsViewMan").onclick  = ()=>tpOpen("bs","manual");
+  if($("tpView-bs")) $("tpView-bs").onclick = ()=>tpOpen("bs");
   const st = $("bsStart"); if(st) st.onchange = e=>{ d.startAt = e.target.value; renderBsDrawers(); };
   const sd = $("bsSDate"); if(sd) sd.onchange = e=>{ d.startDate = e.target.value; renderBsDrawers(); };
   const ed = $("bsEDate"); if(ed) ed.onchange = e=>{ d.endDate = e.target.value; renderBsDrawers(); };
@@ -3783,8 +3875,6 @@ let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM
     /* Matching CIs: newest enrolment first — admins open it to confirm a rule just
        picked something up, so recency is what they came to see. */
     LIC_VSORT="desc",
-    /* The rule drawer's preview list, stacked over the draft it describes. */
-    LIC_PEND=false,
     /* Rules panel at scale: a filter, and a selection that survives it. Selection is
        held by id, not by row, so filtering or re-rendering never silently drops a
        rule from what a bulk action is about to touch. */
@@ -4148,12 +4238,12 @@ function licRuleOpen(id, fromRules){
     ? {id:r.id, name:r.name, auto:r.on, editing:true, err:false, fromRules:!!fromRules,
        groups:r.groups.map((g,i,a)=>({join:g.join||"And", open:i===a.length-1, conds:g.conds.map(c=>({...c}))}))}
     : {id:null, name:"", auto:true, editing:false, err:false, fromRules:!!fromRules, groups:[newGroup()]};
-  LIC_VIEW = null; COND = null; LIC_RULESPANEL = false; LIC_PEND = false;
+  LIC_VIEW = null; COND = null; LIC_RULESPANEL = false; TP = null; TP_MOUNTED = false;
   renderLicDrawer();
 }
 function licRuleClose(){
   const back = LIC_DRAWER && LIC_DRAWER.fromRules;
-  LIC_DRAWER=null; COND=null; LIC_PEND=false;
+  LIC_DRAWER=null; COND=null; TP=null; TP_MOUNTED=false;
   if(back) LIC_RULESPANEL = true;
   renderLicDrawer();
 }
@@ -4165,47 +4255,24 @@ function licRuleClose(){
    Regenerated on every keystroke, so it is patched into #licPrev, not re-rendered. */
 function licPending(d){ return d.auto ? ruleHits(d).filter(c=>!c.enrolled) : []; }
 
+/* Same preview block as Scheduler and Retention, with licensing's words. The seat
+   maths is the one thing only this module has, so it rides along as the block's
+   extra — it is a consequence of the same set of CIs, not a second preview. */
 function licPrevInner(d){
-  const hits  = ruleHits(d);
-  const fresh = licPending(d);
+  const would = licPending(d).length;
   const left  = licLeft();
-  const would = fresh.length;
   const after = left - would;
   const over  = would - left;
-
   const seats = `
     <div class="lp-seats">
       <span class="lp-seats-l">Seats after save</span>
       <span class="lp-seats-v ${over>0?"n-red":after<=2?"n-amber":""}">${after}${
         over>0 ? ` <span class="lp-cap">(Over capacity)</span>` : ""}</span>
-    </div>`;
-
-  if(!hits.length) return `
-    <div class="cb-prev-h">Rule preview</div>
-    <div class="lp-none">No CIs currently match this rule.
-      <div class="lp-sub">${d.auto
-        ? "Future matching CIs will be enrolled automatically as they are discovered."
-        : "Rule is disabled — conditions are kept, nothing is enrolled."}</div></div>`;
-
-  if(!would) return `
-    <div class="cb-prev-h">Rule preview</div>
-    <div class="lp-none">${d.auto ? "No new CIs will be enrolled." : "Rule is disabled — nothing will be enrolled."}
-      <div class="lp-sub">${d.auto
-        ? "All matching CIs are already enrolled."
-        : "Conditions are kept; turn the rule on to enrol what it matches."}</div></div>`;
-
-  return `
-    <div class="cb-prev-h">Rule preview</div>
-    <div class="lp-head">
-      <span class="lp-n">${would}</span>
-      <span class="lp-t">new CI${would===1?"":"s"} will be enrolled</span>
     </div>
-    <button class="lp-link" id="licPrevView">View matching CIs
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5"/></svg></button>
-    ${seats}
     ${over>0 ? `<div class="ferr" style="margin-top:10px;padding:11px 13px;background:var(--crit-soft);border-radius:6px;line-height:1.55">
       <b>Over limit by ${over} seat${over===1?"":"s"}.</b> Narrow the conditions, free seats by removing CIs, or buy more before saving.
     </div>` : ""}`;
+  return previewBlockHTML("lic", seats);
 }
 const licFootLine = d => {
   const fresh = ruleHits(d).filter(c=>!c.enrolled);
@@ -4422,35 +4489,8 @@ function renderLicDrawer(){
       </div>
     </aside>`;
 
-    /* Stacked over the draft, never instead of it — the list is evidence for a
-       decision still being made, so the rule stays visible behind it. Only pending
-       CIs appear: an already-enrolled match is not something saving would change,
-       and an Enrolled column would say "No" on every row. */
-    if(LIC_PEND){
-      const pend = licPending(d);
-      const PCOLS = "56px minmax(0,1fr) 120px 150px";
-      main += `<div class="dw-scrim lite in" id="licPScrim"></div>
-      <aside class="dw stack in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="CIs to be Enrolled">
-        <div class="dw-head"><div><h3>CIs to be Enrolled</h3>
-          <p>${esc(d.name.trim() || "Untitled rule")} · ${pend.length} CI${pend.length===1?"":"s"} will be enrolled when this rule is saved.</p></div>
-          <button class="x" id="licPClose" aria-label="Close">${IC_X}</button></div>
-        <div class="dw-body" style="padding:0">
-          <div class="pk-hd vhd" style="grid-template-columns:${PCOLS}">
-            <span>CI ID</span><span>Host Name</span><span>CI Type</span><span>Discovered On</span></div>
-          ${pend.length ? pend.slice().sort((a,b)=>b.disc-a.disc).map(c=>`
-            <div class="pk-row vrow" style="grid-template-columns:${PCOLS};cursor:default">
-              <span class="id">${c.id}</span>
-              <span class="vhost"><span class="hn" title="${esc(c.host)}">${esc(c.host)}</span><span class="ip">${c.ip}</span></span>
-              <span><span class="pill ghost">${esc(c.type)}</span></span>
-              <span class="vwhen"><span class="vd">${licStamp(c.disc).split(" · ")[0]}</span><span class="vt">${licStamp(c.disc).split(" · ")[1]}</span></span>
-            </div>`).join("") : `<div class="pk-empty vempty">
-              <div class="t">No new CIs will be enrolled.</div>
-              <div class="d">All matching CIs are already enrolled.</div></div>`}
-        </div>
-        <div class="dw-foot"><span class="avail">Nothing is enrolled until the rule is saved.</span>
-          <span class="gap"></span><button class="btn lg" id="licPDone">Close</button></div>
-      </aside>`;
-    }
+    /* The nested list is the SHARED preview drawer (see TP_MODS.lic), rendered into
+       #stackHost like every other module's — one implementation, one behaviour. */
   }
 
   host.innerHTML = main + rules + view;
@@ -4579,14 +4619,9 @@ function renderLicDrawer(){
   const d = LIC_DRAWER;
   $("licDClose").onclick  = licRuleClose;
   $("licDCancel").onclick = licRuleClose;
-  $("licScrim").onclick   = ()=>{ if(!COND && !LIC_VIEW && !LIC_PEND) licRuleClose(); };
+  $("licScrim").onclick   = ()=>{ if(!COND && !LIC_VIEW && !TP) licRuleClose(); };
   $("licRName").oninput   = e => { d.name = e.target.value; };
   $("licDSw").onclick     = ()=>{ d.auto = !d.auto; renderLicDrawer(); };
-
-  if(LIC_PEND){
-    const closePend = ()=>{ LIC_PEND=false; renderLicDrawer(); };
-    $("licPClose").onclick = closePend; $("licPDone").onclick = closePend; $("licPScrim").onclick = closePend;
-  }
 
   /* Typing a value re-computes the preview, the footer line and the save
      gate in place — a full re-render here would steal the caret. The preview
@@ -4596,9 +4631,9 @@ function renderLicDrawer(){
     const f = $("licFoot"); if(f) f.textContent = licFootLine(d);
     const s = $("licDSave");
     if(s) s.disabled = (d.auto ? ruleHits(d).filter(c=>!c.enrolled).length : 0) - licLeft() > 0;
-    const v = $("licPrevView"); if(v) v.onclick = ()=>{ LIC_PEND=true; renderLicDrawer(); };
+    const v = $("tpView-lic"); if(v) v.onclick = ()=>tpOpen("lic");
   };
-  const pv = $("licPrevView"); if(pv) pv.onclick = ()=>{ LIC_PEND=true; renderLicDrawer(); };
+  const pv = $("tpView-lic"); if(pv) pv.onclick = ()=>tpOpen("lic");
   wireCbGroups(d.groups, renderLicDrawer, licSync);
   /* The builder's selects live in this drawer, not the stack — bind them
      here so #stackHost's own wiring is never involved. */
