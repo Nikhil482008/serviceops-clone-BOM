@@ -980,9 +980,35 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 .ovside.win b{color:var(--ok-dot)}
 .ovacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
 
-/* the BOM Policy chooser row inside the targeting card */
-.polpick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.polpick .gap{flex:1}
+/* the reusable-policy band above the targeting cards */
+.polband{border:1px solid var(--line-tbl);border-radius:8px;background:#fff;padding:13px 14px;margin-bottom:12px;
+  transition:border-color .14s,background-color .14s}
+.polband.on{border-color:var(--brand);background:var(--sel-blue)}
+.polband-h{display:flex;align-items:flex-start;gap:11px}
+.polband-i{width:30px;height:30px;border-radius:8px;background:var(--pill-id);color:var(--brand);
+  display:grid;place-items:center;flex:none}
+.polband.on .polband-i{background:var(--brand);color:#fff}
+.polband-t{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px}
+.polband-d{font-size:12px;color:var(--dim);line-height:1.45;margin-top:3px}
+.polband-x{margin-top:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.polband-n{font-size:12px;color:var(--dim)}
+.polband-n b{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.3px;margin-right:3px;
+  font-variant-numeric:tabular-nums}
+
+/* what the modules do with a policy — a summary, never a control */
+.caps{display:flex;flex-direction:column;gap:5px}
+.capchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--dim);min-width:0}
+.capchip svg{width:13px;height:13px;flex:none;color:var(--brand)}
+.capchip .k{font-weight:600;color:var(--ink);flex:none}
+.capchip.off{opacity:.55}
+.capchip.off svg{color:var(--faint)}
+.capnone{font-size:12px;color:var(--faint)}
+
+/* priority — a rank, so it reads as a number and not a quantity */
+.prio{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;
+  border-radius:4px;background:var(--chip-n2);color:var(--ink);font-size:12px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+.prio.top{background:var(--pill-id);color:var(--brand)}
 
 /* policy change impact — never silent, so it sits in the flow, not in a toast */
 .polimp{border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:8px;
@@ -1166,7 +1192,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
     <div class="head">
       <div>
         <h1>BOM Policies</h1>
-        <div class="sub">A BOM Policy answers one question — which CIs does a rule apply to. Define the conditions once and reuse them across Licensing, Scheduler and Retention; membership is worked out from the CMDB on every read, so a CI that starts matching tomorrow is covered tomorrow, with no edit.</div>
+        <div class="sub">Policies define reusable CI targeting that can be used by <a href="#" data-nav="licensing" class="ilink">Licensing</a>, <a href="#" data-nav="scheduler" class="ilink">Scheduler</a> and <a href="#" data-nav="retention" class="ilink">Retention</a>. A policy holds conditions and nothing else — membership is worked out from the CMDB on every read, so a CI that starts matching tomorrow is covered tomorrow, with no edit.</div>
       </div>
       <div class="head-actions">
         <button class="btn pri" id="bpNew">
@@ -1177,6 +1203,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
     </div>
 
     <section class="sumstrip" id="bpSum"></section>
+    <div id="bpBanner"></div>
 
     <div class="sechd">
       <h2>Policies</h2><span class="n" id="bpCount">0</span>
@@ -2361,32 +2388,37 @@ const newGroup = () => ({join:"And", open:true, conds:[newCond()]});
    matching drops out the same way.
    TODO(api): GET/PUT /admin/bom/policies · GET …/{id}/members
    ══════════════════════════════════════════════════════════════ */
+/* `priority` is the ONLY thing here that is not targeting, and it is not behaviour
+   either: it is the tie-break for when two policies cover the same CI and the rules
+   referencing each configure the same capability differently. 1 is highest. */
 let BOM_POLICIES = [
   {id:"BP-1", name:"Windows Design Devices",
    desc:"Windows desktops and servers owned by the Design department.",
-   on:true, updated:"Aug 04, 2026",
+   on:true, priority:1, updated:"Aug 04, 2026",
    groups:[{join:"And", conds:[{field:"plat", op:"Equals", value:"Windows"},
                                {field:"dept", op:"Equals", value:"Design"}]}]},
   {id:"BP-2", name:"Production Linux Servers",
    desc:"Every Linux server running in the production environment.",
-   on:true, updated:"Jul 28, 2026",
+   on:true, priority:1, updated:"Jul 28, 2026",
    groups:[{join:"And", conds:[{field:"plat", op:"Equals", value:"Linux"},
                                {field:"env",  op:"Equals", value:"Production"}]}]},
+  /* Overlaps BP-1 on Design's six Windows servers, and the retention rules pointed
+     at the two set different windows — the one honest precedence case. */
   {id:"BP-3", name:"All Windows Servers",
    desc:"Every Windows server in the estate, whichever department owns it.",
-   on:true, updated:"Jul 22, 2026",
+   on:true, priority:2, updated:"Jul 22, 2026",
    groups:[{join:"And", conds:[{field:"type", op:"Equals", value:"Windows Server"}]}]},
-  {id:"BP-4", name:"Retired Workstations",
-   desc:"Windows desktops that have stopped reporting.",
-   on:true, updated:"Jul 10, 2026",
-   groups:[{join:"And", conds:[{field:"type", op:"Equals", value:"Windows Desktop"},
-                               {field:"status", op:"Equals", value:"Inactive"}]}]},
-  /* Referenced by no rule — so the delete path has an honest subject. */
-  {id:"BP-5", name:"Finance Endpoints",
+  {id:"BP-4", name:"Finance Endpoints",
    desc:"Workstations belonging to Finance.",
-   on:true, updated:"Jul 19, 2026",
+   on:true, priority:3, updated:"Jul 19, 2026",
    groups:[{join:"And", conds:[{field:"dept", op:"Equals", value:"Finance"},
-                               {field:"type", op:"Equals", value:"Windows Desktop"}]}]}
+                               {field:"type", op:"Equals", value:"Windows Desktop"}]}]},
+  /* Referenced by no rule — so the delete path has an honest subject. */
+  {id:"BP-5", name:"Retired Workstations",
+   desc:"Windows desktops that have stopped reporting.",
+   on:true, priority:3, updated:"Jul 10, 2026",
+   groups:[{join:"And", conds:[{field:"type", op:"Equals", value:"Windows Desktop"},
+                               {field:"status", op:"Equals", value:"Inactive"}]}]}
 ];
 
 const bpOf       = id => BOM_POLICIES.find(s=>s.id===id) || null;
@@ -2396,20 +2428,77 @@ const bpCis      = s => s ? matchIn(ALL_CIS, s.groups) : [];
 const bpEnrolled = s => bpCis(s).filter(c=>c.enrolled);
 const bpSummary  = s => ruleSummary(s);           // same words the rules use
 const bpNextId   = () => "BP-" + (BOM_POLICIES.reduce((m,s)=>Math.max(m,+(s.id.split("-")[1]||0)),0)+1);
-/* Every module rule that references this policy. The policy owns WHO; each entry
-   here is a module owning its own WHAT — auto-enrolment, a cadence, a retention
-   window — which is exactly what an edit to the conditions is about to affect. */
+/* ── what the modules currently DO with a policy ───────────────
+   Derived, never stored. The policy configures nothing; each entry is a module
+   rule that references it, owning its own behaviour — auto-enrolment, a cadence,
+   a retention window. This is what the Capabilities column summarises, what
+   "Used by" lists, and what an edit to the conditions is about to reach. */
+const CAP_NAME = {lic:"Licensing", bs:"Scheduler", rt:"Retention"};
+const CAPS_ICON = {
+  lic:`<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="8" width="11" height="7.5" rx="1.8"/><path d="M6.3 8V5.9a2.7 2.7 0 015.4 0V8"/></svg>`,
+  bs: `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.8" y="3.8" width="12.4" height="11.4" rx="2"/><path d="M2.8 7.4h12.4M6.2 2.2v3M11.8 2.2v3"/></svg>`,
+  rt: `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.2 3v12M9 3v12M12.8 3v12"/><circle cx="5.2" cy="6.2" r="1.7" fill="#fff"/><circle cx="9" cy="11" r="1.7" fill="#fff"/><circle cx="12.8" cy="7.6" r="1.7" fill="#fff"/></svg>`
+};
 function bpUsers(id){
   const out = [];
-  LIC_RULES.forEach(r=>{ if(r.policyId===id) out.push({mod:"Licensing", name:r.name, on:r.on,
-    what:"Auto-enrol matching CIs"}); });
-  BS_POLICIES.forEach(p=>{ if(p.policyId===id) out.push({mod:"Scheduler", name:p.name, on:p.on,
-    what:`${bsTrigger(p)} · ${bsClock(p)}`}); });
-  RT_RULES.forEach(r=>{ if(r.policyId===id) out.push({mod:"Retention", name:r.name, on:r.on,
+  LIC_RULES.forEach(r=>{ if(r.policyId===id) out.push({cap:"lic", mod:"Licensing", name:r.name, on:r.on,
+    value:"Auto-enrol", what:"Auto-enrol matching CIs"}); });
+  BS_POLICIES.forEach(p=>{ if(p.policyId===id) out.push({cap:"bs", mod:"Scheduler", name:p.name, on:p.on,
+    value:`${bsTrigger(p)} · ${bsClock(p)}`, what:`${bsTrigger(p)} · ${bsClock(p)}`}); });
+  RT_RULES.forEach(r=>{ if(r.policyId===id) out.push({cap:"rt", mod:"Retention", name:r.name, on:r.on,
+    value:`${r.keep} / ${r.period === "Never delete" ? "never deleted" : r.period}`,
     what:`Keep ${r.keep} · ${r.period === "Never delete" ? "never deleted" : `delete after ${r.period.toLowerCase()}`}`}); });
   return out;
 }
 const bpMods = users => [...new Set(users.map(u=>u.mod))];
+/* The distinct values a capability is set to by the ENABLED rules using this
+   policy. Empty ⇒ the policy drives nothing of that kind. */
+const bpCapValues = (id, cap) =>
+  [...new Set(bpUsers(id).filter(u=>u.cap===cap && u.on).map(u=>u.value))];
+
+/* ── precedence ───────────────────────────────────────────────
+   Priority 1 is highest. Ties fall to the more specific policy (the one matching
+   fewer CIs), then to id, so "which value applies" always has the same answer. */
+function bpRank(a, b){
+  return (a.priority - b.priority)
+      || (bpCis(a).length - bpCis(b).length)
+      || a.id.localeCompare(b.id, undefined, {numeric:true});
+}
+/* ── overlap ──────────────────────────────────────────────────
+   Two policies overlap when they match some of the same CIs. That alone is NOT a
+   conflict: one policy driving scanning and another driving retention for the same
+   CI is the model working as intended. It is a conflict only where the SAME
+   capability is configured to DIFFERENT values — then priority decides which
+   applies, and nothing is applied twice. */
+function bpOverlaps(p){
+  const mine = new Set(bpCis(p).map(c=>c.id));
+  if(!mine.size || !p.on) return [];
+  return BOM_POLICIES.filter(o => o.id !== p.id && o.on).map(o=>{
+    const cis = bpCis(o).filter(c => mine.has(c.id));
+    if(!cis.length) return null;
+    const clashes = ["lic","bs","rt"].map(cap=>{
+      const a = bpCapValues(p.id, cap), b = bpCapValues(o.id, cap);
+      if(!a.length || !b.length) return null;              // different capabilities
+      const same = a.length === b.length && a.every(v => b.includes(v));
+      return same ? null : {cap, mine:a.join(" · "), theirs:b.join(" · ")};
+    }).filter(Boolean);
+    return {other:o, cis, clashes, winner: bpRank(p, o) <= 0 ? "mine" : "theirs"};
+  }).filter(Boolean);
+}
+const bpConflicts = p => bpOverlaps(p).filter(x=>x.clashes.length);
+/* Every clash across the set, deduplicated per pair — the page-level reading, so
+   the summary card and the rows cannot disagree about how many there are. */
+function allBpClashes(){
+  const seen = new Set(), out = [];
+  BOM_POLICIES.filter(p=>p.on).forEach(p=>{
+    bpConflicts(p).forEach(x=>{
+      const k = [p.id, x.other.id].sort().join("|");
+      if(seen.has(k)) return;
+      seen.add(k); out.push({a:p, b:x.other, cis:x.cis, clashes:x.clashes});
+    });
+  });
+  return out;
+}
 
 let RT_DEFAULT = {keep:"10 versions", period:"90 days"};
 /* The pending edit to the default policy, or null when there is none. This one
@@ -2423,10 +2512,16 @@ let RT_DEF_EDIT = false;
 let RT_RULES = [
   {id:"RR-1", name:"Payments host", keep:"5 versions", period:"30 days",
    on:true, auto:false, groups:[], manual:["CI-5"]},
-  /* References the same BOM Policy the weekly schedule uses — targeting defined
-     once, two different behaviours attached to it by two different modules. */
+  /* Reference the same BOM Policies the schedules and licensing rules use —
+     targeting defined once, three behaviours attached by three modules. RR-4 sets
+     Retention differently from RR-2 on the CIs BP-1 and BP-3 share, which is the
+     one case precedence has to settle. */
   {id:"RR-2", name:"Design device history", keep:"20 versions", period:"45 days",
-   on:true, auto:false, groups:[], manual:[], policyId:"BP-1"}
+   on:true, auto:false, groups:[], manual:[], policyId:"BP-1"},
+  {id:"RR-3", name:"Linux production history", keep:"15 versions", period:"60 days",
+   on:true, auto:false, groups:[], manual:[], policyId:"BP-2"},
+  {id:"RR-4", name:"Windows server floor", keep:"10 versions", period:"90 days",
+   on:true, auto:false, groups:[], manual:[], policyId:"BP-3"}
 ];
 let RT_MENU = null;   // which exception's overflow menu is open
 let RT_DRAFT = null;     // the rule being created or edited
@@ -2440,56 +2535,68 @@ let RT_CONFIRM = null;   // id of the rule whose delete is confirming
 let PICK = null, COND = null;
 
 /* ══ Applies to ════════════════════════════════════════════════
-   ONE component for "which CIs does this rule cover", shared by the Scheduler
-   and Retention drawers; Licensing mounts the policy card alone, because its
-   hand-picked path is the separate Add-manually flow. Two ways to target, and
-   they are deliberately not equivalents:
+   Three ways to say which CIs a rule covers, in one component so no two drawers
+   can drift. They are deliberately not equivalents:
 
-   — a BOM POLICY: reusable, named conditions resolved live, so coverage follows
-     the estate — and the same policy can drive Licensing, Scheduler and
-     Retention at once.
+   — a BOM POLICY: named, reusable conditions resolved live. The SAME policy can
+     be referenced by a Licensing rule, a schedule and a retention rule at once,
+     which is the point: write the conditions once.
+   — CONDITIONS WRITTEN HERE: a one-off audience that belongs to this rule alone.
    — a HAND-PICKED list: fixed until edited, for what no condition expresses.
 
-   Conditions are never built inside a rule. Building conditions IS creating a
-   BOM Policy, so the work is reusable the moment it is done — that is the whole
-   feature. Creating one from here saves it and attaches it in the same flow. */
-const IC_POLICY = `<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.4 2.6h9.2a1 1 0 011 1v10.8a1 1 0 01-1 1H4.4a1 1 0 01-1-1V3.6a1 1 0 011-1z"/><path d="M6.2 6.4h5.6M6.2 9h5.6M6.2 11.6h3.2"/></svg>`;
+   Choosing a policy hides the ad-hoc condition card, because two live sources of
+   dynamic targeting in one rule is a question with no good answer — the policy IS
+   the conditions, held somewhere reusable. The hand-picked list stays available
+   either way, and unions with whichever dynamic source is in play. */
+function polBandHTML(o){
+  const pol = o.policyId ? bpOf(o.policyId) : null;
+  /* Licensing enrols, so it counts against the discovered estate; the Scheduler
+     and Retention can only touch licensed CIs, so they count the enrolled set. */
+  const cis = pol ? bpCis(pol) : [], enr = cis.filter(c=>c.enrolled).length;
+  const hit = o.discovered ? cis.length : enr;
+  return `<div class="polband${pol?" on":""}">
+    <div class="polband-h">
+      <span class="polband-i"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="6.4"/><circle cx="9" cy="9" r="2.5"/></svg></span>
+      <span class="tile-hd">
+        <span class="polband-t">Use a BOM Policy <span class="tile-tag rec">Reusable</span></span>
+        <span class="polband-d">${pol
+          ? `Targeting follows <b style="color:var(--ink)">${esc(pol.name)}</b> — ${esc(bpSummary(pol) || "no conditions")}. Edit the policy once and every rule using it follows.`
+          : "Point at an audience that already exists instead of writing the same conditions here again."}</span>
+      </span>
+    </div>
+    <div class="polband-x">
+      ${BOM_POLICIES.length ? ddHTML("tgPol", pol?pol.name:"", BOM_POLICIES.map(x=>x.name), 244, "Use existing BOM Policy") : ""}
+      <button class="btn sm${pol?"":" pri"}" id="tgPolNew">${BOM_POLICIES.length ? "Create new BOM Policy" : "Create the first BOM Policy"}</button>
+      ${pol ? `<span class="polband-n"><b>${hit}</b> ${o.discovered?"matching":"enrolled"} · ${cis.length} total</span>
+               <button class="lnk" id="tgPolView">View policy →</button>
+               <span style="flex:1"></span>
+               <button class="lnk danger" id="tgPolClear">Clear</button>` : ""}
+    </div>
+  </div>`;
+}
 function targetCardsHTML(o){
   const N = ENROLLED_CIS.length;
-  const pol = o.policyId ? bpOf(o.policyId) : null;
-  /* Licensing enrols, so its policy counts against the discovered estate; the
-     Scheduler and Retention can only touch licensed CIs, so they count enrolled. */
-  const hit  = pol ? (o.discovered ? bpCis(pol).length : bpEnrolled(pol).length) : 0;
-  const of   = o.discovered ? ALL_CIS.length : N;
-  const noun = o.discovered ? "discovered CI" : "enrolled CI";
-  const polCard = `
-    <div class="tile dyn${pol ? " act" : ""}">
+  const usingPolicy = !!(o.policyId && bpOf(o.policyId));
+  return `${polBandHTML(o)}
+  <div class="tiles${usingPolicy?" one":""}">
+    ${usingPolicy ? "" : `<div class="tile dyn${o.auto && o.autoCount ? " act" : ""}">
       <div class="tile-top">
-        <span class="tile-i">${IC_POLICY}</span>
+        <span class="tile-i"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
         <span class="tile-hd">
-          <span class="tile-t">Target by BOM Policy <span class="tile-tag rec">Dynamic</span></span>
-          <span class="tile-d">${o.polDesc}</span>
+          <span class="tile-t">Auto-include by condition <span class="tile-tag">This rule only</span></span>
+          <span class="tile-d">${o.autoDesc}</span>
         </span>
       </div>
       <div class="tile-x">
-        <div class="tile-stat${hit?"":" zero"}"><b>${hit}</b> of ${of} ${noun}${of===1?"":"s"}</div>
-        <div class="tile-state">${pol
-          ? `<b style="color:var(--ink)">${esc(pol.name)}</b> — ${esc(bpSummary(pol) || "no conditions yet")}`
-          : BOM_POLICIES.length
-            ? "No policy chosen yet. Reuse one that exists, or create it right here."
-            : "No BOM Policies exist yet — create the first one right here."}</div>
+        <div class="tile-stat${o.autoCount?"":" zero"}"><b>${o.autoCount}</b> of ${N} enrolled CI${N===1?"":"s"}</div>
+        <div class="tile-state">${
+          !o.groups ? "No conditions built yet"
+          : !o.auto ? `Turned off · ${o.groups} group${o.groups===1?"":"s"} kept`
+          : o.autoCount ? `${o.autoCount} CI${o.autoCount===1?"":"s"} currently match`
+          : "No CIs match this condition yet."}</div>
       </div>
-      <div class="tile-b polpick">
-        ${BOM_POLICIES.length ? ddHTML("tgPol", pol ? pol.name : "", BOM_POLICIES.map(x=>x.name), 206, "Use existing BOM Policy") : ""}
-        <button class="btn sm${pol ? "" : " pri"}" id="tgPolNew">+ Create new BOM Policy</button>
-        ${pol ? `<button class="lnk" id="tgPolView">View policy →</button>
-                 <span class="gap"></span>
-                 <button class="lnk danger" id="tgPolClear">Clear</button>` : ""}
-      </div>
-    </div>`;
-  if(o.noManual) return `<div class="tiles one">${polCard}</div>`;
-  return `<div class="tiles">
-    ${polCard}
+      <div class="tile-b"><button class="btn sm pri" id="${o.condId}">${o.groups ? "Edit conditions" : "Build conditions"}</button></div>
+    </div>`}
 
     <div class="tile${o.manualCount?" act":""}">
       <div class="tile-top">
@@ -3392,7 +3499,9 @@ function renderModal(){
   if(RT_AFFECTED && !RT_DRAFT){ renderAffected(); return; }
   const d = RT_DRAFT;
   if(!d) return;
-  const total = rtTargets(d).size;
+  const autoCount = d.auto ? autoMatches(d.groups).length : 0;
+  const nGroups   = (d.groups || []).length;
+  const total     = rtTargets(d).size;
 
 
   /* Keep the reader where they were: the panel is re-rendered wholesale
@@ -3433,11 +3542,12 @@ function renderModal(){
 
       <hr class="dw-div">
 
-      <div class="sechead">Applies to <span>— a reusable BOM Policy, hand-picked CIs, or both</span></div>
+      <div class="sechead">Applies to <span>— use a reusable policy, or define conditions here</span></div>
 
       ${targetCardsHTML({
-        policyId:d.policyId, manualCount:d.manual.length, pickId:"mAdd",
-        polDesc:"Enrolled CIs matching the policy follow this retention automatically — including ones that start matching later.",
+        policyId:d.policyId, auto:d.auto, autoCount, groups:nGroups,
+        manualCount:d.manual.length, condId:"mCond", pickId:"mAdd",
+        autoDesc:"Every enrolled CI matching your conditions is targeted automatically — including new CIs that match later.",
         manDesc:"Pick specific enrolled CIs. The list stays fixed until you update it manually."
       })}
 
@@ -3464,7 +3574,9 @@ function renderModal(){
   $("mCancel").onclick = rtClose;
   $("mScrim").onclick  = ()=>{ if(!PICK && !COND) rtClose(); };
   $("mName").oninput   = e => { d.name = e.target.value; };
-  $("mAdd").onclick    = ()=>openPick(d, renderModal, "manual");
+  $("mAdd").onclick = ()=>openPick(d, renderModal, "manual");
+  /* Absent while a policy is chosen — the policy holds the conditions. */
+  if($("mCond")) $("mCond").onclick = ()=>openCond(d, renderModal);
   wirePolChooser(d, renderModal);
   /* Evidence for the preview's claim — stacked over the draft, never instead of
      it, so the rule stays visible while it is being checked. */
@@ -3564,11 +3676,14 @@ let BS_POLICIES = [
   {id:"BS-3", name:"Payments host — daily", kind:"Recurring", freq:"Daily",
    startAt:isoLocal(atTime(new Date(),"23:30")), tz:BS_TZ[1], on:false,
    cis:["CI-5"], auto:false, groups:[]},
-  /* Targeted through a BOM Policy rather than a fixed list — the same policy a
-     Retention rule below references, which is the whole point of the model. */
+  /* Targeted through a BOM Policy rather than a fixed list — the same policies the
+     Licensing and Retention rules reference, which is the point of the model. */
   {id:"BS-4", name:"Design fleet — weekly", kind:"Recurring", freq:"Weekly", days:["Sun"],
    startAt:isoLocal(atTime(new Date(),"13:00")), tz:BS_TZ[0], on:true,
-   cis:[], auto:false, groups:[], policyId:"BP-1"}
+   cis:[], auto:false, groups:[], policyId:"BP-1"},
+  {id:"BS-5", name:"Linux production — nightly", kind:"Recurring", freq:"Daily",
+   startAt:isoLocal(atTime(new Date(),"02:00")), tz:BS_TZ[0], on:true,
+   cis:[], auto:false, groups:[], policyId:"BP-2"}
 ];
 let BS_Q="", BS_FILT=new Set(), BS_FOPEN=false, BS_MENU=null, BS_CONFIRM=null,
     BS_COV=null, BS_DRAFT=null;
@@ -4094,13 +4209,15 @@ function renderBsDrawers(){
   if(BS_DRAFT){
     const d = BS_DRAFT;
     const dwIn = d._mounted ? "" : " in"; d._mounted = true;
-    const total = bsTargets(d).size;
+    const autoCount = d.auto ? autoMatches(d.groups).length : 0;
+    const nGroups   = (d.groups || []).length;
+    const total     = bsTargets(d).size;
 
     main = `<div class="dw-scrim${dwIn}" id="bsScrim"></div>
     <aside class="dw${dwIn}" style="width:${DW_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Schedule scan">
       <div class="dw-head">
         <div><h3>Schedule Scan</h3>
-          <p>Choose when BOM scans should run and which CIs they cover — through a reusable BOM Policy, or hand-picked.</p></div>
+          <p>Choose when BOM scans should run and which CIs they cover — through a reusable BOM Policy, conditions of your own, or hand-picked.</p></div>
         <button class="x" id="bsDClose" aria-label="Close">${IC_X}</button>
       </div>
 
@@ -4111,10 +4228,11 @@ function renderBsDrawers(){
 
         <hr class="dw-div">
 
-        <div class="sechead">Applies to <span>— a reusable BOM Policy, hand-picked CIs, or both</span></div>
+        <div class="sechead">Applies to <span>— use a reusable policy, or define conditions here</span></div>
         ${targetCardsHTML({
-          policyId:d.policyId, manualCount:d.cis.length, pickId:"bsPick",
-          polDesc:"Enrolled CIs matching the policy are scanned on this cadence automatically — including ones that start matching later.",
+          policyId:d.policyId, auto:d.auto, autoCount, groups:nGroups,
+          manualCount:d.cis.length, condId:"bsCond", pickId:"bsPick",
+          autoDesc:"Automatically schedules every enrolled CI matching your conditions — including new CIs that match later.",
           manDesc:"Choose specific enrolled CIs. The list stays fixed until you update it manually."
         })}
 
@@ -4153,6 +4271,8 @@ function renderBsDrawers(){
   $("bsScrim").onclick   = ()=>{ if(!PICK && !COND) bsClose(); };
   $("bsName").oninput    = e => { d.name = e.target.value; };
   $("bsPick").onclick    = ()=>openPick(d, renderBsDrawers, "cis");
+  /* Absent while a policy is chosen — the policy holds the conditions. */
+  if($("bsCond")) $("bsCond").onclick = ()=>openCond(d, renderBsDrawers);
   /* The same evidence link Retention has, from the same component. */
   if($("tpView-bs")) $("tpView-bs").onclick = ()=>tpOpen("bs");
   wireSchedFields(d, "bs", renderBsDrawers);
@@ -4207,7 +4327,11 @@ const LIC_SEATS = 128;
 let LIC_RULES = [
   {id:"AR-1", name:"Windows Servers", on:true, updated:"Jul 14, 2026",
    policyId:"BP-3", groups:[]},
-  {id:"AR-2", name:"Retired workstations", on:false, updated:"Jun 28, 2026",
+  {id:"AR-2", name:"Design fleet enrolment", on:true, updated:"Aug 04, 2026",
+   policyId:"BP-1", groups:[]},
+  {id:"AR-3", name:"Linux production enrolment", on:true, updated:"Jul 28, 2026",
+   policyId:"BP-2", groups:[]},
+  {id:"AR-4", name:"Finance endpoints", on:false, updated:"Jul 19, 2026",
    policyId:"BP-4", groups:[]}
 ];
 let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM=null,
@@ -4223,13 +4347,17 @@ let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM
 const licUsed = () => ENROLLED_CIS.length;
 const licLeft = () => LIC_SEATS - licUsed();
 const licPool = () => ALL_CIS.filter(c=>!c.enrolled);
-/* A rule reads its membership from the BOM Policy it references; legacy rules with
-   conditions of their own still resolve. Either way the pool is the DISCOVERED
+/* A rule reads its membership from the BOM Policy it references, or from the
+   conditions written on the rule itself. Either way the pool is the DISCOVERED
    estate — an auto-enrol rule has to be able to name a CI that is not enrolled yet. */
 const ruleHits = r => {
   if(r.policyId){ const s = bpOf(r.policyId); if(s) return bpCis(s); }
   return ALL_CIS.filter(c => (r.groups||[]).some(g=>groupMatch(g,c)));
 };
+/* Targeted = points at a policy, or carries a complete condition of its own.
+   Half-written conditions target nothing, on purpose. */
+const licTargeted = d => !!(d.policyId && bpOf(d.policyId))
+  || (d.groups||[]).some(g=>g.conds.some(condDone));
 
 /* Which rule swept a CI in, and exactly when. Recorded at enrolment rather than
    derived at render time — the moment is the fact being reported, so it cannot be
@@ -4802,9 +4930,10 @@ function renderLicDrawer(){
     const fresh = ruleHits(d).filter(c=>!c.enrolled);
     const over  = (d.auto ? fresh.length : 0) - licLeft();
 
-    /* One straight read: name → enabled → the BOM Policy that decides WHO →
-       a compact live preview. The rule owns no conditions — they live on the
-       policy, defined once and reusable by the Scheduler and Retention too. */
+    /* One straight read: name → enabled → who to enrol → a compact live preview.
+       Targeting is either a reusable BOM Policy — the same object the Scheduler
+       and Retention can point at — or conditions written here for this rule alone,
+       through the very same builder. */
     main = `<div class="dw-scrim${dwIn}" id="licScrim"></div>
     <aside class="dw${dwIn}" style="width:${DW_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Auto-enrol rule">
       <div class="dw-head">
@@ -4823,13 +4952,13 @@ function renderLicDrawer(){
           <button class="sw${d.auto?" on":""}" id="licDSw" role="switch" aria-checked="${d.auto}" aria-label="Rule status"></button>
           <div><div class="cb-power-t">Rule is ${d.auto?"enabled":"disabled"}</div>
             <div class="cb-power-d">${d.auto
-              ? "Every discovered CI matching the policy below is enrolled and consumes a seat."
-              : "The policy reference is kept, but nothing is enrolled by this rule."}</div></div>
+              ? "Every discovered CI matching the targeting below is enrolled and consumes a seat."
+              : "The targeting is kept, but nothing is enrolled by this rule."}</div></div>
         </div>
-        <div class="sechead">Applies to <span>— the BOM Policy that decides who gets enrolled</span></div>
-        ${targetCardsHTML({policyId:d.policyId, noManual:true, discovered:true,
-          polDesc:"Every discovered CI matching the policy is enrolled automatically — now, and as new CIs appear. One-off enrolments live under Add manually."})}
-        ${d.err && !d.policyId ? `<div class="ferr" style="margin:-4px 0 12px">Choose or create a BOM Policy — the rule has to know who to enrol.</div>` : ""}
+        <div class="sechead">Which CIs to enrol <span>— use a reusable policy, or define conditions here</span></div>
+        ${polBandHTML({policyId:d.policyId, discovered:true})}
+        ${d.policyId && bpOf(d.policyId) ? "" : cbGroupsHTML(d.groups)}
+        ${d.err && !licTargeted(d) ? `<div class="ferr" style="margin:-4px 0 12px">Choose a BOM Policy or build a condition — the rule has to know who to enrol.</div>` : ""}
         <div class="cb-prev" id="licPrev">${licPrevInner(d)}</div>
       </div>
       <div class="dw-foot">
@@ -4986,6 +5115,7 @@ function renderLicDrawer(){
   };
   const pv = $("tpView-lic"); if(pv) pv.onclick = ()=>tpOpen("lic");
   wirePolChooser(d, renderLicDrawer);
+  wireCbGroups(d.groups, renderLicDrawer, licSync);
   /* The builder's selects live in this drawer, not the stack — bind them
      here so #stackHost's own wiring is never involved. */
   document.querySelectorAll("#licHost [data-dd]").forEach(b=>b.onclick=e=>{
@@ -4999,17 +5129,21 @@ function renderLicDrawer(){
   });
 
   $("licDSave").onclick = ()=>{
-    /* A rule needs a name AND a policy — with neither conditions of its own nor a
-       policy to read them from, it would enrol nothing and mean nothing. */
-    if(!d.name.trim() || !d.policyId){
+    /* A rule needs a name and SOME targeting — a policy to read, or conditions of
+       its own. With neither it would enrol nothing and mean nothing. */
+    if(!d.name.trim() || !licTargeted(d)){
       d.err = true; renderLicDrawer();
       if(!d.name.trim()){ const el=$("licRName"); if(el) el.focus(); }
       return;
     }
     const fresh = ruleHits(d).filter(c=>!c.enrolled);
     if((d.auto ? fresh.length : 0) - licLeft() > 0) return;
+    /* A policy supersedes conditions left behind on the draft: one source of
+       targeting per rule, so what is saved is what the drawer showed. */
     const rule = {id:d.id || licNextRuleId(), name:d.name.trim(), on:d.auto, updated:todayLabel(),
-                  policyId:d.policyId, groups:[]};
+                  policyId:d.policyId || null,
+                  groups:d.policyId ? [] : d.groups.filter(g=>g.conds.some(condDone))
+                         .map(g=>({join:g.join, conds:g.conds.filter(condDone).map(c=>({...c}))}))};
     if(d.editing) LIC_RULES = LIC_RULES.map(x=>x.id===rule.id ? rule : x);
     else LIC_RULES.push(rule);
     if(rule.on) ruleFresh(rule).forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=rule.id; c.ruleAt=Date.now(); });
@@ -5079,15 +5213,36 @@ function renderPolicies(){
   const used = BOM_POLICIES.filter(s=>bpUsers(s.id).length).length;
 
   const refs = BOM_POLICIES.reduce((n,s)=>n + bpUsers(s.id).length, 0);
+  const clashes = allBpClashes();
+  /* Three readings, each answering a question worth asking before touching a
+     policy: how many exist, how much of the estate they reach, and whether any
+     two of them are telling the same CI two different things. */
   document.getElementById("bpSum").innerHTML = `
-    <div class="sumcell"><div class="suml">BOM Policies</div>
-      <div class="sumv">${BOM_POLICIES.length}<span class="u">${active.length} active</span></div></div>
-    <div class="sumcell"><div class="suml">CIs covered</div>
+    <div class="sumcell"><div class="suml">Policies</div>
+      <div class="sumv">${BOM_POLICIES.length}<span class="u">${active.length} active</span></div>
+      <div class="sums">${refs ? `Referenced by ${refs} rule${refs===1?"":"s"} · ${used} in use` : "No rule references a policy yet"}</div></div>
+    <div class="sumcell"><div class="suml">CIs governed</div>
       <div class="sumv">${covered}<span class="u">of ${ALL_CIS.length} discovered</span></div>
-      <div class="sums">${covered ? "Matching at least one active policy" : "No policy matches anything yet"}</div></div>
-    <div class="sumcell"><div class="suml">Reused by</div>
-      <div class="sumv${refs?"":" quiet"}">${refs}<span class="u">rule${refs===1?"":"s"}</span></div>
-      <div class="sums">${refs ? `${used} of ${BOM_POLICIES.length} policies in use — across Licensing, Scheduler and Retention` : "No rule references a policy yet"}</div></div>`;
+      <div class="sums">${covered ? "Covered by at least one active policy" : "No policy matches anything yet"}</div></div>
+    <div class="sumcell"><div class="suml">Overlaps needing precedence</div>
+      <div class="sumv${clashes.length?"":" quiet"}">${clashes.length}</div>
+      <div class="sums${clashes.length?" warn":""}">${clashes.length
+        ? "Same capability, different values — priority decides"
+        : "No two policies set the same capability differently"}</div></div>`;
+
+  /* Calm and aggregate: the count and what it is about, never a red wall on load.
+     An overlap is only reported when the rules pointed at each policy configure
+     the SAME capability differently — different capabilities coexist by design. */
+  document.getElementById("bpBanner").innerHTML = clashes.length ? `
+    <div class="ovl">
+      <span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2.4l6 10.4H2L8 2.4z"/><path d="M8 6.6v3M8 11.3h.01"/></svg></span>
+      <div>
+        <div class="ovl-t">${clashes.length} policy overlap${clashes.length===1?"":"s"} need${clashes.length===1?"s":""} precedence</div>
+        <div class="ovl-d">${clashes.map(c=>`<b style="color:var(--ink)">${esc(c.a.name)}</b> and <b style="color:var(--ink)">${esc(c.b.name)}</b> both set
+          ${c.clashes.map(x=>CAP_NAME[x.cap]).join(" and ")} for ${c.cis.length} shared CI${c.cis.length===1?"":"s"}`).join("<br>")}.
+          Priority decides which value applies — nothing is applied twice.</div>
+      </div>
+    </div>` : "";
 
   const q = BP_Q.trim().toLowerCase();
   const shown = BOM_POLICIES.filter(s => !q ||
@@ -5097,28 +5252,36 @@ function renderPolicies(){
   const wrap = document.getElementById("bpWrap");
   wrap.innerHTML = BOM_POLICIES.length ? (shown.length ? `<div style="overflow-x:auto"><table class="sc-table">
     <thead><tr>
-      <th style="width:22%">Policy Name</th><th>Conditions</th><th style="width:118px">Matching CIs</th>
-      <th style="width:130px">Used By</th><th style="width:104px">Status</th>
-      <th style="width:120px">Last Updated</th><th style="width:150px">Actions</th>
+      <th style="width:20%">Policy</th><th style="width:20%">Conditions</th><th style="width:106px">Matching CIs</th>
+      <th>Capabilities</th><th style="width:78px">Priority</th><th style="width:100px">Status</th>
+      <th style="width:112px">Last Updated</th><th style="width:150px">Actions</th>
     </tr></thead>
     <tbody>${shown.map(s=>{
       const cis = bpCis(s), enr = cis.filter(c=>c.enrolled).length;
       const users = bpUsers(s.id);
+      const conf = bpConflicts(s);
       return `<tr class="${s.on?"":"off"}">
         <td><div class="sc-name">${esc(s.name)}</div>
           <div class="sc-id">${s.id}${s.desc?` · ${esc(s.desc)}`:""}</div></td>
         <td><div class="rulesum${bpSummary(s)?"":" none"}">${bpSummary(s) ? esc(bpSummary(s)) : "No conditions"}</div></td>
         <td><div class="sc-when">${cis.length} CI${cis.length===1?"":"s"}</div>
           <div class="sc-sub">${enr} enrolled</div></td>
-        <td>${users.length
-          ? `<button class="lnk" data-bpusers="${s.id}">Used by ${users.length} rule${users.length===1?"":"s"}</button>
-             <div class="sc-sub">${bpMods(users).join(" · ")}</div>`
-          : `<span class="avail">Not used yet</span>`}</td>
+        <!-- A SUMMARY of the module rules pointed at this policy, not settings on
+             it. Nothing here is editable: the behaviour belongs to the module. -->
+        <td>${users.length ? `<div class="caps">${users.map(u=>`
+              <span class="capchip${u.on?"":" off"}" title="${esc(u.mod)} rule “${esc(u.name)}”${u.on?"":" (disabled)"}">
+                ${CAPS_ICON[u.cap]}<span class="k">${u.mod}</span>${esc(u.value)}</span>`).join("")}</div>
+            <button class="lnk" data-bpusers="${s.id}" style="margin-top:5px">Used by ${users.length} rule${users.length===1?"":"s"} →</button>
+            ${conf.length ? `<div class="sc-sub" style="margin-top:5px"><button class="lnk" data-bpovl="${s.id}" style="color:var(--warn)">
+              Overlaps ${conf.length} polic${conf.length===1?"y":"ies"} on ${
+                [...new Set(conf.flatMap(x=>x.clashes.map(y=>CAP_NAME[y.cap])))].join(", ")}</button></div>` : ""}`
+          : `<span class="capnone">Not used by any rule yet</span>`}</td>
+        <td><span class="prio${s.priority===1?" top":""}">${s.priority}</span></td>
         <td><span class="sc-stat ${s.on?"on":"paused"}"><span class="d" style="background:${
               s.on?"var(--ok-dot)":"var(--neu-dot)"}"></span>${s.on?"Active":"Disabled"}</span></td>
         <td><div class="sc-sub" style="margin:0">${esc(s.updated)}</div></td>
         <td><div class="sc-acts">
-          <button class="iact" data-bpview="${s.id}">View</button>
+          <button class="iact" data-bptoggle="${s.id}">${s.on?"Disable":"Enable"}</button>
           <button class="iact" data-bpedit="${s.id}">Edit</button>
           <button class="iact sq del" data-bpdel="${s.id}" aria-label="Delete ${esc(s.name)}">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.8 4.4h10.4M6.4 4.4V3.2a1 1 0 011-1h1.2a1 1 0 011 1v1.2M4.2 4.4l.6 8a1.2 1.2 0 001.2 1.1h4a1.2 1.2 0 001.2-1.1l.6-8"/></svg></button>
@@ -5148,7 +5311,19 @@ function renderPolicies(){
   if(en) en.onclick = ()=>bpOpen(null);
   document.querySelectorAll("[data-bpview]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpview));
   document.querySelectorAll("[data-bpusers]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpusers));
+  document.querySelectorAll("[data-bpovl]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpovl));
   document.querySelectorAll("[data-bpedit]").forEach(b=>b.onclick=()=>bpOpen(b.dataset.bpedit));
+  /* Disabling stops the policy being applied; the rules that reference it and the
+     conditions themselves are untouched, so enabling puts everything back. */
+  document.querySelectorAll("[data-bptoggle]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const s = bpOf(b.dataset.bptoggle); s.on = !s.on; s.updated = todayLabel();
+    renderPolicies(); renderLicensing(); renderScheduler(); renderRetention();
+    const n = bpUsers(s.id).length;
+    toast(s.on
+      ? `"${s.name}" enabled — it applies again${n?` for ${n} rule${n===1?"":"s"}`:""}`
+      : `"${s.name}" disabled — it stops applying. Its conditions and the ${n} rule${n===1?"":"s"} using it are kept.`);
+  });
   document.querySelectorAll("[data-bpdel]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); BP_CONFIRM = BP_CONFIRM===b.dataset.bpdel ? null : b.dataset.bpdel; renderPolicies();
   });
