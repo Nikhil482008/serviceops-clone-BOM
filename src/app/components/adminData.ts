@@ -322,7 +322,11 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     title: 'BOM Management',
     desc: 'Schedule automatic BOM generation and manage BOM policies for connected devices.',
     icon: 'Package',
+    /* Policies and CI Scopes lead: they are the two questions the three screens
+       below used to ask separately — who, then what. */
     cards: [
+    { title: 'BOM Policies', desc: 'Attach licensing, scanning and retention to a CI scope — any combination, in one place.', icon: 'ClipboardList', href: '/admin/bom-management/policies', page: 'bom-policies' },
+    { title: 'CI Scopes', desc: 'Define which CIs belong together once, then reuse that audience everywhere.', icon: 'Crosshair', href: '/admin/bom-management/scopes', page: 'bom-scopes' },
     { title: 'BOM Scheduler', desc: 'Auto-generate SBOMs for connected devices on a schedule.', icon: 'CalendarClock', href: '/admin/bom-management/scheduler', page: 'bom-scheduler' },
     { title: 'BOM Retention', desc: 'How many living-SBOM versions to keep per device, and for how long.', icon: 'SlidersHorizontal', href: '/admin/bom-management/retention', page: 'bom-retention' },
     { title: 'BOM Licensing', desc: 'License agent-bearing CIs for BOM generation and group them into scopes.', icon: 'Lock', href: '/admin/bom-management/licensing', page: 'bom-licensing' },

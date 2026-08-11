@@ -1,6 +1,6 @@
 import {
   AlertOctagon, BadgeCheck, Bell, BookOpen, Bot, Boxes, Building2, CalendarClock, ChevronRight,
-  CircleDot, ClipboardList, Clock, Code, Cog, Database, FileSignature, FileText, Fingerprint,
+  CircleDot, ClipboardList, Clock, Code, Cog, Crosshair, Database, FileSignature, FileText, Fingerprint,
   FolderKanban, FolderTree, GitBranch, GitCompare, Globe, Inbox, KeyRound, Layers, LayoutTemplate,
   Lightbulb, ListChecks, Lock, Mail, MapPin, Megaphone, MessageSquareQuote, MessagesSquare,
   MonitorDown, MonitorSmartphone, Network, Package, Palette, Plug, Radar, Radio, RefreshCcw,
@@ -16,7 +16,7 @@ import type { LucideIcon } from 'lucide-react';
 
 const ICONS: Record<string, LucideIcon> = {
   AlertOctagon, BadgeCheck, Bell, BookOpen, Bot, Boxes, Building2, CalendarClock, ChevronRight,
-  CircleDot, ClipboardList, Clock, Code, Cog, Database, FileSignature, FileText, Fingerprint,
+  CircleDot, ClipboardList, Clock, Code, Cog, Crosshair, Database, FileSignature, FileText, Fingerprint,
   FolderKanban, FolderTree, GitBranch, GitCompare, Globe, Inbox, KeyRound, Layers, LayoutTemplate,
   Lightbulb, ListChecks, Lock, Mail, MapPin, Megaphone, MessageSquareQuote, MessagesSquare,
   MonitorDown, MonitorSmartphone, Network, Package, Palette, Plug, Radar, Radio, RefreshCcw,

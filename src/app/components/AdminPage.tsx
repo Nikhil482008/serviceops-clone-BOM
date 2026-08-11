@@ -14,12 +14,14 @@ import { ADMIN_SECTIONS, sectionByTitle } from './adminData';
  * to the settings page itself, with the breadcrumb as the way back — the hub stays the index,
  * the page is where the work happens. */
 
-type AdminView = 'hub' | 'bom-licensing' | 'bom-scheduler' | 'bom-retention';
+type AdminView = 'hub' | 'bom-policies' | 'bom-scopes' | 'bom-licensing' | 'bom-scheduler' | 'bom-retention';
 
-/* The three BOM settings screens are the original prototype in public/bom-admin —
+/* The BOM settings screens are the original prototype in public/bom-admin —
  * mounted as-is rather than reimplemented, so they stay pixel-identical to the
  * signed-off design instead of drifting with every restyle. */
 const BOM_SCREENS: Record<Exclude<AdminView, 'hub'>, { label: string; route: string }> = {
+  'bom-policies':  { label: 'BOM Policies',  route: '#/admin/bom-policies' },
+  'bom-scopes':    { label: 'CI Scopes',     route: '#/admin/bom-scopes' },
   'bom-licensing': { label: 'BOM Licensing', route: '#/admin/bom-licensing' },
   'bom-scheduler': { label: 'BOM Scheduler', route: '#/admin/bom-scheduler' },
   'bom-retention': { label: 'BOM Retention', route: '#/admin/bom-retention' },
