@@ -116,6 +116,10 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
 .btn.pri:hover{background:var(--brand-ink);border-color:var(--brand-ink);color:#fff}
 .btn.sm{height:28px;padding:0 10px;font-size:12px}
+/* §2.1 — tertiary: used where the CARD around it is the click target, so the button
+   confirms what clicking does instead of competing with it for attention. */
+.btn.ter{background:none;border-color:transparent;color:var(--brand);padding-left:8px;padding-right:8px}
+.btn.ter:hover{background:var(--pill-id);border-color:transparent;color:var(--brand-ink)}
 
 /* ── overview band ────────────────────────────────────────── */
 .band{display:flex;align-items:center;gap:10px;margin:0 0 10px}
@@ -299,6 +303,7 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .tile{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line-tbl);
   border-radius:8px;padding:13px 14px 12px;box-shadow:0 1px 2px rgba(16,24,40,.04);
   transition:box-shadow .16s,border-color .16s}
+.tile{cursor:pointer}
 .tile:hover{border-color:#CFD8E3;box-shadow:0 4px 14px -6px rgba(16,24,40,.18)}
 .tile.act{border-color:var(--brand);box-shadow:0 4px 14px -6px rgba(61,139,208,.26)}
 .tile-top{display:flex;align-items:flex-start;gap:10px}
@@ -325,11 +330,46 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 
 /* condition builder — grey well holding collapsible white group cards */
 /* on/off for the whole mechanism — lives here, not on the tile */
-.cb-power{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid var(--line-tbl);
-  border-radius:8px;padding:12px 14px;margin-bottom:14px;transition:border-color .14s,background-color .14s}
-.cb-power.on{border-color:var(--brand);background:var(--sel-blue)}
-.cb-power-t{font-size:13px;font-weight:600;color:var(--ink)}
-.cb-power-d{font-size:12px;color:var(--dim);line-height:1.5;margin-top:3px}
+/* Two ways to say WHO, drawn as one choice. Only the selected option carries
+   controls, so there is never a question about which one is in force — before this
+   the policy band and the condition builder sat one above the other, both looking
+   live, with nothing to say they were alternatives. */
+.tchoice{margin-bottom:14px}
+.tpick{border:1px solid var(--line-tbl);border-radius:8px;background:#fff}
+.tpick.on{border-color:var(--brand);background:var(--sel-blue)}
+.tpick-h{display:flex;align-items:flex-start;gap:11px;width:100%;padding:13px 14px;
+  border:0;background:none;font:inherit;text-align:left;cursor:pointer}
+.tpick-r{flex:none;width:16px;height:16px;margin-top:8px;border-radius:50%;
+  border:1.5px solid var(--line-tbl);background:#fff;box-sizing:border-box}
+.tpick.on .tpick-r{border-color:var(--brand);border-width:5px}
+.tpick-i{flex:none;width:30px;height:30px;border-radius:8px;background:var(--pill-id);color:var(--brand);
+  display:flex;align-items:center;justify-content:center}
+.tpick.on .tpick-i{background:var(--brand);color:#fff}
+.tpick-hd{min-width:0}
+.tpick-t{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink)}
+.tpick-d{display:block;font-size:12px;color:var(--dim);line-height:1.45;margin-top:3px}
+.tpick-d b{color:var(--ink)}
+.tpick-b{padding:0 14px 14px 41px}
+.tpick-b .cb{margin:0}
+.tor{display:flex;align-items:center;gap:10px;margin:10px 2px;font-size:11px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.tor::before,.tor::after{content:"";flex:1;height:1px;background:var(--line-tbl)}
+/* The second question sits inside the first answer, so it is drawn a level quieter:
+   white on the tinted card, and no bottom margin of its own. */
+.tchoice.sub{margin:0}
+.tchoice.sub .tpick{background:#fff}
+.tchoice.sub .tpick.on{background:var(--sel-blue)}
+.tgt-set{display:block}
+.tgt-line{font-size:13px;color:var(--ink)}
+.tgt-line b{font-weight:600}
+.tgt-line.none{color:var(--dim)}
+.tgt-sub{font-size:12px;color:var(--dim);line-height:1.45;margin-top:2px}
+.tgt-x{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+.tgt-stat{font-size:12px;color:var(--dim)}
+.tgt-stat b{font-size:16px;font-weight:600;color:var(--ink);letter-spacing:-.4px;margin-right:3px;
+  font-variant-numeric:tabular-nums}
+.tgt-stat.zero b{color:var(--faint)}
+.tgt-state{font-size:12px;color:var(--dim)}
 .cb{background:#F8FAFC;border:1px solid var(--line-tbl);border-radius:8px;padding:14px}
 .cb-group{background:#fff;border-radius:8px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
 .cg-head{display:flex;align-items:center;gap:10px;padding:11px 12px}
@@ -495,20 +535,6 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 /* ── scheduler status control, beside the page title ──────────
    ~60px: caption, then state and its supporting fact on one line, with the action
    naming what happens next. Paused keeps its own tint so it reads across the page. */
-.schedctl{display:flex;align-items:center;gap:16px;padding:10px 12px 10px 14px;border-radius:8px;
-  border:1px solid var(--line-tbl);background:#fff}
-.schedctl.off{border-color:#F0E1BD;background:#FEFBF3}
-.schedctl .sc-l{min-width:0}
-.schedctl .sc-cap{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
-.schedctl .sc-row{margin-top:5px;display:flex;align-items:baseline;gap:12px;white-space:nowrap}
-.schedctl .sc-state{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--ok)}
-.schedctl.off .sc-state{color:var(--dim)}
-.schedctl .sc-state .d{width:8px;height:8px;border-radius:9999px;background:var(--ok-dot);flex:none;
-  box-shadow:0 0 0 3px rgba(34,197,94,.16)}
-.schedctl.off .sc-state .d{background:var(--neu-dot);box-shadow:0 0 0 3px rgba(148,163,184,.18)}
-.schedctl .sc-meta{font-size:12px;color:var(--dim)}
-.schedctl .sc-meta b{font-weight:600;color:var(--ink)}
-.schedctl .btn{flex:none;margin-left:auto}
 /* Metric supporting line — the figure's context, not a second figure. */
 .sums{margin-top:3px;font-size:12px;color:var(--dim)}
 .sums.warn{color:var(--warn)}
@@ -530,6 +556,136 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .setban .last{margin-left:auto;text-align:right;flex:none;font-size:12px;color:var(--dim)}
 .setban .last b{display:block;color:var(--ink);font-weight:600;margin-top:2px}
 
+/* Three readings as separate cards, not one divided strip: they are three
+   different KINDS of thing — a coverage gap you can open, a filter you can apply,
+   and a control you can operate — so each gets its own surface. */
+/* Three cards, one anatomy: header, value, one line, one action. The action rows are
+   pinned to the bottom AND given the same reserved space, so a text link and a real
+   button leave the cards the same height instead of one stretching the row. */
+#bsSummary .kcta,#bsSummary .kact,#rtCards .kcta,#rtCards .kact,#bpSum .kcta{margin-top:auto;padding-top:12px}
+#bsSummary .kact,#rtCards .kact{display:flex}
+/* Retention has four readings, not three — the estate splits two ways and both halves
+   are worth a number, so the row widens rather than the cards stacking. */
+.kpis.four{grid-template-columns:repeat(4,1fr)}
+/* The default policy is a SETTING, so its card carries two values instead of one count —
+   but it stays in the family: same frame, same header, same grid cell. Only the things
+   that must differ differ. The action moves into the header's right corner because a
+   full-width button row underneath was what made this card tall.
+   Values are DATA: plain text, no borders, no hover, nothing that looks like a field —
+   every edit happens in the drawer behind the one Edit control. */
+.kh-r{margin-left:auto;display:flex;align-items:center}
+.kpair{display:flex;gap:22px;flex-wrap:wrap;margin-top:2px}
+.kpair-c{display:flex;flex-direction:column;gap:4px;min-width:0}
+/* The siblings' number style, scaled so two of them fit one card. */
+.knum.sm{font-size:26px;letter-spacing:-.8px}
+.knum.sm .ku{font-size:12px;margin-left:4px}
+/* A card whose subject is a STATE, not a count: same frame, same rhythm, but the
+   40px number would be absurd on the word "Running". */
+.kstate{display:flex;align-items:center;gap:9px;font-size:22px;font-weight:600;
+  line-height:1;letter-spacing:-.5px;color:var(--ok)}
+.kstate .d{width:9px;height:9px;border-radius:9999px;background:var(--ok-dot);flex:none;
+  box-shadow:0 0 0 3px rgba(45,164,110,.16)}
+.kpi.off .kstate{color:var(--dim)}
+.kpi.off .kstate .d{background:var(--neu-dot);box-shadow:0 0 0 3px rgba(148,163,184,.18)}
+/* A card action that carries a warning, or that is currently applied. */
+.kcta.warn{color:var(--warn)}
+.kcta.warn:hover{background:var(--warn-soft)}
+.kcta.on{color:var(--brand);background:var(--sel-blue)}
+/* Run now: a real button rather than a text action, because it starts work. */
+.runbtn{height:28px;padding:0 11px;border:1px solid #CFE0F0;background:var(--sel-blue);border-radius:4px;
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--brand);
+  white-space:nowrap;cursor:pointer;transition:background-color .14s,border-color .14s}
+.runbtn:hover{background:var(--pill-id);border-color:var(--brand)}
+.runbtn:disabled{cursor:default;background:var(--sel-blue);border-color:#CFE0F0}
+.runbtn .n{font-variant-numeric:tabular-nums;font-weight:500;color:var(--dim)}
+/* ── Licensing readings: a decomposition cascade ─────────────────
+   Three cards, one grid. Card 1 says how much room is left, card 2 splits the
+   consumed seats by HOW they are scanned, card 3 splits the same consumed seats by
+   HOW they were enrolled. Every breakdown sums to its parent because all three read
+   one snapshot of ENROLLED_CIS — the arithmetic cannot drift.
+   Colour is a family, not a rainbow: the ingested step is the SAME hue on cards 2
+   and 3 because it is the same population seen twice. */
+.lcards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 16px;max-width:1500px}
+@media (max-width:1280px){.lcards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:860px){.lcards{grid-template-columns:1fr}}
+.lcard{background:#fff;border:1px solid var(--line-tbl);border-radius:14px;padding:20px 22px;
+  display:flex;flex-direction:column}
+.lc-h{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.lc-h .ic{width:16px;height:16px;flex:none;display:grid;place-items:center;color:var(--dim)}
+.lc-h .t{font-size:13.5px;font-weight:500;color:var(--ink)}
+.lc-num{font-size:30px;font-weight:600;line-height:1;letter-spacing:-1px;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.lc-num.warn{color:var(--warn)} .lc-num.crit{color:var(--crit)}
+.lc-sub{margin-top:6px;font-size:12.5px;color:var(--dim)}
+.lc-foot{margin-top:auto;padding-top:12px;min-height:38px;/* 12 padding + 26 control */display:flex;align-items:center;gap:10px;
+  font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.lc-foot .warn{color:var(--warn)} .lc-foot .crit{color:var(--crit)}
+.lc-foot .gap{flex:1}
+.lc-foot:empty{display:none}
+/* the pill states a filter — it may not shrink or wrap to make room for prose */
+.lc-foot .lpill{flex:none}
+.ldot{width:6px;height:6px;border-radius:9999px;flex:none;background:var(--warn-dot)}
+.llnk{border:0;background:none;padding:0;font:inherit;font-size:12px;font-weight:500;
+  color:var(--brand);cursor:pointer;white-space:nowrap;flex:none}
+.llnk:hover{text-decoration:underline}
+.llnk:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
+/* one track, one fill — the length IS the percentage above it */
+.lbar{height:9px;border-radius:5px;background:var(--line-tbl);margin-top:16px;overflow:hidden}
+.lbar i{display:block;height:100%;border-radius:5px;
+  background:linear-gradient(90deg,#5FA3DB,var(--brand))}
+.lbar i.warn{background:linear-gradient(90deg,#FBBF24,var(--warn-dot))}
+.lbar i.crit{background:linear-gradient(90deg,#F87171,var(--crit-dot))}
+/* card 2 — the two scan methods, as left-accent filter buttons */
+.lsplit{display:flex;gap:10px;margin-top:16px;flex:1;min-height:76px}
+.lseg{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;
+  text-align:left;border:0;border-left:2.5px solid var(--c,var(--brand));
+  border-radius:0 8px 8px 0;padding:12px 14px;cursor:pointer;font:inherit;
+  background:color-mix(in srgb,var(--c,var(--brand)) 6%,#fff);
+  transition:background-color .14s,box-shadow .14s}
+.lseg:hover{background:color-mix(in srgb,var(--c,var(--brand)) 12%,#fff)}
+.lseg[aria-pressed="true"]{background:color-mix(in srgb,var(--c,var(--brand)) 16%,#fff);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c,var(--brand)) 34%,transparent)}
+.lseg .v{display:block;font-size:19px;font-weight:600;color:var(--ink);letter-spacing:-.3px;
+  font-variant-numeric:tabular-nums}
+.lseg .k{display:block;margin-top:2px;font-size:12px;color:var(--dim)}
+.lseg:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+/* card 3 — donut + a CONTAINED legend column, every row a filter button.
+   The legend used to stretch to the card edge, so label and value sat at opposite
+   ends of a dead gap. Bounded to ~176px it reads label-then-value in one movement,
+   and the values line up under each other whether they are 1 digit or 3. */
+.lmix{display:flex;align-items:center;gap:17px;margin-top:16px;flex:1}
+.don{position:relative;flex:none;line-height:0}
+.don-n{position:absolute;inset:0;display:grid;place-items:center;font-size:17px;font-weight:600;
+  line-height:1;letter-spacing:-.3px;color:var(--ink);font-variant-numeric:tabular-nums}
+.lleg{flex:0 1 176px;min-width:0;display:flex;flex-direction:column}
+.lleg-h{font-size:12px;color:var(--dim);margin-bottom:4px}
+.lrow{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;
+  border-bottom:1px solid var(--line-tbl);padding:5px 6px;border-radius:6px;font:inherit;
+  color:var(--ink);cursor:pointer;text-align:left;transition:background-color .14s}
+.lrow:last-child{border-bottom:0}
+.lrow:hover{background:var(--row-hover)}
+.lrow[aria-pressed="true"]{background:var(--sel-blue)}
+.lrow:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+/* NOT .sw — that class is the page's toggle switch and brings a knob with it */
+.lrow .dot{width:8px;height:8px;border-radius:9999px;flex:none}
+.lrow .k{flex:1;min-width:0;font-size:12.5px;color:var(--dim)}
+.lrow .v{font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+/* the pill that clears the filter, and the chip that shows one is applied */
+.lpill{height:26px;padding:0 11px;border:1px solid var(--line);background:#fff;border-radius:9999px;
+  font:inherit;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap}
+.lpill:hover{background:var(--surf-hover)}
+.lpill[aria-pressed="true"]{background:var(--sel-blue);border-color:var(--brand);color:var(--brand);font-weight:600}
+.lcount{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fchip{display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 6px 0 10px;border-radius:9999px;
+  background:var(--chip-blue);color:var(--brand);font-size:12px;font-weight:500;white-space:nowrap}
+.fchip b{font-variant-numeric:tabular-nums}
+.fchip button{border:0;background:none;padding:0 2px;font:inherit;font-size:14px;line-height:1;
+  color:inherit;cursor:pointer;opacity:.75}
+.fchip button:hover{opacity:1}
+.tabs-lead{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);
+  padding:0 2px;align-self:center}
+.tabs-lead .n{font-size:12px;font-weight:600;color:var(--neu);background:var(--chip-n2);border-radius:9999px;
+  padding:1px 8px}
 .sechd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .sechd h2{margin:0;font-size:15px;font-weight:600;color:var(--ink)}
 .sechd .n{font-size:12px;font-weight:600;color:var(--neu);background:var(--chip-n2);border-radius:9999px;
@@ -607,10 +763,6 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
 .polbtn:hover{background:var(--surf-hover);border-color:#CFD8E3}
 .polbtn .pt{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px}
 .polbtn .pd{font-size:11px;color:var(--dim);margin-top:2px}
-.kmeter{margin-top:10px;height:5px;border-radius:9999px;background:#EEF2F6;overflow:hidden}
-.kmeter i{display:block;height:100%;border-radius:9999px;background:var(--brand)}
-.kmeter.tight i{background:var(--warn-dot)}
-.kmeter.full i{background:var(--crit-dot)}
 .seatimpact{border:1px solid var(--line-tbl);border-radius:8px;overflow:hidden}
 .si-row{display:flex;align-items:center;gap:12px;padding:9px 14px;font-size:13px;color:var(--dim);
   border-bottom:1px solid var(--line-soft)}
@@ -624,10 +776,21 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
   border-bottom:1px solid var(--line-tbl);font-size:13px;color:var(--brand)}
 .bulkbar b{color:var(--brand);font-weight:600}
 .bulkbar .gap{flex:1}
+/* table pager — a reading device, so it stays quiet: the current page is the only
+   thing carrying weight, and the range is the only number. */
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 16px;border-top:1px solid var(--line-tbl);font-size:12px;color:var(--dim)}
+.pg-range{font-variant-numeric:tabular-nums}
+.pg-nav{display:flex;align-items:center;gap:2px}
+.pg-b{min-width:26px;height:26px;padding:0 6px;border:0;background:none;border-radius:4px;
+  font:inherit;font-variant-numeric:tabular-nums;color:var(--ink);cursor:pointer}
+.pg-b:hover:not(:disabled){background:var(--surf-hover)}
+.pg-b.on{background:var(--chip-blue);color:var(--brand);font-weight:600}
+.pg-b:disabled{color:var(--faint);cursor:default}
+.pg-e{padding:0 4px;color:var(--faint)}
 .sc-table input[type=checkbox]{accent-color:var(--brand);width:14px;height:14px;cursor:pointer}
 .sc-table tr.sel td{background:var(--sel-blue)}
 .tabs .right .search input{height:30px}
-.sumstrip.inset{border:0;border-bottom:1px solid var(--line-tbl);border-radius:0;margin:0;max-width:none}
 .rulesum{font-size:13px;color:var(--ink);line-height:1.5;max-width:44ch;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rulesum.none{color:var(--faint)}
@@ -685,8 +848,19 @@ h1{margin:0 0 2px;font-size:16px;font-weight:600;letter-spacing:0;line-height:1.
    The policy as one sentence over two lines; a RECOMMENDED tag that guides without
    making the other option look unavailable; and each targeting card carrying its
    own way through to the CIs it claims. */
-.polstack{display:flex;flex-direction:column;gap:8px}
-.polline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--ink)}
+/* Two labelled fields, not one sentence with selects inside it. The drawer opens on the
+   DEFAULT values, so the first job is to say so — a sentence cannot, but a field row with
+   a baseline beneath it can. Same .fld/.flab primitive as the name field above, so the
+   whole drawer reads as one form. */
+.polgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.polgrid .fld{margin-bottom:0}
+/* The baseline this exception departs from, and a warning when it departs from nothing. */
+.polbase{margin-top:10px;font-size:12px;color:var(--dim);line-height:1.5}
+.polbase b{font-weight:600;color:var(--ink)}
+.polsame{margin-top:10px;display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:6px;
+  background:var(--warn-soft);border:1px solid var(--warn-line);font-size:12px;line-height:1.5;color:var(--warn)}
+.polsame svg{flex:none;margin-top:1px}
+.polsame b{font-weight:600}
 .tile-tag.rec{color:var(--brand);background:var(--pill-id)}
 .tile.dyn{border-color:#CFE0F0}
 .tile.dyn:hover{border-color:var(--brand)}
@@ -872,6 +1046,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 .fresh{width:6px;height:6px;border-radius:9999px;flex:none}
 .stale{font-size:11px;color:var(--warn);font-weight:500;margin-top:3px}
 .ver{font-family:var(--mono);font-size:12px;font-weight:500}
+.ver.none{color:var(--dim);font-family:inherit}
 /* ID pill treatment (§1.1) */
 .vmore{font-family:var(--sans);font-size:11px;color:var(--brand);font-weight:600;
   background:var(--pill-id);border-radius:2px;padding:1px 5px;margin-left:5px}
@@ -1003,6 +1178,57 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
 .capchip.off{opacity:.55}
 .capchip.off svg{color:var(--faint)}
 .capnone{font-size:12px;color:var(--faint)}
+
+/* ── the readings strip ─────────────────────────────────
+   Quiet tabs: label, number, muted denominator. The selected one is marked by a
+   2px underline and nothing else. Separation is whitespace and a single hairline;
+   colour appears only where a figure needs attention. */
+/* An attention flag always carries words; colour never carries the state alone. */
+
+/* ── the panel ─────────────────────────────────────────── */
+
+/* trend — one stroke, two faint horizontals, no axis furniture */
+
+/* split — 6px tall, labels outside, no glyphs */
+.split{margin-top:16px}
+.split.sub{margin-top:12px;padding-left:16px;border-left:2px solid var(--line-soft)}
+
+/* panel tables — the existing row grammar, no decorative glyphs */
+.seg.sm button{height:26px;padding:0 11px;font-size:12px}
+.sw.sm{width:32px;height:18px}
+.sw.sm::after{width:14px;height:14px}
+.sw.sm.on::after{transform:translateX(14px)}
+
+/* capability cards in the policy drawer — a switch, then that module's settings */
+.capcard{border:1px solid var(--line-tbl);border-radius:8px;background:#fff;margin-bottom:12px;
+  transition:border-color .14s}
+.capcard.on{border-color:var(--brand)}
+.capcard-h{display:flex;align-items:flex-start;gap:12px;padding:13px 14px}
+.capcard-i{width:32px;height:32px;border-radius:8px;background:var(--chip-n);color:var(--neu);
+  display:grid;place-items:center;flex:none}
+.capcard-i svg{width:16px;height:16px}
+.capcard.on .capcard-i{background:var(--brand);color:#fff}
+.capcard-t{font-size:13px;font-weight:600;color:var(--ink)}
+.capcard-d{font-size:12px;color:var(--dim);line-height:1.45;margin-top:3px}
+.capcard-sw{margin-left:auto;flex:none;padding-top:3px}
+.capcard-b{padding:0 14px 14px;border-top:1px solid var(--line-soft);margin-top:2px;padding-top:13px}
+.capcard-b .fld:last-child{margin-bottom:0}
+
+/* one overlap, expanded: who, how many CIs, which capability, and who wins */
+.ovitem{border:1px solid var(--line-tbl);border-radius:8px;padding:12px 14px;margin-top:10px;background:#fff}
+.ovitem.clash{border-color:var(--warn-line);background:var(--warn-soft)}
+.ovitem-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink)}
+.ovitem-h .n{margin-left:auto;font-size:12px;font-weight:400;color:var(--dim)}
+.ovitem-d{font-size:12px;color:var(--dim);line-height:1.55;margin-top:4px}
+.ovcap{display:grid;grid-template-columns:96px 1fr 1fr;gap:10px;align-items:center;
+  margin-top:9px;padding-top:9px;border-top:1px solid var(--line-soft);font-size:12px}
+.ovcap-l{font-weight:600;color:var(--ink)}
+.ovside{color:var(--dim);min-width:0}
+.ovside b{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:2px}
+.ovside.win{color:var(--ink)}
+.ovside.win b{color:var(--ok-dot)}
+.ovacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
 
 /* priority — a rank, so it reads as a number and not a quantity */
 .prio{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;
@@ -1202,8 +1428,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
       </div>
     </div>
 
-    <section class="sumstrip" id="bpSum"></section>
-    <div id="bpBanner"></div>
+    <section class="kpis" id="bpSum"></section>
 
     <div class="sechd">
       <h2>Policies</h2><span class="n" id="bpCount">0</span>
@@ -1246,7 +1471,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
     <!-- The overview row is where the default policy is EDITED: card one is the
          only place it can be changed, so the figures beside it and the control that
          moves them are the same surface. There is no second copy below. -->
-    <section class="kpis" id="rtCards"></section>
+    <section class="kpis four" id="rtCards"></section>
 
     
 
@@ -1273,10 +1498,9 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
       </div>
       <!-- Creating a schedule belongs to the page, not to the table below it: the
            table's job is managing the policies that already exist. The scheduler's
-           own on/off sits here too — it is a control with a state, not a metric, so
-           it belongs beside the other control rather than in the metrics band. -->
+           own on/off used to sit here too; it now IS the third card, so the state and
+           the switch live together instead of the state being reported twice. -->
       <div class="head-actions">
-        <span class="schedstate" id="bsState"></span>
         <button class="btn pri" id="bsNew">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3.5v9M3.5 8h9"/></svg>
           New schedule
@@ -1284,22 +1508,14 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
       </div>
     </div>
 
-    <section class="sumstrip" id="bsSummary"></section>
+    <section class="kpis" id="bsSummary"></section>
 
-    
-
-    <div class="sechd">
-      <h2>Schedule Policies</h2><span class="n" id="bsCount">0</span>
-      <div class="r">
-        <div class="search" style="width:230px">
-          <span class="mag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
-          <input id="bsQ" type="search" placeholder="Search policies…" autocomplete="off">
-        </div>
-        <span id="bsFilter"></span>
-      </div>
-    </div>
-
-    <section class="sc-wrap" id="bsWrap"></section>
+    <!-- Same shape as the Licensing list: the toolbar rides INSIDE the card, above
+         the rows it filters, rather than floating above the card as a page heading. -->
+    <section class="sc-wrap">
+      <div class="tabs" id="bsTabs"></div>
+      <div id="bsWrap"></div>
+    </section>
    </div><!-- /viewScheduler -->
 
    <!-- ── BOM LICENSING ─────────────────────────────────────────
@@ -1341,7 +1557,7 @@ tbody td{padding:12px 16px;vertical-align:middle;font-size:12px;color:var(--ink)
       </div>
     </div>
 
-    <section class="kpis" id="licCards"></section>
+    <section class="lcards" id="licCards"></section>
 
     
 
@@ -1684,6 +1900,7 @@ const sevCls = s => ({Critical:"crit",High:"high",Medium:"med",Low:"low",None:"o
 /* ── KPI ──────────────────────────────────────────────────── */
 const IC_COMP  = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.8l5.4 2.7v5.4L8 12.6 2.6 9.9V4.5L8 1.8z"/><path d="M2.6 4.5L8 7.2l5.4-2.7M8 7.2v5.4"/></svg>`;
 const IC_ASSET = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2.6" width="12" height="4.4" rx="1.2"/><rect x="2" y="9" width="12" height="4.4" rx="1.2"/><path d="M4.4 4.8h.01M4.4 11.2h.01"/></svg>`;
+const IC_ALL   = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h10M3 12h10"/></svg>`;
 const IC_FIND  = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2.2l6 10.6H2L8 2.2z"/><path d="M8 6.4v3M8 11.1h.01"/></svg>`;
 const IC_SEAT  = `<svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7.6" width="12" height="6.8" rx="1.6"/><path d="M5.4 7.6V5.4a3.6 3.6 0 017.2 0v2.2"/></svg>`;
 const IC_OK    = `<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="6.8"/><path d="M5.9 9.2l2.1 2.1 4.1-4.4"/></svg>`;
@@ -2280,6 +2497,16 @@ const ALL_CIS = [
     }
   });
 })();
+/* ── endpoint identity ────────────────────────────────────────
+   An endpoint is the agent's record of a machine. A manually ingested CI has no
+   agent — its BOM was uploaded against the CI itself — so there is no endpoint to
+   name, and the column says so rather than inventing one. Stamped over ALL_CIS,
+   not the enrolled subset: an endpoint does not appear when a seat is taken.
+   TODO(api): the endpoint id belongs to discovery — GET /cmdb/ci/{id} */
+(function seedEndpoints(){
+  let n = 0;
+  ALL_CIS.forEach(c=>{ c.ep = c.origin === "Agent" ? "EP-" + (++n) : null; });
+})();
 /* Mutated in place, never reassigned, so every existing reference to
    ENROLLED_CIS keeps pointing at the live enrolled set. */
 const ENROLLED_CIS = [];
@@ -2486,6 +2713,90 @@ function bpOverlaps(p){
   }).filter(Boolean);
 }
 const bpConflicts = p => bpOverlaps(p).filter(x=>x.clashes.length);
+/* ── capabilities, composed from the policy ────────────────────
+   The policy still stores no behaviour. These read and write the MODULE rules
+   that reference it, so switching Licensing on here creates an auto-enrol rule
+   in Licensing — the same object the Licensing screen manages, not a second copy
+   of it. That is what lets one policy switch on all three at once WITHOUT the
+   three modules losing ownership of what they do.
+
+   `owner` records that the switch created the rule, so switching off can take it
+   away again — while a rule an admin wrote by hand in the module is only
+   disabled, never silently deleted out from under them. */
+const capRuleOf = (id, cap) =>
+  cap === "lic" ? (LIC_RULES.find(r=>r.policyId===id)   || null)
+: cap === "bs"  ? (BS_POLICIES.find(p=>p.policyId===id) || null)
+:                 (RT_RULES.find(r=>r.policyId===id)    || null);
+
+const SCHED_KEYS = ["kind","freq","days","mMode","mDate","mOcc","mDow","mMonth",
+                    "startAt","startDate","endDate","tz"];
+const newCapSched = () => ({kind:"Recurring", freq:"Daily", days:["Sun"],
+  mMode:"date", mDate:"1", mOcc:"First", mDow:"Monday", mMonth:"Every month",
+  startAt:"2026-01-04T02:00", startDate:"", endDate:"", tz:BS_TZ[0]});
+
+/* The three switches as the drawer needs them: current settings when a rule
+   already exists, sensible defaults when it does not. */
+function capDraftFor(id){
+  const lic = id && capRuleOf(id,"lic"), bs = id && capRuleOf(id,"bs"), rt = id && capRuleOf(id,"rt");
+  const sched = {...newCapSched()};
+  if(bs) SCHED_KEYS.forEach(k=>{ if(bs[k] !== undefined) sched[k] = k==="days" ? [...bs[k]] : bs[k]; });
+  return {
+    lic:{on:!!lic},
+    bs: {on:!!bs, ...sched},
+    rt: {on:!!rt, keep: rt ? rt.keep : RT_DEFAULT.keep, period: rt ? rt.period : RT_DEFAULT.period}
+  };
+}
+/* Write the switches back to the modules. Returns what actually happened, so the
+   toast can report it rather than assert it. */
+function applyCaps(p, caps){
+  const added = [], removed = [];
+  /* Licensing */
+  let r = capRuleOf(p.id, "lic");
+  if(caps.lic.on){
+    if(!r){ LIC_RULES.push({id:licNextRuleId(), name:p.name, on:true, updated:todayLabel(),
+                            policyId:p.id, owner:p.id, groups:[]});
+            added.push("Licensing"); }
+    else r.on = true;
+  } else if(r){
+    if(r.owner === p.id){ LIC_RULES = LIC_RULES.filter(x=>x!==r); removed.push("Licensing"); }
+    else r.on = false;
+  }
+  /* Scheduler */
+  let b = capRuleOf(p.id, "bs");
+  if(caps.bs.on){
+    if(!b){ b = {id:bsNextId(), name:p.name, on:true, cis:[], auto:false, groups:[],
+                 policyId:p.id, owner:p.id};
+            BS_POLICIES.push(b); added.push("Scheduler"); }
+    b.on = true; SCHED_KEYS.forEach(k=>{ b[k] = k==="days" ? [...caps.bs.days] : caps.bs[k]; });
+  } else if(b){
+    if(b.owner === p.id){ BS_POLICIES = BS_POLICIES.filter(x=>x!==b); removed.push("Scheduler"); }
+    else b.on = false;
+  }
+  /* Retention */
+  let t = capRuleOf(p.id, "rt");
+  if(caps.rt.on){
+    if(!t){ t = {id:rtNextId(), name:p.name, on:true, auto:false, groups:[], manual:[],
+                 policyId:p.id, owner:p.id};
+            RT_RULES.push(t); added.push("Retention"); }
+    t.on = true; t.keep = caps.rt.keep; t.period = caps.rt.period;
+  } else if(t){
+    if(t.owner === p.id){ RT_RULES = RT_RULES.filter(x=>x!==t); removed.push("Retention"); }
+    else t.on = false;
+  }
+  /* Licensing is the one capability that changes the estate on save — the other
+     two describe what happens to CIs that already hold a seat. Seats are the gate. */
+  let enrolled = 0, short = 0;
+  const lr = capRuleOf(p.id, "lic");
+  if(p.on && lr && lr.on){
+    const want = ruleFresh(lr), room = Math.max(0, licLeft());
+    const take = want.slice(0, room);
+    take.forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=lr.id; c.byPolicy=p.id; c.ruleAt=Date.now(); });
+    syncEnrolled();
+    enrolled = take.length; short = want.length - take.length;
+  }
+  return {added, removed, enrolled, short};
+}
+
 /* Every clash across the set, deduplicated per pair — the page-level reading, so
    the summary card and the rows cannot disagree about how many there are. */
 function allBpClashes(){
@@ -2507,6 +2818,11 @@ let RT_DEFAULT = {keep:"10 versions", period:"90 days"};
 let RT_DEF_DRAFT = null;
 /* Whether the read-only "CIs on an exception" list is open. */
 let RT_AFFECTED = false;
+/* Which exception rules the list shows. Lives here rather than on the card so the
+   reading and the list cannot disagree about what is being displayed. */
+let RT_SHOW = "all";
+/* The other half of the estate: the CIs no exception reaches. */
+let RT_DEFCIS = false;
 /* Whether the default-policy editor is open. */
 let RT_DEF_EDIT = false;
 let RT_RULES = [
@@ -2548,79 +2864,86 @@ let PICK = null, COND = null;
    dynamic targeting in one rule is a question with no good answer — the policy IS
    the conditions, held somewhere reusable. The hand-picked list stays available
    either way, and unions with whichever dynamic source is in play. */
-function polBandHTML(o){
-  const pol = o.policyId ? bpOf(o.policyId) : null;
-  /* Licensing enrols, so it counts against the discovered estate; the Scheduler
-     and Retention can only touch licensed CIs, so they count the enrolled set. */
+/* The policy option appears in two shapes — a band in the Scheduler and Retention, one
+   arm of an either/or in Licensing — so its ICON, WORDS and CONTROLS are defined once
+   here and borrowed by both. Fork them and they drift; the ids in particular are what
+   `wirePolChooser` binds, so a second copy would be a second, unwired chooser. */
+const POL_ICON = `<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="6.4"/><circle cx="9" cy="9" r="2.5"/></svg>`;
+const POL_TITLE = `Use a BOM Policy <span class="tile-tag rec">Reusable</span>`;
+const polDescHTML = pol => pol
+  ? `Targeting follows <b style="color:var(--ink)">${esc(pol.name)}</b> — ${esc(bpSummary(pol) || "no conditions")}. Edit the policy once and every rule using it follows.`
+  : "Point at an audience that already exists instead of writing the same conditions here again.";
+/* Licensing enrols, so it counts against the discovered estate; the Scheduler and
+   Retention can only touch licensed CIs, so they count the enrolled set. When those
+   two are the same number, saying it twice reads as a coincidence to decode. */
+function polControlsHTML(pol, o){
   const cis = pol ? bpCis(pol) : [], enr = cis.filter(c=>c.enrolled).length;
   const hit = o.discovered ? cis.length : enr;
-  return `<div class="polband${pol?" on":""}">
-    <div class="polband-h">
-      <span class="polband-i"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="6.4"/><circle cx="9" cy="9" r="2.5"/></svg></span>
-      <span class="tile-hd">
-        <span class="polband-t">Use a BOM Policy <span class="tile-tag rec">Reusable</span></span>
-        <span class="polband-d">${pol
-          ? `Targeting follows <b style="color:var(--ink)">${esc(pol.name)}</b> — ${esc(bpSummary(pol) || "no conditions")}. Edit the policy once and every rule using it follows.`
-          : "Point at an audience that already exists instead of writing the same conditions here again."}</span>
-      </span>
-    </div>
-    <div class="polband-x">
-      ${BOM_POLICIES.length ? ddHTML("tgPol", pol?pol.name:"", BOM_POLICIES.map(x=>x.name), 244, "Use existing BOM Policy") : ""}
-      <button class="btn sm${pol?"":" pri"}" id="tgPolNew">${BOM_POLICIES.length ? "Create new BOM Policy" : "Create the first BOM Policy"}</button>
-      ${pol ? `<span class="polband-n"><b>${hit}</b> ${o.discovered?"matching":"enrolled"} · ${cis.length} total</span>
-               <button class="lnk" id="tgPolView">View policy →</button>
-               <span style="flex:1"></span>
-               <button class="lnk danger" id="tgPolClear">Clear</button>` : ""}
-    </div>
+  return `<div class="polband-x">
+    ${BOM_POLICIES.length ? ddHTML("tgPol", pol?pol.name:"", BOM_POLICIES.map(x=>x.name), 244, "Use existing BOM Policy") : ""}
+    <button class="btn sm${pol?"":" pri"}" id="tgPolNew">${BOM_POLICIES.length ? "Create new BOM Policy" : "Create the first BOM Policy"}</button>
+    ${pol ? `<span class="polband-n"><b>${hit}</b> ${o.discovered?"matching":"enrolled"}${
+               hit === cis.length ? "" : ` · ${cis.length} total`}</span>
+             <button class="lnk" id="tgPolView">View policy →</button>
+             <span style="flex:1"></span>
+             <button class="lnk danger" id="tgPolClear">Clear</button>` : ""}
   </div>`;
 }
-function targetCardsHTML(o){
-  const N = ENROLLED_CIS.length;
-  const usingPolicy = !!(o.policyId && bpOf(o.policyId));
-  return `${polBandHTML(o)}
-  <div class="tiles${usingPolicy?" one":""}">
-    ${usingPolicy ? "" : `<div class="tile dyn${o.auto && o.autoCount ? " act" : ""}">
-      <div class="tile-top">
-        <span class="tile-i"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
-        <span class="tile-hd">
-          <span class="tile-t">Auto-include by condition <span class="tile-tag">This rule only</span></span>
-          <span class="tile-d">${o.autoDesc}</span>
-        </span>
-      </div>
-      <div class="tile-x">
-        <div class="tile-stat${o.autoCount?"":" zero"}"><b>${o.autoCount}</b> of ${N} enrolled CI${N===1?"":"s"}</div>
-        <div class="tile-state">${
-          !o.groups ? "No conditions built yet"
-          : !o.auto ? `Turned off · ${o.groups} group${o.groups===1?"":"s"} kept`
-          : o.autoCount ? `${o.autoCount} CI${o.autoCount===1?"":"s"} currently match`
-          : "No CIs match this condition yet."}</div>
-      </div>
-      <div class="tile-b"><button class="btn sm pri" id="${o.condId}">${o.groups ? "Edit conditions" : "Build conditions"}</button></div>
-    </div>`}
+const IC_COND = `<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg>`;
+const IC_HAND = `<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.6 14.4c0-2.6 2.2-4.2 4.8-4.2s4.8 1.6 4.8 4.2"/><circle cx="7.4" cy="6" r="2.7"/><path d="M13.4 6.4h3.2M15 4.8v3.2"/></svg>`;
+const IC_AUTO = `<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 2.4v2M9 13.6v2M2.4 9h2M13.6 9h2M4.3 4.3l1.4 1.4M12.3 12.3l1.4 1.4M13.7 4.3l-1.4 1.4M5.7 12.3l-1.4 1.4"/><circle cx="9" cy="9" r="2.6"/></svg>`;
 
-    <div class="tile${o.manualCount?" act":""}">
+/* The two ways to target sit side by side because they are not alternatives: a rule can
+   carry both, and `targetIds` unions them. Each card OWNS one of them and is itself the
+   click target — the button inside is tertiary, confirming what clicking does rather
+   than competing with the card for attention.
+
+   The Automatic card does not ask HOW here. It reports what is currently chosen and
+   opens the next drawer, where reusable-policy vs own-conditions is decided. One
+   question per surface: nested radio groups made this read as a menu of four things. */
+function tgtChoiceHTML(d, o){
+  const N    = ENROLLED_CIS.length;
+  const pol  = d.policyId ? bpOf(d.policyId) : null;
+  const nGrp = (d.groups || []).length;
+  const hits = d.auto ? autoMatches(d.groups).length : 0;
+  const cov  = pol ? bpEnrolled(pol).length : hits;
+  const nMan = (d[o.manualKey] || []).length;
+  const set  = !!(pol || nGrp);
+
+  const card = (go, act, dyn, icon, title, tag, desc, stat, state, id, cta) => `
+    <div class="tile${dyn?" dyn":""}${act?" act":""}" data-tgtgo="${go}">
       <div class="tile-top">
-        <span class="tile-i"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.6 14.4c0-2.6 2.2-4.2 4.8-4.2s4.8 1.6 4.8 4.2"/><circle cx="7.4" cy="6" r="2.7"/><path d="M13.4 6.4h3.2M15 4.8v3.2"/></svg></span>
+        <span class="tile-i">${icon}</span>
         <span class="tile-hd">
-          <span class="tile-t">Add CIs by hand <span class="tile-tag">Fixed</span></span>
-          <span class="tile-d">${o.manDesc}</span>
+          <span class="tile-t">${title}${tag}</span>
+          <span class="tile-d">${desc}</span>
         </span>
       </div>
       <div class="tile-x">
-        <div class="tile-stat${o.manualCount?"":" zero"}"><b>${o.manualCount}</b> of ${N} enrolled CI${N===1?"":"s"}</div>
-        <!-- Count only. Listing every CI made the card grow without bound; the
-             names live one click away. -->
-        <div class="tile-state">${
-          !o.manualCount ? "No CIs selected"
-          : o.manualCount === N ? "Every enrolled CI is selected"
-          : `${o.manualCount} selected CI${o.manualCount===1?"":"s"}`}</div>
-<!-- No per-card link: the preview block below owns the one way in, so the
-             count is never offered twice at two different levels. -->
+        <div class="tile-stat${stat?"":" zero"}"><b>${stat}</b> of ${N} enrolled CI${N===1?"":"s"}</div>
+        <div class="tile-state">${state}</div>
       </div>
-      <div class="tile-b"><button class="btn sm" id="${o.pickId}">${o.manualCount ? "Edit selection" : "Choose CIs"}</button></div>
-    </div>
+      <div class="tile-b"><button class="btn sm ter" id="${id}">${cta}</button></div>
+    </div>`;
+
+  return `<div class="tiles">
+    ${card("auto", set, true, IC_AUTO, "Automatic",
+        ` <span class="tile-tag rec">Recommended</span>`, o.autoDesc, cov,
+        pol  ? `Follows BOM Policy <b style="color:var(--ink)">${esc(pol.name)}</b> — ${
+                  esc(bpSummary(pol) || "no conditions")}`
+        : nGrp ? esc((d.groups.map(g=>groupSummary(g)).filter(Boolean)[0]) ||
+                     `${nGrp} condition group${nGrp===1?"":"s"}`)
+        : "Not set up yet",
+        o.condId, set ? "Change" : "Choose how")}
+    ${card("manual", !!nMan, false, IC_HAND, "Add CIs by hand",
+        ` <span class="tile-tag">Fixed</span>`, o.manDesc, nMan,
+        !nMan ? "No CIs selected"
+        : nMan === N ? "Every enrolled CI is selected"
+        : `${nMan} selected CI${nMan===1?"":"s"}`,
+        o.pickId, nMan ? "Edit selection" : "Choose CIs")}
   </div>`;
 }
+
 /* The chooser's buttons. Its dropdown routes through ddSet / polDdSet from
    whichever drawer hosts it. Creating a policy stacks the editor over the rule
    and hands the new id back — created and attached in one flow, no round trip
@@ -2798,14 +3121,14 @@ function ddSet(id, val){
   }
   if(id==="mKeep")     RT_DRAFT.keep = val;
   if(id==="mPeriod")   RT_DRAFT.period = val;
-  /* The policy chooser renders in whichever rule drawer is open; only one can be. */
-  if(id==="tgPol"){ const o = LIC_DRAWER || RT_DRAFT; if(o) polDdSet(o, id, val); }
-  /* Condition selects belong to whichever surface is showing the group
-     editor: the stacked builder when it is open, else the Auto-enrol Rule
-     drawer, which mounts the same editor inline. */
-  /* Topmost first: the policy editor can be stacked over a rule drawer, and the
-     selects the reader is looking at are the ones in front of them. */
-  const CG = COND ? COND.groups : BP_DRAFT ? BP_DRAFT.groups : LIC_DRAWER ? LIC_DRAWER.groups : null;
+  /* Topmost first: the definition drawer stacks OVER a rule drawer, so while it is
+     open it owns the chooser. */
+  if(id==="tgPol"){ const o = COND || LIC_DRAWER || RT_DRAFT || BS_DRAFT; if(o) polDdSet(o, id, val); }
+  /* Condition selects belong to whatever is IN FRONT of the reader, and the stack goes
+     rule drawer -> definition drawer -> policy editor. So the policy editor wins over the
+     definition drawer, which wins over a drawer that mounts the editor inline. Getting
+     this order wrong routes the policy editor's own conditions into the rule beneath it. */
+  const CG = BP_DRAFT ? BP_DRAFT.groups : COND ? COND.groups : LIC_DRAWER ? LIC_DRAWER.groups : null;
   if(CG && /^c[fov]-/.test(id)){
     const [kind, gi, ri] = id.split("-");
     const c = CG[+gi].conds[+ri];
@@ -2833,6 +3156,20 @@ function ddSet(id, val){
 /* Either limit can be switched off, so the note is composed from the
    ones actually in force — claiming "whichever comes first" against a
    limit that cannot fire would be worse than saying nothing. */
+/* The card's line under the values — the same fact rtNote() states, but written to fit
+   one line inside a quarter-width card (~45 chars, roughly 80% of the card's text width).
+   Data-driven, and it says the ONE thing the two label/value pairs cannot: that the limits
+   are an OR, not an AND. rtNote() keeps the fuller wording for the drawer. */
+function rtCardLine(keep, period){
+  const noCap = keep === "All versions", noAge = period === "Never delete";
+  if(noCap && noAge) return "Nothing is ever deleted";
+  if(noCap)          return `Deleted after ${period.toLowerCase()}, no version cap`;
+  if(noAge)          return `Keeps ${keep.toLowerCase()}, never deleted by age`;
+  return `Keeps ${keep.toLowerCase()} or ${period.toLowerCase()}, whichever first`;
+}
+/* An exception that matches the default is a no-op. Worth naming, because the drawer
+   seeds exactly those values — so every new rule starts in that state. */
+const rtSameAsDefault = d => d.keep === RT_DEFAULT.keep && d.period === RT_DEFAULT.period;
 function rtNote(keep, period){
   const noCap = keep === "All versions", noAge = period === "Never delete";
   if(noCap && noAge) return "Nothing is ever deleted.";
@@ -2869,45 +3206,65 @@ function renderRetention(){
      pending edit; RT_DEFAULT stays the truth until Save. */
   const nEx = RT_RULES.length, nOn = RT_RULES.filter(r=>r.on).length, aff = rtAffected();
   const rest = ENROLLED_CIS.length - aff;
+  const disabledOnly = RT_SHOW === "disabled";
+  /* "10 versions" -> 10 + versions, so the figure carries the weight and the unit stays
+     muted, exactly as the counting cards read. "Never delete" has no figure, so it does
+     not get a fake one. */
+  const numUnit = v => { const m = /^(\S+)\s+(.*)$/.exec(v); return m ? [m[1], m[2]] : [v, ""]; };
+  const [dkN, dkU] = numUnit(D.keep);
+  const [dpN, dpU] = D.period === "Never delete" ? ["Never", ""] : numUnit(D.period);
   document.getElementById("rtCards").innerHTML = `
     <article class="kpi">
-      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.6V8l2.4 1.5"/></svg></span><span class="t">Default Policy</span></div>
-      <div class="rtc-read">
-        <div>Keep <b>${esc(D.keep)}</b></div>
-        <div>Delete after <b>${esc(D.period.toLowerCase())}</b></div>
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.6V8l2.4 1.5"/></svg></span><span class="t">Default policy</span>
+        <span class="kh-r"><button class="iact" id="rtDefEdit" aria-label="Edit default policy" title="Edit default policy">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.2 2.6l2.2 2.2M12.1 1.7a1.3 1.3 0 011.8 1.8L5.6 11.8l-2.6.8.8-2.6 8.3-8.3z"/></svg>Edit</button></span>
       </div>
-      <div class="ksec">Applies to all enrolled CIs</div>
-      <div class="rtc-act"><button class="btn sm" id="rtDefEdit">Edit</button></div>
+      <div class="kpair">
+        <div class="kpair-c"><span class="suml">Keep last</span>
+          <span class="knum sm n-neutral">${esc(dkN)}${dkU ? `<span class="ku">${esc(dkU)}</span>` : ""}</span></div>
+        <div class="kpair-c"><span class="suml">Delete after</span>
+          <span class="knum sm n-neutral">${esc(dpN)}${dpU ? `<span class="ku">${esc(dpU)}</span>` : ""}</span></div>
+      </div>
+      <div class="klabel">${esc(rtCardLine(D.keep, D.period))}</div>
     </article>
 
     <article class="kpi">
-      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span><span class="t">Exception Rules</span></div>
-      <div class="knum n-neutral">${nOn}</div>
-      <div class="klabel">Active exception rule${nOn===1?"":"s"}</div>
-      <div class="ksec">${aff
-        ? `${aff} CI${aff===1?"":"s"} use${aff===1?"s":""} an exception`
-        : (nEx ? "No CI currently matches them" : "No CI uses an exception")}${
-        nEx-nOn ? ` · ${nEx-nOn} disabled` : ""}</div>
-      <button class="kcta" id="rtViewEx"><span class="lb">View rules</span><span class="ar">→</span></button>
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span><span class="t">Exception rules</span></div>
+      <div class="knum n-neutral">${nOn}<span class="ku">/ ${nEx}</span></div>
+      <div class="klabel">Enabled exception rule${nOn===1?"":"s"}</div>
+      ${nEx-nOn
+        ? `<button class="kcta${disabledOnly?" on":""}" id="rtShowOff"><span class="lb">${
+             disabledOnly ? "Showing disabled only" : `${nEx-nOn} disabled`}</span><span class="ar">${disabledOnly?"×":"→"}</span></button>`
+        : `<button class="kcta" disabled><span class="lb">${nEx ? "None disabled" : "No exceptions yet"}</span></button>`}
     </article>
 
     <article class="kpi">
-      <div class="kh"><span class="ic">${IC_ASSET}</span><span class="t">Following Default</span></div>
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3.4 6.2h8.2l-2-2M14.6 11.8H6.4l2 2"/></svg></span><span class="t">Following an exception</span></div>
+      <div class="knum n-neutral">${aff}<span class="ku">CI${aff===1?"":"s"}</span></div>
+      <div class="klabel">Follows custom retention policies</div>
+      <button class="kcta" id="rtViewCis"${aff?"":" disabled"}><span class="lb">${
+        aff ? "View CIs" : "None overridden"}</span>${aff?`<span class="ar">→</span>`:""}</button>
+    </article>
+
+    <article class="kpi">
+      <div class="kh"><span class="ic">${IC_ASSET}</span><span class="t">Following default</span></div>
       <div class="knum n-neutral">${rest}<span class="ku">CI${rest===1?"":"s"}</span></div>
-      <div class="klabel">Following default policy</div>
-      <div class="ksec">${aff ? `${aff} CI${aff===1?"":"s"} overridden` : "No CI is overridden"}</div>
-      <button class="kcta" id="rtViewCis"${aff?"":" disabled"}><span class="lb">View affected</span><span class="ar">→</span></button>
+      <div class="klabel">Kept on the default policy</div>
+      <button class="kcta" id="rtViewDef"${rest?"":" disabled"}><span class="lb">${
+        rest ? "View CIs" : "None on the default"}</span>${rest?`<span class="ar">→</span>`:""}</button>
     </article>`;
 
   document.getElementById("rtCount").textContent = RT_RULES.length;
   const wrap = document.getElementById("rtWrap");
+  /* The count chip stays the TOTAL; the filter narrows the rows, not the fact. */
+  const shown = disabledOnly ? RT_RULES.filter(r=>!r.on) : RT_RULES;
 
   wrap.innerHTML = RT_RULES.length ? `<div style="overflow-x:auto"><table class="sc-table">
     <thead><tr>
       <th style="width:26%">Policy</th><th>Applies To</th><th>Retention Policy</th>
       <th>Status</th><th style="width:150px">Actions</th>
     </tr></thead>
-    <tbody>${RT_RULES.map(r=>{
+    <tbody>${shown.map(r=>{
       const n = rtTargets(r).size;
       return `<tr class="${r.on?"":"off"}">
         <td><div class="sc-name">${esc(r.name)}</div><div class="sc-id">${r.id} · overrides default</div></td>
@@ -2954,20 +3311,22 @@ function renderRetention(){
 
   /* The card reports the policy; editing it happens in its own surface, so the
      overview stays a dashboard and the only way to change the default is here. */
+  /* The button is the only way in — no card-level click, because a button that already
+     says "Edit default policy" does not need the whole card to repeat the offer. */
   const rtEd = document.getElementById("rtDefEdit");
   if(rtEd) rtEd.onclick = ()=>{
     RT_DEF_DRAFT = {keep:RT_DEFAULT.keep, period:RT_DEFAULT.period};
     RT_DEF_EDIT = true; renderModal();
   };
 
-  /* Each reading offers a way through to what it counts. */
-  const rtVE = document.getElementById("rtViewEx");
-  if(rtVE) rtVE.onclick = ()=>{
-    const w = document.getElementById("rtWrap");
-    if(w) w.scrollIntoView({behavior:"smooth", block:"center"});
-  };
+  /* Each reading offers a way through to what it counts: the disabled count filters
+     the list to them, and each half of the estate opens its own CIs. */
+  const rtSO = document.getElementById("rtShowOff");
+  if(rtSO) rtSO.onclick = ()=>{ RT_SHOW = RT_SHOW === "disabled" ? "all" : "disabled"; renderRetention(); };
   const rtVC = document.getElementById("rtViewCis");
   if(rtVC && !rtVC.disabled) rtVC.onclick = ()=>{ RT_AFFECTED = true; renderModal(); };
+  const rtVD = document.getElementById("rtViewDef");
+  if(rtVD && !rtVD.disabled) rtVD.onclick = ()=>{ RT_DEFCIS = true; renderModal(); };
 
   document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>rtOpen(b.dataset.edit));
   document.querySelectorAll("[data-rttoggle]").forEach(b=>b.onclick=e=>{
@@ -3034,9 +3393,11 @@ function openCond(target, back){
   const g = (target.groups || []).map((x,i,a)=>({
     join: x.join || "And", open: i === a.length-1, conds: x.conds.map(c=>({...c}))
   }));
-  /* Nothing configured yet ⇒ start switched on, so building a condition
-     actually does something. An explicit earlier "off" is respected. */
-  COND = {auto: g.length ? target.auto : true, groups: g.length ? g : [newGroup()], target, back};
+  /* Carries BOTH answers, because this drawer now asks which of the two it is.
+     Always on: getting here means automatic targeting IS the rule's choice. */
+  COND = {auto: true, tmode: target.policyId ? "policy" : "conditions",
+          policyId: target.policyId || null,
+          groups: g.length ? g : [newGroup()], target, back};
   renderStack();
 }
 function closeCond(){ const b = COND && COND.back; COND = null; renderStack(); if(b) b(); }
@@ -3157,8 +3518,8 @@ function wireCbGroups(G, rerender, onVal){
    field offers, so the preview answers "which population did I just
    sweep in" rather than only "how many". */
 function cbPrevLine(hits){
-  if(COND && !COND.auto)
-    return `Auto-include is <b>off</b> — nothing is targeted by these conditions`;
+  /* No "auto-include is off" branch: reaching this builder means conditions ARE the
+     targeting, so there is no off state left for it to report. */
   if(!hits.length) return `Matches <b>0</b> of ${ENROLLED_CIS.length} enrolled CIs right now`;
   const agent = hits.filter(c=>c.origin==="Agent").length;
   return `Matches <b>${hits.length}</b> of ${ENROLLED_CIS.length} enrolled CI(s): ` +
@@ -3215,21 +3576,35 @@ function wireStack(){
     $("cbClose").onclick  = closeCond;
     $("cbCancel").onclick = closeCond;
     $("cbScrim").onclick  = closeCond;
-    $("cbAuto").onclick   = ()=>{ COND.auto = !COND.auto; renderStack(); };
     wireCbGroups(G, renderStack, ()=>{
       const h = document.getElementById("cbPrevH");
-      if(h) h.innerHTML = cbPrevLine(COND.auto ? autoMatches(G) : []);
+      if(h) h.innerHTML = cbPrevLine(autoMatches(G));
     });
+    /* One question, one answer: applying writes the chosen definition and CLEARS the
+       other, so the rule can never carry a policy and conditions that disagree. */
+    document.querySelectorAll("#stackHost [data-tgt]").forEach(b=>b.onclick=e=>{
+      e.stopPropagation();
+      const val = b.dataset.tgt.split(":")[1];
+      if(COND.tmode !== val){ COND.tmode = val; renderStack(); }
+    });
+    if(COND.tmode === "policy") wirePolChooser(COND, renderStack);
     $("cbApply").onclick = ()=>{
-      const t = COND.target, back = COND.back;
-      t.groups = G.filter(g=>g.conds.some(condDone))
-                  .map(g=>({join:g.join, conds:g.conds.filter(condDone).map(c=>({...c}))}));
-      t.auto = COND.auto;
-      const n = t.auto ? autoMatches(t.groups).length : 0;
+      const t = COND.target, back = COND.back, byPol = COND.tmode === "policy";
+      if(byPol){
+        t.policyId = COND.policyId || null; t.groups = []; t.auto = false;
+      } else {
+        t.policyId = null;
+        t.groups = G.filter(g=>g.conds.some(condDone))
+                    .map(g=>({join:g.join, conds:g.conds.filter(condDone).map(c=>({...c}))}));
+        t.auto = true;
+      }
+      const p = byPol && t.policyId ? bpOf(t.policyId) : null;
+      const n = byPol ? (p ? bpEnrolled(p).length : 0) : autoMatches(t.groups).length;
       COND = null; renderStack(); if(back) back();
-      toast(t.auto
-        ? `Conditions applied — ${n} enrolled CI${n===1?"":"s"} matched`
-        : `Conditions saved — auto-include is off, nothing is targeted`);
+      toast(byPol
+        ? (p ? `Now follows "${p.name}" — ${n} enrolled CI${n===1?"":"s"} covered`
+             : "No BOM Policy chosen — nothing is targeted yet")
+        : `Conditions applied — ${n} enrolled CI${n===1?"":"s"} matched`);
     };
   }
 
@@ -3359,30 +3734,43 @@ function renderStack(){
   if(COND){
     const cbIn = COND._mounted ? "" : " in";
     COND._mounted = true;
-    const hits = COND.auto ? autoMatches(COND.groups) : [];
+    const cbPol = COND.tmode === "policy";
+    const cbSel = COND.policyId ? bpOf(COND.policyId) : null;
+    const hits  = cbPol ? [] : autoMatches(COND.groups);
     conds = `
     <div class="dw-scrim lite${cbIn}" id="cbScrim"></div>
     <aside class="dw stack${cbIn}" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Auto-include conditions">
       <div class="dw-head">
-        <div><h3>Auto-include conditions</h3><p>Conditions in a group must all match. A CI matching any group is included.</p></div>
+        <div><h3>How should CIs be chosen?</h3><p>Point at a reusable BOM Policy, or write conditions that belong to this rule alone.</p></div>
         <button class="x" id="cbClose" aria-label="Close">${IC_X}</button>
       </div>
 
       <div class="dw-body">
-        <div class="cb-power${COND.auto?" on":""}">
-          <button class="sw${COND.auto?" on":""}" id="cbAuto" role="switch"
-                  aria-checked="${COND.auto}" aria-label="Auto-include by condition"></button>
-          <div>
-            <div class="cb-power-t">Auto-include is ${COND.auto ? "on" : "off"}</div>
-            <div class="cb-power-d">${COND.auto
-              ? "CIs matching the conditions below join this rule automatically — now, and as new CIs are enrolled."
-              : "The conditions below are kept, but no CI is targeted by them. Turn on to apply."}</div>
+        <!-- The second question, on its own surface. No on/off switch: choosing a
+             definition IS switching it on, and a switch here would let a rule sit
+             claiming a targeting that produced nothing. -->
+        <div class="tchoice sub" role="radiogroup" aria-label="How the CIs are defined">
+          <div class="tpick${cbPol?" on":""}">
+            <button class="tpick-h" data-tgt="mode:policy" role="radio" aria-checked="${!!cbPol}">
+              <span class="tpick-r"></span><span class="tpick-i">${POL_ICON}</span>
+              <span class="tpick-hd"><span class="tpick-t">${POL_TITLE}</span>
+                <span class="tpick-d">${polDescHTML(cbSel)}</span></span>
+            </button>
+            ${cbPol ? `<div class="tpick-b">${polControlsHTML(cbSel, {discovered:false})}</div>` : ""}
+          </div>
+          <div class="tor"><span>or</span></div>
+          <div class="tpick${cbPol?"":" on"}">
+            <button class="tpick-h" data-tgt="mode:conditions" role="radio" aria-checked="${!cbPol}">
+              <span class="tpick-r"></span><span class="tpick-i">${IC_COND}</span>
+              <span class="tpick-hd"><span class="tpick-t">Define conditions here <span class="tile-tag">This rule only</span></span>
+                <span class="tpick-d">Conditions in a group must all match. A CI matching any group is included.</span></span>
+            </button>
           </div>
         </div>
 
-        ${cbGroupsHTML(COND.groups)}
+        ${cbPol ? "" : cbGroupsHTML(COND.groups)}
 
-        <div class="cb-prev">
+        <div class="cb-prev"${cbPol?' style="display:none"':""}>
           <div class="cb-prev-h" id="cbPrevH">${cbPrevLine(hits)}</div>
           ${hits.length ? `<div style="overflow-x:auto"><table class="cbt">
             <thead><tr><th>CI ID</th><th>Host Name</th><th>CI Type</th><th>Status</th><th>IP address</th></tr></thead>
@@ -3400,7 +3788,7 @@ function renderStack(){
       <div class="dw-foot">
         <span class="gap"></span>
         <button class="btn lg" id="cbCancel">Cancel</button>
-        <button class="btn pri lg" id="cbApply">Apply conditions</button>
+        <button class="btn pri lg" id="cbApply">${cbPol ? "Apply policy" : "Apply conditions"}</button>
       </div>
     </aside>`;
   }
@@ -3416,6 +3804,34 @@ function renderStack(){
 /* Read-only: which enrolled CIs are on an exception rather than the default, and
    which rule takes each one. Opened from the Overrides reading — a count is only
    useful if you can see what it counts. */
+/* The complement of renderAffected(), derived from the same targets — so the two
+   lists always add up to the enrolled estate rather than being counted twice. */
+function renderDefaultCis(){
+  const host = document.getElementById("modalHost");
+  const on = new Set();
+  RT_RULES.forEach(r=>{ if(r.on) rtTargets(r).forEach(id=>on.add(id)); });
+  const rows = ENROLLED_CIS.filter(c=>!on.has(c.id));
+  const D = RT_DEFAULT;
+  host.innerHTML = `<div class="dw-scrim in" id="rtDcScrim"></div>
+    <aside class="dw in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="CIs on the default policy">
+      <div class="dw-head"><div><h3>CIs on the default policy</h3>
+        <p>${rows.length} of ${ENROLLED_CIS.length} enrolled CI${ENROLLED_CIS.length===1?"":"s"} · keep ${esc(D.keep)}, ${
+          D.period==="Never delete" ? "never deleted" : `delete after ${esc(D.period.toLowerCase())}`} · read-only</p></div>
+        <button class="x" id="rtDcClose" aria-label="Close">${IC_X}</button></div>
+      <div class="dw-body" style="padding:0">
+        <div class="pk-hd" style="grid-template-columns:68px 1fr 128px 108px"><span>CI ID</span><span>Host Name</span><span>CI Type</span><span>IP address</span></div>
+        ${rows.length ? rows.map(c=>`<div class="pk-row" style="grid-template-columns:68px 1fr 128px 108px;cursor:default">
+          <span class="id">${c.id}</span><span>${esc(c.host)}</span>
+          <span><span class="pill ghost">${esc(c.type)}</span></span><span class="ip">${c.ip}</span></div>`).join("")
+          : `<div class="pk-empty">Every enrolled CI is covered by an exception.</div>`}
+      </div>
+      <div class="dw-foot"><span class="avail">Move a CI off the default by adding it to an exception.</span>
+        <span class="gap"></span><button class="btn lg" id="rtDcDone">Close</button></div>
+    </aside>`;
+  const close = ()=>{ RT_DEFCIS=false; host.innerHTML=""; };
+  ["rtDcClose","rtDcDone","rtDcScrim"].forEach(id=>{ const el=document.getElementById(id); if(el) el.onclick=close; });
+}
+
 function renderAffected(){
   const host = document.getElementById("modalHost");
   const rows = [];
@@ -3496,6 +3912,7 @@ function renderDefEditor(){
 
 function renderModal(){
   if(RT_DEF_EDIT && !RT_DRAFT){ renderDefEditor(); return; }
+  if(RT_DEFCIS && !RT_DRAFT){ renderDefaultCis(); return; }
   if(RT_AFFECTED && !RT_DRAFT){ renderAffected(); return; }
   const d = RT_DRAFT;
   if(!d) return;
@@ -3531,23 +3948,38 @@ function renderModal(){
         ${d.err && !d.name.trim() ? `<div class="ferr">Give the exception a name so it can be recognised later.</div>` : ""}
       </div>
 
-      <div class="sechead">Retention policy</div>
-      <!-- One policy, read as one sentence across two lines, rather than a row of
-           controls the reader has to reassemble. -->
-      <div class="polstack">
-        <div class="polline">Keep the latest ${ddHTML("mKeep", d.keep, KEEP_OPTS, 168)}</div>
-        <div class="polline">or delete versions older than ${ddHTML("mPeriod", d.period, PERIOD_OPTS, 150)}</div>
+      <div class="sechead">Retention policy <span>— what these CIs keep instead of the default</span></div>
+      <!-- Two labelled fields of equal width. The old version read as one sentence with
+           the selects embedded in it, which hid that these are the two things to set. -->
+      <div class="polgrid">
+        <div class="fld">
+          <span class="flab">Keep the latest</span>
+          ${ddHTML("mKeep", d.keep, KEEP_OPTS, "full")}
+        </div>
+        <div class="fld">
+          <span class="flab">Delete versions older than</span>
+          ${ddHTML("mPeriod", d.period, PERIOD_OPTS, "full")}
+        </div>
       </div>
-      <div class="polrow-note">${rtNote(d.keep, d.period)}</div>
+      <!-- A new exception opens pre-filled with the DEFAULT, so on open it changes nothing.
+           Saying that outright is the one thing the reader needs before touching anything;
+           the note becomes an ordinary baseline line the moment either value moves. -->
+      ${rtSameAsDefault(d)
+        ? `<div class="polsame">
+             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1.8l6.2 11.4H1.8L8 1.8z"/><path d="M8 6.3v3M8 11.4h.01"/></svg>
+             <span><b>These are the default values</b>, so this exception would change nothing.
+               Set a different limit above — that is what makes it an exception.</span>
+           </div>`
+        : `<div class="polbase">${rtNote(d.keep, d.period)}
+             Default is <b>${esc(RT_DEFAULT.keep.toLowerCase())}</b> or <b>${esc(RT_DEFAULT.period.toLowerCase())}</b>.</div>`}
 
       <hr class="dw-div">
 
-      <div class="sechead">Applies to <span>— use a reusable policy, or define conditions here</span></div>
+      <div class="sechead">Applies to <span>— use either, or both</span></div>
 
-      ${targetCardsHTML({
-        policyId:d.policyId, auto:d.auto, autoCount, groups:nGroups,
-        manualCount:d.manual.length, condId:"mCond", pickId:"mAdd",
-        autoDesc:"Every enrolled CI matching your conditions is targeted automatically — including new CIs that match later.",
+      ${tgtChoiceHTML(d, {
+        manualKey:"manual", condId:"mCond", pickId:"mAdd",
+        autoDesc:"Targets whatever matches — through a BOM Policy or conditions of your own — including new CIs that match later.",
         manDesc:"Pick specific enrolled CIs. The list stays fixed until you update it manually."
       })}
 
@@ -3555,7 +3987,6 @@ function renderModal(){
     </div>
 
     <div class="dw-foot">
-      <span class="avail">Applies to <b style="color:var(--ink)">${total}</b> of ${ENROLLED_CIS.length} enrolled CIs</span>
       <span class="gap"></span>
       <button class="btn lg" id="mCancel">Cancel</button>
       <button class="btn pri lg" id="mSave">${d.editing ? "Save changes" : "Create exception"}</button>
@@ -3574,7 +4005,12 @@ function renderModal(){
   $("mCancel").onclick = rtClose;
   $("mScrim").onclick  = ()=>{ if(!PICK && !COND) rtClose(); };
   $("mName").oninput   = e => { d.name = e.target.value; };
-  $("mAdd").onclick = ()=>openPick(d, renderModal, "manual");
+  /* The whole card navigates; its tertiary button carries the id but no handler of its
+     own, so the click bubbles here and the two can never disagree about what they do. */
+  document.querySelectorAll("#modalHost [data-tgtgo]").forEach(el=>el.onclick=()=>{
+    if(el.dataset.tgtgo === "auto") openCond(d, renderModal);
+    else openPick(d, renderModal, "manual");
+  });
   /* Absent while a policy is chosen — the policy holds the conditions. */
   if($("mCond")) $("mCond").onclick = ()=>openCond(d, renderModal);
   wirePolChooser(d, renderModal);
@@ -3618,6 +4054,8 @@ document.addEventListener("keydown", e=>{
   else if(PICK) closePick();
   else if(TP){ TP=null; TP_MOUNTED=false; renderStack(); }
   else if(BP_IMPACT){ BP_IMPACT=false; renderPolicyDrawer(); }
+  else if(BP_OVL){ BP_OVL=false; renderPolicyDrawer(); }
+  else if(BP_UNGOV){ BP_UNGOV=false; renderPolicyDrawer(); }
   else if(BP_VIEW){ BP_VIEW=null; BP_VIEW_STACK=false; renderPolicyDrawer(); }
   else if(BP_DRAFT) bpClose();
   else if(RT_DRAFT) rtClose();
@@ -3625,6 +4063,7 @@ document.addEventListener("keydown", e=>{
   else if(LIC_VIEW){ LIC_VIEW=null; renderLicDrawer(); }
   else if(LIC_DRAWER) licRuleClose();
   else if(LIC_RULESPANEL) licRulesClose();
+  else if(BS_UNCOV){ BS_UNCOV=false; renderBsDrawers(); }
   else if(BS_COV){ BS_COV=null; renderBsDrawers(); }
   else if(RT_CONFIRM){ RT_CONFIRM=null; renderRetention(); }
   else if(BS_MENU || BS_CONFIRM){ BS_MENU=null; BS_CONFIRM=null; renderScheduler(); }
@@ -3686,8 +4125,7 @@ let BS_POLICIES = [
    cis:[], auto:false, groups:[], policyId:"BP-2"}
 ];
 let BS_Q="", BS_FILT=new Set(), BS_FOPEN=false, BS_MENU=null, BS_CONFIRM=null,
-    BS_COV=null, BS_DRAFT=null;
-    BS_COV=null, BS_DRAFT=null;
+    BS_COV=null, BS_UNCOV=false, BS_DRAFT=null;
 
 /* A paused policy has no next run — saying otherwise would be a lie the
    admin acts on. Same when the global switch is off. */
@@ -3817,18 +4255,24 @@ const bsClockOf  = ms => { const d=new Date(ms);
 /* A run advances one CI at a time, so its length follows what it actually covers
    rather than a fixed wait, and it finishes because the work finished. */
 const BS_TICK = 420;
+/* A manual run always takes this long, whatever it covers — the button is a promise
+   that work is happening, and a one-CI policy blinking instantly reads as a no-op. */
+const BS_RUN_MS = 10000;
 function bsRunNow(p){
   if(bsRunning(p.id)) return;                          // already in flight
   const run = { id:"RUN-"+p.id+"-"+Date.now(), policyId:p.id, by:"manual",
                 total:bsCis(p).length, done:0, startedAt:Date.now(), finishedAt:null };
   BS_RUNS.push(run);
+  /* Progress is spread across the fixed duration rather than a fixed tick per CI,
+     so 1 CI and 33 CIs both take BS_RUN_MS and the count still climbs honestly. */
+  const every = run.total ? Math.max(80, Math.round(BS_RUN_MS / run.total)) : 0;
   const step = ()=>{
     run.done++;
     if(run.done >= run.total){ run.finishedAt = Date.now(); renderScheduler(); return; }
-    renderScheduler(); setTimeout(step, BS_TICK);
+    renderScheduler(); setTimeout(step, every);
   };
   if(!run.total){ run.finishedAt = run.startedAt; renderScheduler(); return; }
-  renderScheduler(); setTimeout(step, BS_TICK);
+  renderScheduler(); setTimeout(step, every);
 }
 
 const BS_FILTERS = [
@@ -3865,47 +4309,57 @@ function renderScheduler(){
      table cell rather than a headline. */
   const lastRun = bsLastAny();
   const uncovered = ENROLLED_CIS.length - covered;
-  const pct = ENROLLED_CIS.length ? Math.round(covered/ENROLLED_CIS.length*100) : 0;
   const today = bsRunsToday(), inFlight = today.filter(r=>!r.finishedAt).length;
   const doneToday = today.length - inFlight;
+  /* Each footer is the thing it names, not a caption about it: the coverage gap
+     OPENS the CIs in it, the disabled count FILTERS the list to them, and the third
+     card is the scheduler switch itself. A reading you can act on beats a reading
+     that leaves you hunting for where to act. */
+  const pausedOn = BS_FILT.has("paused");
   document.getElementById("bsSummary").innerHTML = `
-    <div class="sumcell"><div class="suml">Coverage</div>
-      <div class="sumv big${covered?"":" quiet"}">${covered} / ${ENROLLED_CIS.length}<span class="u">CIs</span></div>
-      <div class="sums${uncovered?" warn":""}">${uncovered
-        ? `${uncovered} CI${uncovered===1?"":"s"} not covered`
-        : `${pct}% scheduled`}</div></div>
-    <div class="sumcell"><div class="suml">Active policies</div>
-      <div class="sumv big${active.length?"":" quiet"}">${active.length} / ${BS_POLICIES.length}</div>
-      <div class="sums">${paused.length ? `${paused.length} disabled` : "none disabled"}</div></div>
-    <div class="sumcell"><div class="suml">Scan activity</div>
-      <div class="sumv big${today.length?"":" quiet"}">${today.length}<span class="u">scan${today.length===1?"":"s"} today</span></div>
-      <!-- State and last execution belong to the control above; repeating them here
-           would be the duplication that control was built to remove. -->
-      <div class="sums">${today.length
-        ? `${doneToday} completed${inFlight?` · ${inFlight} running`:""}`
-        : "no scans yet today"}</div></div>`;
+    <article class="kpi">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 1.9l6 2.4v4.2c0 3.4-2.4 6.2-6 7.1-3.6-.9-6-3.7-6-7.1V4.3l6-2.4z"/><path d="M6.4 9.1l1.9 1.9 3.5-3.9"/></svg></span><span class="t">Coverage</span></div>
+      <div class="knum n-neutral">${covered}<span class="ku">/ ${ENROLLED_CIS.length} CIs</span></div>
+      <div class="klabel">Covered by an enabled schedule</div>
+      ${uncovered
+        ? `<button class="kcta warn" id="bsUncov"><span class="lb">${uncovered} CI${uncovered===1?"":"s"} not covered</span><span class="ar">→</span></button>`
+        : `<button class="kcta" disabled><span class="lb">Everything is covered</span></button>`}
+    </article>
 
-  /* ── scheduler status control ───────────────────────────
-     State and action say DIFFERENT things: the status reports what the system is
-     doing right now ("Running"/"Paused"), the button names what will happen next
-     ("Pause"/"Resume"). The old chip said "On" beside "Disable", which is the same
-     fact twice and leaves the reader to work out which one is the state.
-     It sits beside the page title, in space the header was not using, so a control
-     of this size costs the page no vertical room at all. */
-  document.getElementById("bsState").className = "schedctl" + (BS_ENABLED ? "" : " off");
-  document.getElementById("bsState").innerHTML = `
-    <div class="sc-l">
-      <div class="sc-cap">Automatic BOM generation</div>
-      <div class="sc-row">
-        <span class="sc-state"><span class="d"></span>${BS_ENABLED ? "Running" : "Paused"}</span>
-        ${BS_ENABLED
-          ? (lastRun
-              ? `<span class="sc-meta">Last execution <b>${bsClockOf(lastRun.finishedAt)}${TZ_SHORT?` ${TZ_SHORT}`:""}</b></span>`
-              : `<span class="sc-meta">No execution yet today</span>`)
-          : `<span class="sc-meta">No scheduled scans will run until resumed.</span>`}
+    <article class="kpi">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span><span class="t">Active policies</span></div>
+      <div class="knum n-neutral">${active.length}<span class="ku">/ ${BS_POLICIES.length}</span></div>
+      <div class="klabel">Enabled schedule policies</div>
+      ${paused.length
+        ? `<button class="kcta${pausedOn?" on":""}" id="bsShowPaused"><span class="lb">${
+             pausedOn ? `Showing disabled only` : `${paused.length} disabled`}</span><span class="ar">${pausedOn?"×":"→"}</span></button>`
+        : `<button class="kcta" disabled><span class="lb">None disabled</span></button>`}
+    </article>
+
+    <!-- A control, not a metric — but it belongs in this row because "is the
+         scheduler running" is the first thing the other two readings depend on.
+         State and switch live on one surface, so the state is never reported twice. -->
+    <article class="kpi${BS_ENABLED?"":" off"}">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.6V8l2.4 1.5"/></svg></span><span class="t">Automatic BOM generation</span></div>
+      <div class="kstate"><span class="d"></span>${BS_ENABLED ? "Running" : "Paused"}</div>
+      <div class="klabel">${BS_ENABLED
+        ? (lastRun ? `Last execution ${bsClockOf(lastRun.finishedAt)}${TZ_SHORT?` ${TZ_SHORT}`:""}`
+                   : "No execution yet today")
+        : "No schedule will run until resumed"}</div>
+      <div class="kact"><button class="btn sm" id="bsSw">${BS_ENABLED ? "Pause scheduler" : "Resume scheduler"}</button></div>
+    </article>`;
+
+  /* The toolbar first: it CREATES #bsFilter and #bsQ, so nothing below can bind
+     them until it has run. */
+  document.getElementById("bsTabs").innerHTML = `
+    <span class="tabs-lead">Schedule Policies <span class="n" id="bsCount">${BS_POLICIES.length}</span></span>
+    <div class="right">
+      <div class="search" style="width:220px">
+        <span class="mag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
+        <input id="bsQ" type="search" value="${esc(BS_Q)}" placeholder="Search policies…" autocomplete="off">
       </div>
-    </div>
-    <button class="btn sm" id="bsSw">${BS_ENABLED ? "Pause scheduler" : "Resume scheduler"}</button>`;
+      <span id="bsFilter"></span>
+    </div>`;
 
   /* ── filter control (§5.3 — one control, never a row) ──── */
   const groups = [...new Set(BS_FILTERS.map(f=>f.g))];
@@ -3922,7 +4376,6 @@ function renderScheduler(){
 
   /* ── policy list ───────────────────────────────────────── */
   const list = bsVisible();
-  document.getElementById("bsCount").textContent = BS_POLICIES.length;
   const wrap = document.getElementById("bsWrap");
 
   if(!BS_POLICIES.length){
@@ -3941,7 +4394,7 @@ function renderScheduler(){
       <div class="cta"><button class="btn" id="bsClr">Clear filters</button></div>
     </div>`;
     document.getElementById("bsClr").onclick = ()=>{
-      BS_FILT.clear(); BS_Q=""; document.getElementById("bsQ").value=""; renderScheduler();
+      BS_FILT.clear(); BS_Q=""; renderScheduler();
     };
   } else {
     wrap.innerHTML = `<table class="sc-table">
@@ -3954,8 +4407,10 @@ function renderScheduler(){
         /* Idle → Running → Completed, read from the run log. "Completed" is the
            most recent finish and settles back to idle after a short while, so the
            row states what is true now rather than what was true once. */
+        /* Idle → Running → idle. There is no "Completed" state: a button that
+           reports the last run is a status pretending to be an action, and it left
+           the row's only way to run again unavailable for as long as it lingered. */
         const run = bsRunning(p.id), done = bsLastDone(p.id);
-        const justDone = !run && done && (Date.now() - done.finishedAt) < 8000;
         return `<tr class="${p.on?"":"off"}">
           <td><div class="sc-name">${esc(p.name)}</div><div class="sc-id">${p.id}</div></td>
           <td><button class="sc-cov" data-bscov="${p.id}">${bsCis(p).length} Enrolled CI${bsCis(p).length===1?"":"s"}</button>
@@ -3971,12 +4426,10 @@ function renderScheduler(){
             : `<span class="sc-stat ${p.on?"on":"paused"}"><span class="d" style="background:${p.on?"var(--ok-dot)":"var(--neu-dot)"}"></span>${p.on?"Active":"Disabled"}</span>`}</td>
           <td><div class="sc-acts">
             ${run
-              ? `<button class="iact running" disabled><span class="spin"></span>Running</button>`
-              : justDone
-                ? `<button class="iact ok" data-bsrun="${p.id}" title="Completed ${bsClockOf(done.finishedAt)}">
-                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-6.5"/></svg>Completed</button>`
-                : `<button class="iact" data-bsrun="${p.id}" title="Generate BOMs for this policy now">
-                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4.5 3.2l8 4.8-8 4.8z"/></svg>Run now</button>`}
+              ? `<button class="runbtn" disabled aria-live="polite">
+                   <span class="spin"></span>Running<span class="n">${run.done}/${run.total}</span></button>`
+              : `<button class="runbtn" data-bsrun="${p.id}" title="Generate BOMs for this policy now">
+                   <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M4.6 3.1l8.2 4.9-8.2 4.9z"/></svg>Run now</button>`}
             <button class="iact" data-bsedit="${p.id}">Edit</button>
             <button class="iact sq" data-bsmenu="${p.id}" aria-label="More actions for ${esc(p.name)}">
               <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3.2" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="12.8" cy="8" r="1.3"/></svg></button>
@@ -3997,6 +4450,24 @@ function renderScheduler(){
   }
 
   /* wiring */
+  /* The search input is created by this render, so it is bound here and the caret
+     is put back — the page-level listener it used to have would be lost on re-render. */
+  const bq = document.getElementById("bsQ");
+  if(bq) bq.oninput = e=>{ BS_Q = e.target.value; renderScheduler();
+    const el = document.getElementById("bsQ");
+    if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } };
+
+  /* The coverage gap opens the CIs in it; the disabled count filters the list to
+     them and clicking again clears — the reading and the action are one control. */
+  const un = document.getElementById("bsUncov");
+  if(un) un.onclick = ()=>{ BS_UNCOV = true; renderBsDrawers(); };
+  const sp = document.getElementById("bsShowPaused");
+  if(sp) sp.onclick = ()=>{
+    if(BS_FILT.has("paused")) BS_FILT.delete("paused");
+    else { BS_FILT.clear(); BS_FILT.add("paused"); }
+    renderScheduler();
+  };
+
   document.getElementById("bsSw").onclick = ()=>{
     BS_ENABLED = !BS_ENABLED; renderScheduler();
     toast(BS_ENABLED ? "Automatic BOM generation enabled" : "Automatic BOM generation disabled — no policy will run");
@@ -4183,7 +4654,7 @@ function schedDdSet(d, P, id, v){
 
 function renderBsDrawers(){
   const host = document.getElementById("bsHost");
-  if(!BS_DRAFT && !BS_COV){ host.innerHTML = ""; return; }
+  if(!BS_DRAFT && !BS_COV && !BS_UNCOV){ host.innerHTML = ""; return; }
 
   /* coverage read-out — opened from the list's Coverage cell */
   let cov = "";
@@ -4205,6 +4676,28 @@ function renderBsDrawers(){
     </aside>`;
   }
 
+  /* The gap, named. Coverage counts what enabled policies reach, so this is exactly
+     its complement — computed from the same set, never a second tally. */
+  if(BS_UNCOV){
+    const have = bsCovered();
+    const rows = ENROLLED_CIS.filter(c=>!have.has(c.id));
+    cov = `<div class="dw-scrim in" id="bsUncScrim"></div>
+    <aside class="dw in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="CIs not covered">
+      <div class="dw-head"><div><h3>CIs not covered</h3><p>${rows.length} enrolled CI${rows.length===1?"":"s"} no enabled schedule reaches. Their BOMs are never regenerated.</p></div>
+        <button class="x" id="bsUncClose" aria-label="Close">${IC_X}</button></div>
+      <div class="dw-body" style="padding:0">
+        <div class="pk-hd" style="grid-template-columns:68px 1fr 128px 108px"><span>CI ID</span><span>Name</span><span>CI Type</span><span>IP address</span></div>
+        ${rows.length ? rows.map(c=>`<div class="pk-row" style="grid-template-columns:68px 1fr 128px 108px;cursor:default">
+          <span class="id">${c.id}</span><span>${esc(c.host)}</span>
+          <span><span class="pill ghost">${esc(c.type)}</span></span><span class="ip">${c.ip}</span></div>`).join("")
+          : `<div class="pk-empty">Every enrolled CI is covered by an enabled schedule.</div>`}
+      </div>
+      <div class="dw-foot"><span class="gap"></span>
+        <button class="btn lg" id="bsUncDone">Close</button>
+        <button class="btn pri lg" id="bsUncNew">New schedule</button></div>
+    </aside>`;
+  }
+
   let main = "";
   if(BS_DRAFT){
     const d = BS_DRAFT;
@@ -4222,32 +4715,32 @@ function renderBsDrawers(){
       </div>
 
       <div class="dw-body">
+        <!-- The name leads, as it does in every other rule drawer here: it is what the
+             schedule will be called in the list, so it is asked before what it does. -->
+        <div class="fld">
+          <label class="flab" for="bsName">Schedule name<span class="req">*</span></label>
+          <input class="finput${d.err && !d.name.trim() ? " err" : ""}" id="bsName" type="text"
+                 value="${esc(d.name)}" placeholder="e.g. ${esc(bsEcho(d))}" autocomplete="off">
+          ${d.err && !d.name.trim() ? `<div class="ferr">Give the schedule a name so it can be recognised later.</div>` : ""}
+        </div>
+
         <div class="sechead">Schedule setup</div>
 
         ${schedFieldsHTML(d, "bs")}
 
         <hr class="dw-div">
 
-        <div class="sechead">Applies to <span>— use a reusable policy, or define conditions here</span></div>
-        ${targetCardsHTML({
-          policyId:d.policyId, auto:d.auto, autoCount, groups:nGroups,
-          manualCount:d.cis.length, condId:"bsCond", pickId:"bsPick",
-          autoDesc:"Automatically schedules every enrolled CI matching your conditions — including new CIs that match later.",
+        <div class="sechead">Applies to <span>— use either, or both</span></div>
+        ${tgtChoiceHTML(d, {
+          manualKey:"cis", condId:"bsCond", pickId:"bsPick",
+          autoDesc:"Scans whatever matches — through a BOM Policy or conditions of your own — including new CIs that match later.",
           manDesc:"Choose specific enrolled CIs. The list stays fixed until you update it manually."
         })}
 
         ${previewBlockHTML("bs")}
-
-        <hr class="dw-div">
-        <div class="fld" style="margin-bottom:0">
-          <label class="flab" for="bsName">Schedule name <span style="color:var(--faint)">— optional</span></label>
-          <input class="finput" id="bsName" type="text" value="${esc(d.name)}"
-                 placeholder="${esc(bsEcho(d))}" autocomplete="off">
-        </div>
       </div>
 
       <div class="dw-foot">
-        <span class="avail">Scans <b style="color:var(--ink)">${total}</b> of ${ENROLLED_CIS.length} enrolled CIs</span>
         <span class="gap"></span>
         <button class="btn lg" id="bsDCancel">Cancel</button>
         <button class="btn pri lg" id="bsDSave">${d.editing?"Save changes":"Create schedule"}</button>
@@ -4260,6 +4753,13 @@ function renderBsDrawers(){
   [...host.querySelectorAll(".dw-body")].forEach((el,i)=>{ if(keep[i]!=null) el.scrollTop = keep[i]; });
 
   const $ = i => document.getElementById(i);
+  if(BS_UNCOV){
+    const close = ()=>{ BS_UNCOV=false; renderBsDrawers(); };
+    $("bsUncClose").onclick = close;
+    $("bsUncDone").onclick  = close;
+    $("bsUncScrim").onclick = close;
+    $("bsUncNew").onclick   = ()=>{ BS_UNCOV=false; bsOpen(null); };
+  }
   if(BS_COV){
     const close = ()=>{ BS_COV=null; renderBsDrawers(); };
     $("bsCovClose").onclick = close; $("bsCovDone").onclick = close; $("bsCovScrim").onclick = close;
@@ -4270,7 +4770,11 @@ function renderBsDrawers(){
   $("bsDCancel").onclick = bsClose;
   $("bsScrim").onclick   = ()=>{ if(!PICK && !COND) bsClose(); };
   $("bsName").oninput    = e => { d.name = e.target.value; };
-  $("bsPick").onclick    = ()=>openPick(d, renderBsDrawers, "cis");
+  /* Card navigates; the tertiary button inside carries the id and bubbles to it. */
+  document.querySelectorAll("#bsHost [data-tgtgo]").forEach(el=>el.onclick=()=>{
+    if(el.dataset.tgtgo === "auto") openCond(d, renderBsDrawers);
+    else openPick(d, renderBsDrawers, "cis");
+  });
   /* Absent while a policy is chosen — the policy holds the conditions. */
   if($("bsCond")) $("bsCond").onclick = ()=>openCond(d, renderBsDrawers);
   /* The same evidence link Retention has, from the same component. */
@@ -4292,10 +4796,15 @@ function renderBsDrawers(){
   });
   $("bsDSave").onclick = ()=>{
     /* Only what the chosen shape actually requires is enforced. */
-    const bad = (d.kind==="Recurring" && d.freq==="Weekly" && !d.days.length)
+    const bad = !d.name.trim()
+             || (d.kind==="Recurring" && d.freq==="Weekly" && !d.days.length)
              || (d.kind==="Recurring" && d.freq==="Custom" && !d.endDate);
-    if(bad){ d.err = true; renderBsDrawers(); return; }
-    const p = {id:d.id||bsNextId(), name:(d.name.trim() || bsEcho(d)), kind:d.kind, freq:d.freq,
+    if(bad){
+      d.err = true; renderBsDrawers();
+      if(!d.name.trim()){ const el = document.getElementById("bsName"); if(el) el.focus(); }
+      return;
+    }
+    const p = {id:d.id||bsNextId(), name:d.name.trim(), kind:d.kind, freq:d.freq,
                days:[...d.days], mMode:d.mMode, mDate:d.mDate, mOcc:d.mOcc, mDow:d.mDow, mMonth:d.mMonth,
                startAt:d.startAt, startDate:d.startDate, endDate:d.endDate, tz:d.tz, on:d.on,
                cis:[...d.cis], auto:d.auto, policyId:d.policyId || null,
@@ -4334,7 +4843,12 @@ let LIC_RULES = [
   {id:"AR-4", name:"Finance endpoints", on:false, updated:"Jul 19, 2026",
    policyId:"BP-4", groups:[]}
 ];
-let LIC_TAB="manual", LIC_Q="", LIC_FILT=new Set(), LIC_FOPEN=false, LIC_CONFIRM=null,
+let LIC_KPI="seats",              /* the selected reading; a panel is always open */
+    LIC_TREND=30,                 /* the trend window, in days */
+    /* ONE filter over the table, driven by the card segments. It replaced the tab
+       strip and the Filter dropdown, which were two more ways to narrow the same list
+       by the same dimension — three controls, three chances to disagree. */
+    LIC_SEG="all", LIC_PAGE=1, LIC_Q="", LIC_CONFIRM=null,
     LIC_SEL=new Set(), LIC_MENU=null, LIC_RCONF=null, LIC_DRAWER=null, LIC_VIEW=null,
     /* Matching CIs: newest enrolment first — admins open it to confirm a rule just
        picked something up, so recency is what they came to see. */
@@ -4354,6 +4868,13 @@ const ruleHits = r => {
   if(r.policyId){ const s = bpOf(r.policyId); if(s) return bpCis(s); }
   return ALL_CIS.filter(c => (r.groups||[]).some(g=>groupMatch(g,c)));
 };
+/* Which BOM Policy enrolled a CI, if one did — read through the rule that swept
+   it in, so a rule written in Licensing reports its policy just the same. */
+const enrolPolicy = c => {
+  if(c.byPolicy) return bpOf(c.byPolicy);
+  const r = c.byRule && LIC_RULES.find(x=>x.id===c.byRule);
+  return r && r.policyId ? bpOf(r.policyId) : null;
+};
 /* Targeted = points at a policy, or carries a complete condition of its own.
    Half-written conditions target nothing, on purpose. */
 const licTargeted = d => !!(d.policyId && bpOf(d.policyId))
@@ -4366,16 +4887,91 @@ const licTargeted = d => !!(d.policyId && bpOf(d.policyId))
    as an em-dash. */
 (function seedRuleEnrolments(){
   const DAY = 864e5, now = Date.now();
-  [["CI-1", 0.35], ["CI-3", 2.4], ["CI-4", 5.7]].forEach(([id, daysAgo])=>{
-    const c = ciOf(id);
-    if(c && c.enrolled && c.by === "Auto"){ c.byRule = "AR-1"; c.ruleAt = now - daysAgo*DAY; }
+  /* HOW a CI got its seat is DERIVED from the rules, not decided per CI. It used
+     to be assigned independently, which let 25 CIs report "enrolled by rule" while
+     no enabled rule matched them, and left the owning rule unrecorded on all but
+     three — so the count on the page and the rules behind it disagreed. Every CI
+     counted as auto-enrolled is now one a live rule genuinely sweeps in, and it
+     carries the rule that did it. */
+  /* A rule only ever sweeps in an AGENT-SCANNED CI. A manually ingested CI has no
+     agent to act on — its BOM is pushed in by hand — so it is manually added by
+     definition. That is what makes the hierarchy true rather than merely drawn:
+        enrolled → agent-scanned → added by a rule | added manually
+                 → manually ingested */
+  const swept = new Map();
+  LIC_RULES.filter(r=>r.on).forEach(r=>ruleHits(r).forEach(c=>{
+    if(c.origin === "Agent" && !swept.has(c.id)) swept.set(c.id, r);
+  }));
+  ALL_CIS.forEach((c,i)=>{
+    if(c.enrolled){
+      const r = swept.get(c.id);
+      c.by       = r ? "Auto" : "Manual";
+      c.byRule   = r ? r.id : null;
+      c.byPolicy = r ? (r.policyId || null) : null;
+      c.ruleAt   = r ? now - ((i * 13) % 168 + 0.4) * 36e5 : null;
+      /* WHEN the seat was taken. Consumption can only be shown over time if each
+         seat knows when it started; spread across the last 90 days so the trend
+         has a real shape rather than a drawn one.
+         TODO(api): the series belongs to the server — GET /admin/bom-licensing/
+         seat-history?days=30|90 — derived here only so the panel can be judged. */
+      c.enrolledAt = now - ((i * 29) % 88 + 1) * DAY;
+    } else c.enrolledAt = null;
+    /* When the agent last reported. Most are current; a deterministic minority are
+       stale, which is the whole point of the agent-health panel.
+       TODO(api): the agent reports this itself; derived here for the same reason. */
+    c.lastSync = c.origin === "Agent"
+      ? now - ((i * 17) % 23 === 0 ? (9 + (i % 6)) * DAY : ((i * 7) % 40) * 36e5)
+      : null;
+    /* One fact, one source: the "Last seen" column is this timestamp formatted,
+       not a second string that can drift away from it. */
+    c.seen = c.lastSync ? licSeen(c.lastSync) : "Ingested — no agent";
+    /* When discovery first saw each CI. An unenrolled CI has no enrolment moment
+       to show, so this is what dates it — and a recently discovered one is exactly
+       what an admin is checking the rule caught. */
+    c.disc = now - ((i*37) % 90 + 0.6) * DAY;
   });
-  /* When discovery first saw each CI. An unenrolled CI has no enrolment moment to
-     show, so this is what dates it — and a recently discovered one is exactly what
-     an admin is checking the rule caught. Spread deterministically by index. */
-  ALL_CIS.forEach((c,i)=>{ c.disc = now - ((i*37) % 90 + 0.6) * DAY; });
+  syncEnrolled();
 })();
 
+/* ── the readings' supporting series ──────────────────────────
+   Both derived from the stamps above, so a panel can never show a shape the table
+   beneath it contradicts. */
+const DAY_MS = 864e5;
+/* Seats in use at the end of each of the last N days. */
+function seatSeries(days){
+  const now = Date.now(), out = [];
+  for(let i = days - 1; i >= 0; i--){
+    const t = now - i * DAY_MS;
+    out.push({t, v: ALL_CIS.filter(c=>c.enrolled && c.enrolledAt != null && c.enrolledAt <= t).length});
+  }
+  return out;
+}
+const syncAge  = c => c.lastSync == null ? null : (Date.now() - c.lastSync) / DAY_MS;
+const SYNC_BANDS = [
+  {k:"Synced today",    hit:a=>a <= 1,          tone:""},
+  {k:"1–7 days ago",    hit:a=>a > 1 && a <= 7, tone:""},
+  {k:"Over 7 days ago", hit:a=>a > 7,           tone:"warn"}
+];
+const staleAgents = () => ENROLLED_CIS.filter(c=>{ const a = syncAge(c); return a != null && a > 7; })
+                                      .sort((a,b)=>a.lastSync - b.lastSync);
+
+/* "Wed, Jul 15, 09:12" — the shape the Last-seen column has always had, now
+   produced from the timestamp rather than stored beside it. */
+/* A declaration, not a const: the seeding above runs before this line is reached
+   and needs it — a const would make that a temporal-dead-zone error. */
+function licSeen(ms){
+  const d = new Date(ms);
+  return `${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}, ` +
+         `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+/* "3 days ago" — relative, because staleness is the question being asked. */
+const agoLabel = ms => {
+  const h = (Date.now() - ms) / 36e5;
+  if(h < 1)  return "just now";
+  if(h < 24) return `${Math.round(h)}h ago`;
+  const d = Math.round(h/24);
+  return d === 1 ? "yesterday" : `${d} days ago`;
+};
 /* "Aug 10, 2026 · 2:45 PM" — date AND time, because two CIs swept in by the same
    rule minutes apart have to be distinguishable in the list. */
 const licStamp = ms => {
@@ -4396,138 +4992,291 @@ function ruleSummary(r){
   return gs.map((g,i)=> (i ? ` ${(g.join||"And").toLowerCase()} ` : "") +
     (gs.length>1 ? `(${groupSummary(g)})` : groupSummary(g))).join("");
 }
-const ruleFresh = r => ruleHits(r).filter(c=>!c.enrolled);
+/* A rule only ever sweeps in an AGENT-SCANNED CI — there is no agent on a manually
+   ingested one for the rule to act through, so it can only ever be enrolled by hand.
+   Same rule the seeding applies, stated once: without it a rule could stamp
+   by:"Auto" on an ingested CI, and the tab count and the Enrollment type column
+   would disagree about the same row. It also makes "waiting to enrol" a number that
+   actually drains when the rule runs. */
+const ruleFresh = r => ruleHits(r).filter(c=>!c.enrolled && c.origin === "Agent");
 const ruleOf    = id => LIC_RULES.find(r=>r.id===id);
 const licNextRuleId = () => "AR-" + (LIC_RULES.reduce((m,r)=>Math.max(m,+(r.id.split("-")[1]||0)),0)+1);
 const todayLabel = () => { const d=new Date(); return `${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; };
 
-const LIC_FILTERS = [
-  {g:"Status", id:"active", lab:"Active",   fn:c=>c.status==="Active"},
-  {g:"Status", id:"inact",  lab:"Inactive", fn:c=>c.status!=="Active"},
-  {g:"Origin", id:"Agent",  lab:"Agent-scanned", fn:c=>c.origin==="Agent"},
-  {g:"Origin", id:"Manual", lab:"Manually ingested", fn:c=>c.origin==="Manual"},
-];
-function licVisible(source){
+/* What the table shows: the enrolled set, narrowed by the search and by whichever
+   card segment is active. One function, so a segment's number and the rows it
+   produces are the same query. */
+function licVisible(){
   const q = LIC_Q.trim().toLowerCase();
-  const groups = [...new Set(LIC_FILTERS.map(f=>f.g))];
-  return (source || ENROLLED_CIS).filter(c=>{
-    if(q && ![c.id,c.host,c.type,c.ip,c.os].join(" ").toLowerCase().includes(q)) return false;
-    return groups.every(g=>{
-      const on = LIC_FILTERS.filter(f=>f.g===g && LIC_FILT.has(f.id));
-      return !on.length || on.some(f=>f.fn(c));
-    });
+  const seg = licSeg();
+  return ENROLLED_CIS.filter(c=>{
+    if(!seg.fn(c)) return false;
+    return !q || [c.id,c.ep||"",c.host,c.type,c.ip,c.os].join(" ").toLowerCase().includes(q);
   });
 }
 
-/* The two tabs partition the enrolled set by HOW a CI got its seat, so
-   neither list has to explain the other. Manual = decisions an admin
-   made; Auto-enrol = the consequence of policies, which live in a drawer. */
-const licManualCIs = () => ENROLLED_CIS.filter(c=>c.by !== "Auto");
-const licAutoCIs   = () => ENROLLED_CIS.filter(c=>c.by === "Auto");
+/* ── the two dimensions, kept apart ───────────────────────────
+   SCAN is how a CI's BOM arrives; ENROL is how it came to hold a seat. A manually
+   ingested CI is by hand by definition, so it is its own value in BOTH — merging it
+   into a single "by hand" count is the bug this split exists to prevent. */
+const scanOf  = c => c.origin === "Agent" ? "agent" : "ingest";
+const enrolOf = c => c.origin !== "Agent" ? "ingest" : (c.by === "Auto" ? "rule" : "hand");
+/* One place defines every segment: its words, its predicate and its colour. The card
+   label, the table chip and the row filter all read it, so a segment's number and the
+   rows it produces cannot disagree. */
+const LIC_SEGS = {
+  all:    {lab:"All enrolled",      dim:null,   fn:()=>true,                     c:null},
+  agent:  {lab:"Agent-scanned",     dim:"scan", fn:c=>scanOf(c)==="agent",       c:"var(--brand)"},
+  ingest: {lab:"Manually ingested", dim:"scan", fn:c=>scanOf(c)==="ingest",      c:"#2AA9C0"},
+  rule:   {lab:"By rule",           dim:"enrol",fn:c=>enrolOf(c)==="rule",       c:"var(--brand)"},
+  hand:   {lab:"By hand",           dim:"enrol",fn:c=>enrolOf(c)==="hand",       c:"#9DC7EA"}
+};
+const licSeg   = () => LIC_SEGS[LIC_SEG] || LIC_SEGS.all;
+/* The tabs are the coarse half of one filter, not a second one. Three of them, matching
+   the top level of the cascade; "by rule" and "by hand" are a split WITHIN agent-scanned,
+   so choosing one from card 3 selects the Agent-scanned tab and shows the finer segment
+   as a chip. One state, two surfaces — they cannot disagree because there is nothing to
+   disagree with. */
+const LIC_TABS = ["all", "agent", "ingest"];
+const licTabOf = k => k === "rule" || k === "hand" ? "agent" : k;
+const licSegCIs = k => ENROLLED_CIS.filter(LIC_SEGS[k].fn);
 
-function renderLicensing(){
-  const used = licUsed(), left = licLeft();
-  const pressure = left <= 0 ? "full" : left <= 2 ? "tight" : "";
-  const agent  = ENROLLED_CIS.filter(c=>c.origin==="Agent").length;
-  const byAuto = licAutoCIs().length;
-  const inactive = ENROLLED_CIS.filter(c=>c.status!=="Active").length;
-  const liveRules = LIC_RULES.filter(r=>r.on);
-  const wouldAdd = new Set(liveRules.flatMap(r=>ruleFresh(r).map(c=>c.id))).size;
+/* ══ the licensing readings ═══════════════════════════════
+   Four numbers, and for each one a panel that adds a DIMENSION the number does
+   not already state — a trend, a source split with somewhere to act, agent health,
+   the rules themselves. A panel that only restated its tab would be decoration.
 
-  document.getElementById("licCards").innerHTML = `
-    <article class="kpi">
-      <div class="kh"><span class="ic">${IC_SEAT}</span><span class="t">Seat pressure</span></div>
-      <div class="kbody">
-        <div class="knum ${left<=0?"n-red":left<=2?"n-amber":"n-neutral"}">${Math.max(0,left)}</div>
-        <div class="klabel">${left===1?"seat available":"seats available"}</div>
-        <div class="kmeter ${pressure}"><i style="width:${Math.min(100,Math.round(used/LIC_SEATS*100))}%"></i></div>
-        <div class="ksec">${used} consumed of ${LIC_SEATS} total${
-          left<=0 ? " · nothing more can be enrolled" : left<=2 ? " · running low" : ""}</div>
+   Attention is the exception, never the default: colour appears on a figure only
+   when something is actually wrong, and always with words beside it.
+   ═════════════════════════════════════════════════════════════ */
+const licAgentCIs  = () => ENROLLED_CIS.filter(c=>c.origin === "Agent");
+const licIngestCIs = () => ENROLLED_CIS.filter(c=>c.origin !== "Agent");
+/* Within the agent-scanned population: swept in by a rule, or added by hand. */
+const licByRule    = () => licAgentCIs().filter(c=>c.by === "Auto");
+const licByHand    = () => licAgentCIs().filter(c=>c.by !== "Auto");
+
+/* One track, one fill, width = the exact percentage. Ticks made the eye count
+   rectangles and round to the nearest one; a length cannot be miscounted. The fill
+   carries the card's state colour, so the bar never contradicts the figure above it. */
+function seatBarHTML(used, total, tone){
+  const pct = total ? Math.max(0, Math.min(100, Math.round((used / total) * 100))) : 0;
+  return `<div class="lbar" role="img" aria-label="${used} of ${total} seats consumed, ${pct} percent">
+    <i class="${tone}" style="width:${pct}%"></i></div>`;
+}
+
+/* Three arcs, rounded caps, a real gap between them. Drawn from one array so the
+   donut and the legend beside it are the same numbers. */
+function donutHTML(parts, centre, label){
+  const R = 33, C = 2 * Math.PI * R, GAP = 11;
+  const total = parts.reduce((n,p)=>n + p.v, 0) || 1;
+  let at = 0;
+  const arcs = parts.map(p=>{
+    const span = (p.v / total) * C;
+    const len  = Math.max(0, span - GAP);
+    const off  = -at;
+    at += span;
+    return p.v > 0 ? `<circle cx="44" cy="44" r="${R}" fill="none" stroke="${p.c}" stroke-width="12"
+      stroke-linecap="round" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${off}"
+      transform="rotate(-90 44 44)"></circle>` : "";
+  }).join("");
+  return `<div class="don"><svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label="${esc(label)}">
+    <circle cx="44" cy="44" r="${R}" fill="none" stroke="var(--chip-n2)" stroke-width="12"></circle>
+    ${arcs}</svg><span class="don-n">${centre}</span></div>`;
+}
+
+/* A card segment is a real button: focusable, aria-pressed, and it filters the table
+   below rather than navigating anywhere. */
+const segBtn = (k, cls, inner, extra) =>
+  `<button class="${cls}" data-licseg="${k}" aria-pressed="${LIC_SEG === k}"${extra||""}>${inner}</button>`;
+
+/* ══ the three cards ══════════════════════════════════════
+   A decomposition cascade: 8 licensed = 6 consumed + 2 available; the 6 split two
+   ways, once by scan method and once by enrolment method. Both breakdowns are taken
+   from the same ENROLLED_CIS snapshot in one pass, so 6 = 5 + 1 and 6 = 4 + 1 + 1
+   always close — there is no second query to disagree with the first. */
+function licCardsHTML(){
+  const total = LIC_SEATS, used = licUsed(), left = Math.max(0, LIC_SEATS - used);
+
+  /* Percentages, not counts, so the thresholds hold from an 8-seat demo to a
+     128-seat estate. Colour never travels alone — the words carry the state too. */
+  const tone = left <= 0 ? "crit" : (left / total) <= 0.25 ? "warn" : "";
+  const word = left <= 0 ? "enrollment blocked" : tone === "warn" ? "running low" : "";
+  /* The headline is the PRESSURE, which is a proportion — the card is named for it.
+     Both counts stay in the footer, so nothing is lost to the percentage. */
+  const pct  = total ? Math.round((used / total) * 100) : 0;
+
+  const agent = licSegCIs("agent").length, ingest = licSegCIs("ingest").length;
+  const rule  = licSegCIs("rule").length,  hand   = licSegCIs("hand").length;
+
+  /* The mix decomposes the AGENT-SCANNED 90, not the enrolled 102: "by rule" and
+     "by hand" are ways an agent CI came to hold a seat, and an ingested CI has no
+     agent to be swept in by. It is a leaf of card 2, not a slice of this one. */
+  const mix = [
+    {k:"rule", lab:"By rule", v:rule, c:LIC_SEGS.rule.c},
+    {k:"hand", lab:"By hand", v:hand, c:LIC_SEGS.hand.c}
+  ];
+  const onRules = LIC_RULES.filter(r=>r.on).length, offRules = LIC_RULES.length - onRules;
+
+  return `
+    <article class="lcard">
+      <div class="lc-h"><span class="ic"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7.6" width="12" height="6.8" rx="1.6"/><path d="M5.4 7.6V5.4a3.6 3.6 0 017.2 0v2.2"/></svg></span><span class="t">Seat pressure</span></div>
+      <div class="lc-num${tone?" "+tone:""}">${pct}%</div>
+      <div class="lc-sub">of ${total} seats consumed</div>
+      ${seatBarHTML(used, total, tone)}
+      <div class="lc-foot">
+        <span>${used} consumed · ${left} available${word ? ` · <span class="${tone}">${word}</span>` : ""}</span>
+        <span class="gap"></span>
+        ${segBtn("all", "lpill", "All enrolled")}
       </div>
     </article>
-    <article class="kpi">
-      <div class="kh"><span class="ic">${IC_ASSET}</span><span class="t">Enrolled CIs</span></div>
-      <div class="kbody">
-        <div class="knum n-neutral">${used}</div>
-        <div class="klabel">consuming a seat</div>
-        <div class="kdrv">
-          <button class="dv tip" data-licf="Agent" data-tip="Scanned by the ServiceOps agent."><b class="n-neutral">${agent}</b><span class="dl">agent-scanned</span></button>
-          <span class="sep">•</span>
-          <button class="dv tip" data-licf="Manual" data-tip="Agentless — their BOMs are pushed in through Ingest."><b class="n-neutral">${used-agent}</b><span class="dl">manually ingested</span></button>
-        </div>
-        <div class="ksec">${inactive
-          ? `<span style="color:var(--warn)">${inactive} inactive — still holding a seat</span>`
-          : "All enrolled CIs are reporting"}</div>
+
+    <article class="lcard">
+      <div class="lc-h"><span class="ic">${IC_ASSET}</span><span class="t">Enrolled CIs</span></div>
+      <div class="lc-num">${used}</div>
+      <div class="lc-sub">how the ${used} consume a seat</div>
+      <div class="lsplit">
+        ${segBtn("agent", "lseg", `<span class="v">${agent}</span><span class="k">agent-scanned</span>`,
+                 ` style="--c:${LIC_SEGS.agent.c}"`)}
+        ${segBtn("ingest", "lseg", `<span class="v">${ingest}</span><span class="k">manually ingested</span>`,
+                 ` style="--c:${LIC_SEGS.ingest.c}"`)}
       </div>
+      <div class="lc-foot"></div>
     </article>
-    <article class="kpi${wouldAdd > left ? " urgent" : ""}">
-      <div class="kh"><span class="ic">${IC_COMP}</span><span class="t">Source mix</span></div>
-      <div class="kbody">
-        <div class="knum n-neutral">${used}</div>
-        <div class="klabel">how they got enrolled</div>
-        <div class="kdrv">
-          <button class="dv tip" data-lictab2="auto" data-tip="Swept in by an auto-enrol rule, and kept in sync."><b class="n-neutral">${byAuto}</b><span class="dl">by rule</span></button>
-          <span class="sep">•</span>
-          <button class="dv tip" data-lictab2="manual" data-tip="Chosen by an admin. Never changes on its own."><b class="n-neutral">${used-byAuto}</b><span class="dl">by hand</span></button>
+
+    <article class="lcard">
+      <div class="lc-h"><span class="ic"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="6.4"/><path d="M9 2.6v6.4l4.5 2.6"/></svg></span><span class="t">Source mix</span></div>
+      <div class="lmix">
+        ${donutHTML(mix, agent, `${agent} agent-scanned CIs: ${mix.map(p=>`${p.v} ${p.lab.toLowerCase()}`).join(", ")}`)}
+        <div class="lleg">
+          <div class="lleg-h">how the ${agent} agent-scanned got enrolled</div>
+          ${mix.map(p=>segBtn(p.k, "lrow",
+            `<span class="dot" style="background:${p.c}"></span><span class="k">${p.lab}</span><span class="v">${p.v}</span>`)).join("")}
         </div>
-        <div class="ksec">${
-          !LIC_RULES.length ? "No auto-enrol rules — every seat was allocated by hand"
-          : !liveRules.length ? `${LIC_RULES.length} rules, all disabled`
-          : wouldAdd > left ? `<span style="color:var(--crit)">Enabled rules match ${wouldAdd} unenrolled CI${wouldAdd===1?"":"s"} but only ${Math.max(0,left)} seat${left===1?"":"s"} remain</span>`
-          : `${liveRules.length} of ${LIC_RULES.length} rule${LIC_RULES.length===1?"":"s"} enabled${wouldAdd?` · ${wouldAdd} CI${wouldAdd===1?"":"s"} waiting to enrol`:""}`}</div>
+      </div>
+      <div class="lc-foot">
+        ${offRules
+          ? `<span class="ldot"></span><span><span class="warn">${offRules} rule${offRules===1?"":"s"} disabled</span> · ${onRules} of ${LIC_RULES.length} enabled</span>`
+          : `<span>All ${LIC_RULES.length} rule${LIC_RULES.length===1?"":"s"} enabled</span>`}
+        <span class="gap"></span>
+        <button class="llnk" id="licRulesLink">Manage</button>
       </div>
     </article>`;
+}
 
-  const manual = LIC_TAB === "manual";
+function renderLicensing(){
+  document.getElementById("licCards").innerHTML = licCardsHTML();
+
+  const list = licVisible();
+  const seg  = licSeg();
+  /* The chip is how an applied filter announces itself, and the only place it can be
+     removed besides re-clicking its segment. Its number is `list.length` — the rows
+     actually on screen — so the card and the table can never quote different totals. */
+  /* A tab shows its own whole-set count; the chip carries the finer segment and the
+     rows actually on screen. Only a sub-segment gets a chip — a tab that is already
+     selected does not need a chip repeating it. */
+  const onTab = licTabOf(LIC_SEG);
+  const sub   = LIC_SEG !== onTab;
   document.getElementById("licTabs").innerHTML = `
-    <button class="tab" role="tab" aria-selected="${manual}" data-lictab="manual">
-      ${IC_ASSET}Manual Enrolment <span class="n">${licManualCIs().length}</span></button>
-    <button class="tab" role="tab" aria-selected="${!manual}" data-lictab="auto">
-      ${IC_COMP}Auto-enrol <span class="n">${byAuto}</span></button>
+    ${LIC_TABS.map(k=>`<button class="tab" role="tab" aria-selected="${onTab===k}" data-licseg="${k}">
+      ${k==="all"?IC_ALL:k==="agent"?IC_COMP:IC_ASSET}${LIC_SEGS[k].lab === "All enrolled" ? "All CIs" : LIC_SEGS[k].lab}
+      <span class="n">${k==="all" ? ENROLLED_CIS.length : licSegCIs(k).length}</span></button>`).join("")}
+    ${sub ? `<span class="fchip" style="margin-left:10px;align-self:center">${esc(seg.lab)} · <b>${list.length}</b>
+      <button data-licseg="${onTab}" aria-label="Clear the ${esc(seg.lab)} filter">×</button></span>` : ""}
     <div class="right">
+      <span class="lcount" id="licCount">${list.length} shown</span>
       <div class="search" style="width:220px">
         <span class="mag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
         <input id="licQ" type="search" value="${esc(LIC_Q)}" placeholder="Search CIs…" autocomplete="off"></div>
-      <span id="licFilter"></span>
-      ${manual ? "" : `<button class="btn" id="licViewRules">
-             <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg>View Rules
-             <span class="pill ghost" style="margin-left:2px">${LIC_RULES.length}</span></button>`}
+      <button class="btn" id="licViewRules">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg>Manage rules
+        <span class="pill ghost" style="margin-left:2px">${LIC_RULES.length}</span></button>
     </div>`;
 
-  document.getElementById("licWrap").innerHTML = manual ? licManualHTML() : licAutoHTML();
+  document.getElementById("licWrap").innerHTML =
+    !ENROLLED_CIS.length ? `<div class="estate">
+        <span class="ic">${IC_SEAT}</span>
+        <div class="t">No CI is enrolled.</div>
+        <div class="d">Nothing is being scanned, scheduled or retained — all ${LIC_SEATS} seats are free.</div>
+        <div class="cta"><button class="btn pri lg" id="licEmptyAdd">Add manually</button></div></div>`
+    : !list.length ? licNoMatch(ENROLLED_CIS.length)
+    : licCiTable(list, {bulk:true});
   licWire();
 }
 
+/* 15 rows to a page. Paging is a reading device, not a filter: every count on the
+   screen — the tab totals, the bulk bar, the readings above — stays a whole-set
+   number, and only the rows on screen are cut. */
+const LIC_PER_PAGE = 15;
+
+/* Range on the left, movement on the right. First and last stay reachable however
+   long the list gets, so it can never hide its own end. */
+function licPagerHTML(from, shown, total, pages){
+  const win = [];
+  for(let p = 1; p <= pages; p++){
+    if(p === 1 || p === pages || Math.abs(p - LIC_PAGE) <= 1) win.push(p);
+    else if(win[win.length - 1] !== "…") win.push("…");
+  }
+  return `<div class="pager">
+    <span class="pg-range">${from + 1}–${from + shown} of ${total}</span>
+    <span class="pg-nav">
+      <button class="pg-b" data-licpage="${LIC_PAGE - 1}"${LIC_PAGE === 1 ? " disabled" : ""} aria-label="Previous page">‹</button>
+      ${win.map(p => p === "…" ? `<span class="pg-e">…</span>`
+        : `<button class="pg-b${p === LIC_PAGE ? " on" : ""}" data-licpage="${p}"${
+             p === LIC_PAGE ? ' aria-current="page"' : ""}>${p}</button>`).join("")}
+      <button class="pg-b" data-licpage="${LIC_PAGE + 1}"${LIC_PAGE === pages ? " disabled" : ""} aria-label="Next page">›</button>
+    </span></div>`;
+}
+
 /* ── shared CI table ──────────────────────────────────────────
-   Both tabs list CIs. Neither names a rule: the Auto tab says only
-   that a rule owns the seat, because which rule is a policy question
-   and policy lives in the rules drawer. */
+   Every tab lists CIs. None names a rule: the seat says only that a rule owns it,
+   because WHICH rule is a policy question and policy lives in the rules drawer.
+   Status is not a column here — a licence seat is held or it is not, and that is
+   what every row on this page already is. */
 function licCiTable(rows, opts){
-  const bulk = !!(opts && opts.bulk);
-  const ids = rows.map(c=>c.id);
+  const bulk  = !!(opts && opts.bulk);
+  const total = rows.length;
+  const pages = Math.max(1, Math.ceil(total / LIC_PER_PAGE));
+  /* Clamped, not reset: removing the last CI on the last page should leave you on
+     the new last page, not throw you back to the top of the list. */
+  if(LIC_PAGE > pages) LIC_PAGE = pages;
+  const from = (LIC_PAGE - 1) * LIC_PER_PAGE;
+  const page = rows.slice(from, from + LIC_PER_PAGE);
+  const ids = page.map(c=>c.id);
   const allSel = bulk && ids.length && ids.every(id=>LIC_SEL.has(id));
+  /* The header checkbox can only honestly mean "this page" once the list is paged,
+     so reaching past it is an explicit, separate offer — and only worth making when
+     there is genuinely something past it. */
+  const rest = bulk && allSel && total > page.length && !rows.every(c=>LIC_SEL.has(c.id));
   return `
     ${bulk && LIC_SEL.size ? `<div class="bulkbar"><b>${LIC_SEL.size}</b> selected
+      ${rest ? `<button class="clear" id="licSelAllF">Select all ${total}</button>` : ""}
       <span class="gap"></span>
       <button class="clear" id="licSelNone">Clear selection</button>
       <button class="btn sm danger" id="licBulk">Remove ${LIC_SEL.size} CI${LIC_SEL.size===1?"":"s"}</button></div>` : ""}
     <div style="overflow-x:auto"><table class="sc-table">
       <thead><tr>
-        ${bulk ? `<th style="width:38px"><input type="checkbox" id="licAll"${allSel?" checked":""} aria-label="Select all shown"></th>` : ""}
-        <th>CI ID</th><th>Host Name</th><th>CI Type</th><th>IP Address</th>
-        <th>Origin</th><th>Status</th><th>Last seen</th><th style="width:110px">Actions</th>
+        ${bulk ? `<th style="width:38px"><input type="checkbox" id="licAll"${allSel?" checked":""} aria-label="Select the ${page.length} CIs on this page"></th>` : ""}
+        <th>CI ID</th><th>End Point ID</th><th>Host Name</th><th>CI Type</th><th>IP Address</th>
+        <th>Scan</th><th>Enrolled via</th><th>Last seen</th><th style="width:110px">Actions</th>
       </tr></thead>
-      <tbody>${rows.map(c=>`<tr class="${c.status==="Active"?"":"off"}${bulk&&LIC_SEL.has(c.id)?" sel":""}">
+      <tbody>${page.map(c=>`<tr class="${bulk&&LIC_SEL.has(c.id)?"sel":""}">
         ${bulk ? `<td><input type="checkbox" data-licsel="${c.id}"${LIC_SEL.has(c.id)?" checked":""} aria-label="Select ${c.id}"></td>` : ""}
         <td><span class="cname">${c.id}</span></td>
+        <td>${c.ep ? `<span class="ver">${c.ep}</span>`
+                   : `<span class="ver none" title="Ingested by hand — no agent, so no endpoint">—</span>`}</td>
         <td>${esc(c.host)}<div class="sc-sub">${esc(c.os)}</div></td>
         <td><span class="pill ghost">${esc(c.type)}</span></td>
         <td><span class="ver">${c.ip}</span></td>
-        <td>${c.by==="Auto"
-          ? `<span class="pill teal">Auto-enrolled</span>`
-          : `<span class="src">${c.origin==="Agent"?"Agent":"Manual ingest"}</span>`}</td>
-        <td><span class="sc-stat ${c.status==="Active"?"on":"paused"}"><span class="d" style="background:${
-              c.status==="Active"?"var(--ok-dot)":"var(--neu-dot)"}"></span>${c.status}</span></td>
+        <!-- Two columns, two dimensions. Every card segment has exactly one of these
+             cells to point at, which is what keeps a segment's number and the rows it
+             filters to the same fact. -->
+        <td><span class="src">${scanOf(c) === "agent" ? "Agent" : "Ingested"}</span></td>
+        <td>${(()=>{ const e = enrolOf(c);
+          const bp = e === "rule" ? enrolPolicy(c) : null;
+          return (e === "rule" ? `<span class="pill teal">Rule</span>`
+                 : `<span class="src">${e === "hand" ? "Hand" : "Ingested"}</span>`)
+            + (bp ? `<div class="govby">by <a href="#" data-licpol="${bp.id}">${esc(bp.name)}</a></div>` : "");
+        })()}</td>
         <td><div class="sc-sub" style="margin:0">${esc(c.seen)}</div></td>
         <td><div class="sc-acts">
           <button class="iact" data-licrm="${c.id}">Remove</button>
@@ -4537,98 +5286,64 @@ function licCiTable(rows, opts){
               c.by==="Auto" ? " A rule still matches it, so it may be enrolled again." : ""}</p>
             <div class="row"><button class="btn sm" data-licrmno="1">Cancel</button>
               <button class="btn sm danger" data-licrmyes="${c.id}">Remove CI</button></div></div>` : ""}
-        </div></td></tr>`).join("")}</tbody></table></div>`;
-}
-
-/* ── tab 1: CIs enrolled by hand ──────────────────────────── */
-function licManualHTML(){
-  const all = licManualCIs(), list = licVisible(all);
-  if(!all.length) return `<div class="estate">
-    <span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="10" width="16" height="10" rx="2.2"/><path d="M8 10V7.2a4 4 0 018 0V10"/></svg></span>
-    <div class="t">No CIs enrolled by hand.</div>
-    <div class="d">Pick specific CIs to enrol — you have ${Math.max(0,licLeft())} seat${licLeft()===1?"":"s"} available.</div>
-    <div class="cta"><button class="btn pri lg" id="licEmptyAdd">Add manually</button></div></div>`;
-  if(!list.length) return licNoMatch(all.length);
-  return licCiTable(list, {bulk:true});
-}
-
-/* ── tab 2: CIs enrolled by rule — CI-first, no rule names ─── */
-function licAutoHTML(){
-  const all = licAutoCIs(), list = licVisible(all);
-  const on = LIC_RULES.filter(r=>r.on).length;
-  const waiting = new Set(LIC_RULES.filter(r=>r.on).flatMap(r=>ruleFresh(r).map(c=>c.id))).size;
-  const left = licLeft();
-
-  const strip = `<section class="sumstrip inset">
-    <div class="sumcell"><div class="suml">Auto-enrolled CIs</div>
-      <div class="sumv${all.length?"":" quiet"}">${all.length}<span class="u">of ${licUsed()} enrolled</span></div></div>
-    <div class="sumcell"><div class="suml">Rules</div>
-      <div class="sumv${LIC_RULES.length?"":" quiet"}">${LIC_RULES.length}<span class="u">${on} active · ${LIC_RULES.length-on} disabled</span></div></div>
-    <div class="sumcell"><div class="suml">Waiting to enrol</div>
-      <div class="sumv${waiting?(waiting>left?" ":""):" quiet"}"${waiting>left?' style="color:var(--crit)"':""}>${waiting}${
-        waiting ? `<span class="u">${waiting>left?`only ${Math.max(0,left)} seat${left===1?"":"s"} left`:"matched, not yet enrolled"}</span>` : ""}</div></div>
-  </section>`;
-
-  if(!LIC_RULES.length) return strip + `<div class="estate">
-    <span class="ic"><svg width="26" height="26" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
-    <div class="t">No auto-enrol rules yet.</div>
-    <div class="d">Every seat is allocated by hand. Create a rule to enrol matching CIs automatically and keep enrolling them as new CIs are discovered.</div>
-    <div class="cta"><button class="btn pri lg" id="licEmptyRule">New Rule</button></div></div>`;
-
-  if(!all.length) return strip + `<div class="estate">
-    <span class="ic"><svg width="26" height="26" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg></span>
-    <div class="t">No CI has been enrolled automatically.</div>
-    <div class="d">${on ? "Your rules are active but nothing they match is unenrolled yet." : `All ${LIC_RULES.length} rules are disabled, so nothing is being enrolled.`}</div>
-    <div class="cta"><button class="btn lg" id="licEmptyView">View Rules</button></div></div>`;
-
-  if(!list.length) return strip + licNoMatch(all.length);
-  return strip + licCiTable(list, {bulk:true});
+        </div></td></tr>`).join("")}</tbody></table></div>
+    ${total > LIC_PER_PAGE ? licPagerHTML(from, page.length, total, pages) : ""}`;
 }
 
 function licNoMatch(total){
   return `<div class="estate">
     <span class="ic"><svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg></span>
     <div class="t">No CI matches these filters.</div>
-    <div class="d">That is a filter result, not an all-clear — ${total} CI${total===1?"":"s"} in this tab.</div>
+    <div class="d">That is a filter result, not an all-clear — ${total} CI${total===1?"":"s"} hold a seat.</div>
     <div class="cta"><button class="btn" id="licClr">Clear filters</button></div></div>`;
 }
 
 function licWire(){
   const $ = i => document.getElementById(i);
-  document.querySelectorAll("[data-lictab]").forEach(b=>b.onclick=()=>{
-    LIC_TAB = b.dataset.lictab; LIC_SEL.clear(); LIC_MENU=null; LIC_CONFIRM=null; renderLicensing();
+  /* One handler for every card segment, the chip's × and the "All enrolled" pill —
+     they are the same control in three places, so they share one code path.
+     Radio behaviour: re-clicking the active segment returns to All, which is why the
+     button is a toggle rather than a setter. */
+  document.querySelectorAll("[data-licseg]").forEach(b=>b.onclick=()=>{
+    const k = b.dataset.licseg;
+    LIC_SEG = (k === LIC_SEG && k !== "all") ? "all" : k;
+    LIC_PAGE = 1; LIC_SEL.clear(); LIC_MENU=null; LIC_CONFIRM=null;
+    renderLicensing();
   });
-  document.querySelectorAll("[data-lictab2]").forEach(b=>b.onclick=()=>{
-    LIC_TAB = b.dataset.lictab2; LIC_SEL.clear(); LIC_FILT.clear(); renderLicensing();
-    document.getElementById("licWrap").scrollIntoView({behavior:"smooth", block:"center"});
+  const rl = $("licRulesLink"); if(rl) rl.onclick = licRulesOpen;
+
+  document.querySelectorAll("[data-licact]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    if(b.dataset.licact === "enrol") licAddOpen(); else licRulesOpen();
   });
-  document.querySelectorAll("[data-licf]").forEach(b=>b.onclick=()=>{
-    LIC_FILT.clear(); LIC_FILT.add(b.dataset.licf); LIC_FOPEN=false; renderLicensing();
-    document.getElementById("licWrap").scrollIntoView({behavior:"smooth", block:"center"});
+  document.querySelectorAll("[data-licenrol]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    if(licLeft() <= 0) return;
+    const c = ciOf(b.dataset.licenrol);
+    c.enrolled = true; c.by = "Manual"; c.byRule = null; c.byPolicy = null;
+    c.enrolledAt = Date.now();
+    syncEnrolled(); renderLicensing();
+    toast(`${c.id} enrolled — ${licLeft()} seat${licLeft()===1?"":"s"} left`);
+  });
+  document.querySelectorAll("[data-licrtoggle]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const r = ruleOf(b.dataset.licrtoggle); r.on = !r.on; r.updated = todayLabel();
+    renderLicensing();
+    toast(r.on ? `"${r.name}" enabled` : `"${r.name}" disabled — nothing more is enrolled by it`);
+  });
+  /* A seat held through a policy names it, and the name opens it. */
+  document.querySelectorAll("[data-licpol]").forEach(a=>a.onclick=e=>{ e.preventDefault(); bpView(a.dataset.licpol); });
+
+  document.querySelectorAll("[data-licpage]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation(); LIC_PAGE = +b.dataset.licpage; renderLicensing();
   });
 
   const q = $("licQ");
-  if(q) q.oninput = e=>{ LIC_Q=e.target.value; renderLicensing();
+  /* A new query is a new list, so it starts at its beginning. */
+  if(q) q.oninput = e=>{ LIC_Q=e.target.value; LIC_PAGE=1; renderLicensing();
     const el=$("licQ"); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } };
 
-  /* one filter control, same as Scheduler */
-  const fgroups = [...new Set(LIC_FILTERS.map(f=>f.g))];
-  const fh = $("licFilter");
-  if(fh) fh.innerHTML = `<span class="fwrap">
-    <button class="fbtn${LIC_FILT.size?" on":""}" id="licFBtn">${IC_FUNNEL}Filter${
-      LIC_FILT.size?`<span class="cnt">${LIC_FILT.size}</span>`:""}</button>
-    ${LIC_FOPEN ? `<span class="catcher" id="licFCatch"></span><span class="pop" id="licFPop">${
-      fgroups.map((g,i)=>`${i?'<span class="sep"></span>':""}<span class="ph">${g}</span>` +
-        LIC_FILTERS.filter(f=>f.g===g).map(f=>
-          `<label><input type="checkbox" data-licfl="${f.id}"${LIC_FILT.has(f.id)?" checked":""}>${f.lab}</label>`).join("")
-      ).join("")}</span>` : ""}</span>`;
-  if($("licFBtn")) $("licFBtn").onclick = e=>{ e.stopPropagation(); LIC_FOPEN=!LIC_FOPEN; renderLicensing(); };
-  const fp=$("licFPop"); if(fp) fp.onclick=e=>e.stopPropagation();
-  const fc=$("licFCatch"); if(fc) fc.onclick=e=>{ e.stopPropagation(); LIC_FOPEN=false; renderLicensing(); };
-  document.querySelectorAll("[data-licfl]").forEach(cb=>cb.onchange=()=>{
-    cb.checked ? LIC_FILT.add(cb.dataset.licfl) : LIC_FILT.delete(cb.dataset.licfl); renderLicensing();
-  });
-  if($("licClr")) $("licClr").onclick = ()=>{ LIC_FILT.clear(); LIC_Q=""; renderLicensing(); };
+  if($("licClr")) $("licClr").onclick = ()=>{ LIC_SEG="all"; LIC_Q=""; LIC_PAGE=1; renderLicensing(); };
 
   /* tab-specific actions */
   /* The tab-scoped add buttons are gone — the page's one CTA lives in the header.
@@ -4642,9 +5357,14 @@ function licWire(){
   /* bulk selection */
   const all = $("licAll");
   if(all) all.onchange = ()=>{
-    const shown = licVisible(LIC_TAB==="manual" ? licManualCIs() : licAutoCIs()).map(c=>c.id);
+    /* Scoped to the page, because the page is what the box sits at the top of. */
+    const from = (LIC_PAGE - 1) * LIC_PER_PAGE;
+    const shown = licVisible().slice(from, from + LIC_PER_PAGE).map(c=>c.id);
     all.checked ? shown.forEach(id=>LIC_SEL.add(id)) : shown.forEach(id=>LIC_SEL.delete(id));
     renderLicensing();
+  };
+  if($("licSelAllF")) $("licSelAllF").onclick = ()=>{
+    licVisible().forEach(c=>LIC_SEL.add(c.id)); renderLicensing();
   };
   document.querySelectorAll("[data-licsel]").forEach(cb=>cb.onchange=()=>{
     cb.checked ? LIC_SEL.add(cb.dataset.licsel) : LIC_SEL.delete(cb.dataset.licsel);
@@ -4670,7 +5390,7 @@ function licWire(){
   });
 }
 document.addEventListener("click", ()=>{
-  if(LIC_FOPEN || LIC_CONFIRM){ LIC_FOPEN=false; LIC_CONFIRM=null; renderLicensing(); }
+  if(LIC_CONFIRM){ LIC_CONFIRM=null; renderLicensing(); }
   if(LIC_RCONF){ LIC_RCONF=null; renderLicDrawer(); }
 });
 
@@ -4714,8 +5434,12 @@ function licRuleOpen(id, fromRules){
      There is no "build conditions" step to click through. */
   LIC_DRAWER = r
     ? {id:r.id, name:r.name, auto:r.on, editing:true, err:false, fromRules:!!fromRules, policyId:r.policyId||null,
+       tmode:r.policyId ? "policy" : "conditions", stash:null,
        groups:r.groups.map((g,i,a)=>({join:g.join||"And", open:i===a.length-1, conds:g.conds.map(c=>({...c}))}))}
-    : {id:null, name:"", auto:true, editing:false, err:false, fromRules:!!fromRules, policyId:null, groups:[newGroup()]};
+    /* A new rule opens on its own conditions: the builder is usable straight away,
+       and the reusable option sits above it, one click and clearly unselected. */
+    : {id:null, name:"", auto:true, editing:false, err:false, fromRules:!!fromRules, policyId:null,
+       tmode:"conditions", stash:null, groups:[newGroup()]};
   LIC_VIEW = null; COND = null; LIC_RULESPANEL = false; TP = null; TP_MOUNTED = false;
   renderLicDrawer();
 }
@@ -4752,11 +5476,48 @@ function licPrevInner(d){
     </div>` : ""}`;
   return previewBlockHTML("lic", seats);
 }
-const licFootLine = d => {
-  const fresh = ruleHits(d).filter(c=>!c.enrolled);
-  return d.auto ? `${fresh.length} CI${fresh.length===1?"":"s"} would be enrolled on save`
-                : "Rule is disabled — nothing changes";
-};
+
+/* Licensing draws the targeting choice as one either/or; the Scheduler and Retention
+   ask an extra question first (see tgtChoiceHTML). Both borrow the same policy icon,
+   title, description and controls, so the option cannot drift between them. */
+function licTargetPickHTML(d){
+  const pol   = d.policyId ? bpOf(d.policyId) : null;
+  const onPol = d.tmode === "policy";
+  const opt = (mode, on, icon, title, tag, desc, body) => `
+    <div class="tpick${on?" on":""}">
+      <button class="tpick-h" data-tmode="${mode}" role="radio" aria-checked="${on}">
+        <span class="tpick-r"></span>
+        <span class="tpick-i">${icon}</span>
+        <span class="tpick-hd">
+          <span class="tpick-t">${title}${tag}</span>
+          <span class="tpick-d">${desc}</span>
+        </span>
+      </button>
+      ${on ? `<div class="tpick-b">${body}</div>` : ""}
+    </div>`;
+  return `<div class="tchoice" role="radiogroup" aria-label="Which CIs to enrol">
+    ${opt("policy", onPol, POL_ICON, POL_TITLE, "", polDescHTML(pol),
+          polControlsHTML(pol, {discovered:true}))}
+    <div class="tor"><span>or</span></div>
+    ${opt("conditions", !onPol,
+      `<svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.6 4.6h12.8M5 9h8M7.4 13.4h3.2"/></svg>`,
+      "Define conditions here", ` <span class="tile-tag">This rule only</span>`,
+      "Written for this rule alone — nothing else can reuse them.",
+      cbGroupsHTML(d.groups))}
+  </div>`;
+}
+
+/* The mode IS the draft, not a display flag: the preview, the save gate and the saved
+   rule all read the draft, so switching has to move the data or they would keep
+   reporting the option the admin just turned away from. Conditions are stashed rather
+   than dropped — looking at a policy and coming back should not cost the work. */
+function licSetMode(m){
+  const d = LIC_DRAWER;
+  if(!d || d.tmode === m) return;
+  if(m === "policy"){ d.stash = d.groups; d.groups = []; }
+  else { d.groups = (d.stash && d.stash.length) ? d.stash : [newGroup()]; d.stash = null; d.policyId = null; }
+  d.tmode = m; d.err = false; renderLicDrawer();
+}
 
 function renderLicDrawer(){
   const host = document.getElementById("licHost");
@@ -4948,21 +5709,12 @@ function renderLicDrawer(){
                  placeholder="e.g. Windows Servers" autocomplete="off">
           ${d.err && !d.name.trim() ? `<div class="ferr">Give the exception a name so it can be recognised later.</div>` : ""}
         </div>
-        <div class="cb-power${d.auto?" on":""}">
-          <button class="sw${d.auto?" on":""}" id="licDSw" role="switch" aria-checked="${d.auto}" aria-label="Rule status"></button>
-          <div><div class="cb-power-t">Rule is ${d.auto?"enabled":"disabled"}</div>
-            <div class="cb-power-d">${d.auto
-              ? "Every discovered CI matching the targeting below is enrolled and consumes a seat."
-              : "The targeting is kept, but nothing is enrolled by this rule."}</div></div>
-        </div>
-        <div class="sechead">Which CIs to enrol <span>— use a reusable policy, or define conditions here</span></div>
-        ${polBandHTML({policyId:d.policyId, discovered:true})}
-        ${d.policyId && bpOf(d.policyId) ? "" : cbGroupsHTML(d.groups)}
+        <div class="sechead">Which CIs to enrol <span>— pick one</span></div>
+        ${licTargetPickHTML(d)}
         ${d.err && !licTargeted(d) ? `<div class="ferr" style="margin:-4px 0 12px">Choose a BOM Policy or build a condition — the rule has to know who to enrol.</div>` : ""}
         <div class="cb-prev" id="licPrev">${licPrevInner(d)}</div>
       </div>
       <div class="dw-foot">
-        <span class="avail" id="licFoot">${licFootLine(d)}</span>
         <span class="gap"></span>
         <button class="btn lg" id="licDCancel">Cancel</button>
         <button class="btn pri lg" id="licDSave"${over>0?" disabled":""}>${d.editing?"Save changes":"Create rule"}</button>
@@ -5101,14 +5853,18 @@ function renderLicDrawer(){
   $("licDCancel").onclick = licRuleClose;
   $("licScrim").onclick   = ()=>{ if(!COND && !LIC_VIEW && !TP) licRuleClose(); };
   $("licRName").oninput   = e => { d.name = e.target.value; };
-  $("licDSw").onclick     = ()=>{ d.auto = !d.auto; renderLicDrawer(); };
+  /* Enable/disable is not asked here. A new rule is created enabled, and turning an
+     existing one off is a one-click switch in the rules list — asking again inside
+     the builder made a second home for a decision that already has one. */
+  document.querySelectorAll("#licHost [data-tmode]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation(); licSetMode(b.dataset.tmode);
+  });
 
   /* Typing a value re-computes the preview, the footer line and the save
      gate in place — a full re-render here would steal the caret. The preview
      is replaced wholesale, so its link is re-bound with it. */
   const licSync = ()=>{
     const p = $("licPrev"); if(p) p.innerHTML = licPrevInner(d);
-    const f = $("licFoot"); if(f) f.textContent = licFootLine(d);
     const s = $("licDSave");
     if(s) s.disabled = (d.auto ? ruleHits(d).filter(c=>!c.enrolled).length : 0) - licLeft() > 0;
     const v = $("tpView-lic"); if(v) v.onclick = ()=>tpOpen("lic");
@@ -5147,7 +5903,8 @@ function renderLicDrawer(){
     if(d.editing) LIC_RULES = LIC_RULES.map(x=>x.id===rule.id ? rule : x);
     else LIC_RULES.push(rule);
     if(rule.on) ruleFresh(rule).forEach(c=>{ c.enrolled=true; c.by="Auto"; c.byRule=rule.id; c.ruleAt=Date.now(); });
-    syncEnrolled(); licRuleClose(); LIC_TAB="rules"; renderLicensing();
+    /* Land on what the rule just changed: the CIs a rule enrolled. */
+    syncEnrolled(); licRuleClose(); LIC_SEG="rule"; LIC_PAGE=1; renderLicensing();
     toast(rule.on
       ? `"${rule.name}" saved — ${fresh.length} CI${fresh.length===1?"":"s"} enrolled, ${licLeft()} seat${licLeft()===1?"":"s"} left`
       : `"${rule.name}" saved — disabled, nothing enrolled`);
@@ -5163,6 +5920,9 @@ function renderLicDrawer(){
    that is made obvious.
    ══════════════════════════════════════════════════════════════ */
 let BP_Q = "", BP_DRAFT = null, BP_VIEW = null, BP_CONFIRM = null, BP_IMPACT = false;
+/* Which policies the list shows, and the two lists the readings open. All three live
+   here rather than on the cards, so a reading and the thing it opens cannot disagree. */
+let BP_SHOW = "all", BP_UNGOV = false, BP_OVL = false;
 
 /* Conditions as they read, not as they are stored. Same phrasing the rules use. */
 function condReadHTML(groups){
@@ -5214,39 +5974,51 @@ function renderPolicies(){
 
   const refs = BOM_POLICIES.reduce((n,s)=>n + bpUsers(s.id).length, 0);
   const clashes = allBpClashes();
-  /* Three readings, each answering a question worth asking before touching a
-     policy: how many exist, how much of the estate they reach, and whether any
-     two of them are telling the same CI two different things. */
+  /* Three readings, each answering a question worth asking before touching a policy:
+     how many exist, how much of the estate they reach, and whether any two are telling
+     the same CI two different things. Each footer is a way THROUGH to what it counts —
+     the same pattern as Scheduler and Retention — which is what let the page-wide yellow
+     overlap banner go: its detail now opens from the reading that reports it, instead of
+     shouting the same fact a second time under it. */
+  const unused = BOM_POLICIES.length - used;
+  const ungov  = ALL_CIS.length - covered;
+  const unusedOnly = BP_SHOW === "unused";
   document.getElementById("bpSum").innerHTML = `
-    <div class="sumcell"><div class="suml">Policies</div>
-      <div class="sumv">${BOM_POLICIES.length}<span class="u">${active.length} active</span></div>
-      <div class="sums">${refs ? `Referenced by ${refs} rule${refs===1?"":"s"} · ${used} in use` : "No rule references a policy yet"}</div></div>
-    <div class="sumcell"><div class="suml">CIs governed</div>
-      <div class="sumv">${covered}<span class="u">of ${ALL_CIS.length} discovered</span></div>
-      <div class="sums">${covered ? "Covered by at least one active policy" : "No policy matches anything yet"}</div></div>
-    <div class="sumcell"><div class="suml">Overlaps needing precedence</div>
-      <div class="sumv${clashes.length?"":" quiet"}">${clashes.length}</div>
-      <div class="sums${clashes.length?" warn":""}">${clashes.length
-        ? "Same capability, different values — priority decides"
-        : "No two policies set the same capability differently"}</div></div>`;
+    <article class="kpi">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="6.4"/><circle cx="9" cy="9" r="2.5"/></svg></span><span class="t">Policies</span></div>
+      <div class="knum n-neutral">${active.length}<span class="ku">/ ${BOM_POLICIES.length}</span></div>
+      <div class="klabel">${refs ? `Active, referenced by ${refs} rule${refs===1?"":"s"}` : "Active — no rule references one yet"}</div>
+      ${unused
+        ? `<button class="kcta${unusedOnly?" on":""}" id="bpShowUnused"><span class="lb">${
+             unusedOnly ? "Showing unused only" : `${unused} used by nothing`}</span><span class="ar">${unusedOnly?"×":"→"}</span></button>`
+        : `<button class="kcta" disabled><span class="lb">Every policy is in use</span></button>`}
+    </article>
 
-  /* Calm and aggregate: the count and what it is about, never a red wall on load.
-     An overlap is only reported when the rules pointed at each policy configure
-     the SAME capability differently — different capabilities coexist by design. */
-  document.getElementById("bpBanner").innerHTML = clashes.length ? `
-    <div class="ovl">
-      <span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2.4l6 10.4H2L8 2.4z"/><path d="M8 6.6v3M8 11.3h.01"/></svg></span>
-      <div>
-        <div class="ovl-t">${clashes.length} policy overlap${clashes.length===1?"":"s"} need${clashes.length===1?"s":""} precedence</div>
-        <div class="ovl-d">${clashes.map(c=>`<b style="color:var(--ink)">${esc(c.a.name)}</b> and <b style="color:var(--ink)">${esc(c.b.name)}</b> both set
-          ${c.clashes.map(x=>CAP_NAME[x.cap]).join(" and ")} for ${c.cis.length} shared CI${c.cis.length===1?"":"s"}`).join("<br>")}.
-          Priority decides which value applies — nothing is applied twice.</div>
-      </div>
-    </div>` : "";
+    <article class="kpi">
+      <div class="kh"><span class="ic">${IC_ASSET}</span><span class="t">CIs governed</span></div>
+      <div class="knum n-neutral">${covered}<span class="ku">of ${ALL_CIS.length}</span></div>
+      <div class="klabel">Covered by at least one active policy</div>
+      ${ungov
+        ? `<button class="kcta" id="bpUngov"><span class="lb">${ungov} governed by none</span><span class="ar">→</span></button>`
+        : `<button class="kcta" disabled><span class="lb">Every CI is covered</span></button>`}
+    </article>
+
+    <article class="kpi">
+      <div class="kh"><span class="ic"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.4 6.4h8.2M2.4 11.6h8.2"/><circle cx="13.6" cy="6.4" r="1.9"/><circle cx="13.6" cy="11.6" r="1.9"/></svg></span><span class="t">Overlaps</span></div>
+      <div class="knum ${clashes.length?"n-amber":"n-neutral"}">${clashes.length}</div>
+      <div class="klabel">${clashes.length
+        ? "Same capability, different values"
+        : "No two policies set one differently"}</div>
+      ${clashes.length
+        ? `<button class="kcta warn" id="bpOvlOpen"><span class="lb">Review precedence</span><span class="ar">→</span></button>`
+        : `<button class="kcta" disabled><span class="lb">Nothing to resolve</span></button>`}
+    </article>`;
 
   const q = BP_Q.trim().toLowerCase();
-  const shown = BOM_POLICIES.filter(s => !q ||
-    [s.name, s.desc, bpSummary(s)].join(" ").toLowerCase().includes(q));
+  /* The count chip stays the TOTAL; the filter narrows the rows, not the fact. */
+  const shown = BOM_POLICIES.filter(s => (!q ||
+    [s.name, s.desc, bpSummary(s)].join(" ").toLowerCase().includes(q)) &&
+    (!unusedOnly || !bpUsers(s.id).length));
   document.getElementById("bpCount").textContent = BOM_POLICIES.length;
 
   const wrap = document.getElementById("bpWrap");
@@ -5309,6 +6081,15 @@ function renderPolicies(){
 
   const en = document.getElementById("bpEmptyNew");
   if(en) en.onclick = ()=>bpOpen(null);
+  /* Each reading offers a way through to what it counts: the unused count filters the
+     list to them, and the two populations open their own lists. */
+  const bpU = document.getElementById("bpShowUnused");
+  if(bpU) bpU.onclick = ()=>{ BP_SHOW = BP_SHOW === "unused" ? "all" : "unused"; renderPolicies(); };
+  const bpG = document.getElementById("bpUngov");
+  if(bpG && !bpG.disabled) bpG.onclick = ()=>{ BP_UNGOV = true; renderPolicyDrawer(); };
+  const bpO = document.getElementById("bpOvlOpen");
+  if(bpO && !bpO.disabled) bpO.onclick = ()=>{ BP_OVL = true; renderPolicyDrawer(); };
+
   document.querySelectorAll("[data-bpview]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpview));
   document.querySelectorAll("[data-bpusers]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpusers));
   document.querySelectorAll("[data-bpovl]").forEach(b=>b.onclick=()=>bpView(b.dataset.bpovl));
@@ -5340,10 +6121,11 @@ function renderPolicies(){
 function bpOpen(id, opts){
   const s = id && bpOf(id);
   BP_DRAFT = s
-    ? {id:s.id, name:s.name, desc:s.desc||"", on:s.on, err:false,
+    ? {id:s.id, name:s.name, desc:s.desc||"", on:s.on, priority:s.priority||2, err:false,
        groups:s.groups.map((g,i,a)=>({join:g.join||"And", open:i===a.length-1, conds:g.conds.map(c=>({...c}))})),
-       ...(opts||{})}
-    : {id:null, name:"", desc:"", on:true, err:false, groups:[newGroup()], ...(opts||{})};
+       caps:capDraftFor(s.id), ...(opts||{})}
+    : {id:null, name:"", desc:"", on:true, priority:2, err:false, groups:[newGroup()],
+       caps:capDraftFor(null), ...(opts||{})};
   BP_VIEW = null; BP_IMPACT = false; renderPolicyDrawer();
 }
 /* `stacked` when it is opened from a rule or policy drawer — the same detail
@@ -5358,6 +6140,69 @@ function bpClose(){
 
 function renderPolicyDrawer(){
   const host = document.getElementById("bpHost");
+
+  /* The CIs no active policy reaches — the complement of the "CIs governed" figure,
+     derived from the same set so the two can never add up to something other than the
+     discovered estate. */
+  if(BP_UNGOV && !BP_DRAFT && !BP_VIEW){
+    const on = new Set(BOM_POLICIES.filter(p=>p.on).flatMap(p=>bpCis(p).map(c=>c.id)));
+    const rows = ALL_CIS.filter(c=>!on.has(c.id));
+    host.innerHTML = `<div class="dw-scrim in" id="bpGScrim"></div>
+      <aside class="dw in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="CIs governed by no policy">
+        <div class="dw-head"><div><h3>CIs governed by no policy</h3>
+          <p>${rows.length} of ${ALL_CIS.length} discovered CI${ALL_CIS.length===1?"":"s"} that no active policy matches. They can still be targeted directly by a rule.</p></div>
+          <button class="x" id="bpGClose" aria-label="Close">${IC_X}</button></div>
+        <div class="dw-body" style="padding:0">
+          <div class="pk-hd" style="grid-template-columns:68px 1fr 128px 108px"><span>CI ID</span><span>Host Name</span><span>CI Type</span><span>IP address</span></div>
+          ${rows.length ? rows.map(c=>`<div class="pk-row" style="grid-template-columns:68px 1fr 128px 108px;cursor:default">
+            <span class="id">${c.id}</span><span>${esc(c.host)}</span>
+            <span><span class="pill ghost">${esc(c.type)}</span></span><span class="ip">${c.ip}</span></div>`).join("")
+            : `<div class="pk-empty">Every discovered CI is covered by an active policy.</div>`}
+        </div>
+        <div class="dw-foot"><span class="gap"></span>
+          <button class="btn lg" id="bpGDone">Close</button>
+          <button class="btn pri lg" id="bpGNew">New BOM Policy</button></div>
+      </aside>`;
+    const close = ()=>{ BP_UNGOV=false; host.innerHTML=""; };
+    ["bpGClose","bpGDone","bpGScrim"].forEach(id=>{ const el=document.getElementById(id); if(el) el.onclick=close; });
+    document.getElementById("bpGNew").onclick = ()=>{ BP_UNGOV=false; bpOpen(null); };
+    return;
+  }
+
+  /* The overlaps, in the reading that reports them rather than a page-wide banner.
+     Same `allBpClashes()` data the count comes from, so the list and the figure are
+     one fact — and the policy names open the policies themselves. */
+  if(BP_OVL && !BP_DRAFT && !BP_VIEW){
+    const cl = allBpClashes();
+    host.innerHTML = `<div class="dw-scrim in" id="bpOScrim"></div>
+      <aside class="dw in" style="width:${DW2_W}px;max-width:95vw" role="dialog" aria-modal="true" aria-label="Overlaps needing precedence">
+        <div class="dw-head"><div><h3>Overlaps needing precedence</h3>
+          <p>${cl.length} pair${cl.length===1?"":"s"} set the same capability to different values for CIs they both match. Priority decides which value applies — nothing is applied twice.</p></div>
+          <button class="x" id="bpOClose" aria-label="Close">${IC_X}</button></div>
+        <div class="dw-body">
+          ${cl.length ? cl.map(c=>`
+            <div class="ovl calm" style="margin-bottom:10px">
+              <span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2.4l6 10.4H2L8 2.4z"/><path d="M8 6.6v3M8 11.3h.01"/></svg></span>
+              <div>
+                <div class="ovl-t">${c.clashes.map(x=>CAP_NAME[x.cap]).join(" and ")} · ${c.cis.length} shared CI${c.cis.length===1?"":"s"}</div>
+                <div class="ovl-d"><button class="lnk" data-bpovlgo="${c.a.id}">${esc(c.a.name)}</button>
+                  <span class="mut">priority ${c.a.priority}</span> and
+                  <button class="lnk" data-bpovlgo="${c.b.id}">${esc(c.b.name)}</button>
+                  <span class="mut">priority ${c.b.priority}</span> both set it.
+                  <b style="color:var(--ink)">${esc((c.a.priority <= c.b.priority ? c.a : c.b).name)}</b> wins on the shared CIs.</div>
+              </div>
+            </div>`).join("")
+            : `<div class="avail">No two active policies set the same capability differently.</div>`}
+        </div>
+        <div class="dw-foot"><span class="avail">Change a policy's priority to change which value wins.</span>
+          <span class="gap"></span><button class="btn lg" id="bpODone">Close</button></div>
+      </aside>`;
+    const close = ()=>{ BP_OVL=false; host.innerHTML=""; };
+    ["bpOClose","bpODone","bpOScrim"].forEach(id=>{ const el=document.getElementById(id); if(el) el.onclick=close; });
+    document.querySelectorAll("[data-bpovlgo]").forEach(b=>b.onclick=()=>{ BP_OVL=false; bpView(b.dataset.bpovlgo); });
+    return;
+  }
+
   if(!BP_DRAFT && !BP_VIEW){ host.innerHTML = ""; return; }
   const keep = [...host.querySelectorAll(".dw-body")].map(el=>el.scrollTop);
   const $ = i => document.getElementById(i);
@@ -5421,7 +6266,7 @@ function renderPolicyDrawer(){
            aria-label="${d.id?"Edit":"New"} BOM Policy">
       <div class="dw-head">
         <div><h3>${d.id ? "Edit BOM Policy" : "New BOM Policy"}</h3>
-          <p>Name a set of conditions once. Every BOM policy can then point at it instead of repeating them.</p></div>
+          <p>Name the CIs once, then switch on what BOM Management should do for them. Any combination — and every rule in Licensing, Scheduler or Retention can target this policy too.</p></div>
         <button class="x" id="bpDClose" aria-label="Close">${IC_X}</button>
       </div>
 
@@ -5443,9 +6288,11 @@ function renderPolicyDrawer(){
         ${cbGroupsHTML(d.groups)}
 
         <div class="tprev">
-          <div class="tprev-h">Matching CIs</div>
+          <div class="tprev-h">Preview</div>
           ${hits.length
             ? `<div class="tprev-l"><b>${hits.length}</b> CI${hits.length===1?"":"s"} match right now · ${enr} enrolled</div>
+               ${capsOn(d).length ? `<div class="caps" style="margin-top:8px">${capsOn(d).map(c=>`
+                 <span class="capchip">${CAPS_ICON[c]}<span class="k">${CAP_NAME[c]}</span>${esc(capDraftPhrase(d, c))}</span>`).join("")}</div>` : ""}
                <button class="tprev-cta" id="bpViewCis">View matching CIs<span class="ar">→</span></button>`
             : `<div class="tprev-none">Nothing matches yet.<div class="tprev-sub">An incomplete condition matches nothing, so a half-written policy never sweeps in the estate by accident.</div></div>`}
         </div>
@@ -5466,10 +6313,44 @@ function renderPolicyDrawer(){
                 : `${imp.users.length} rule${imp.users.length===1?" uses":"s use"} this policy — across ${imp.mods.join(", ") || "no module yet"} — so any change here reaches ${imp.users.length===1?"it":"them all"}.`}
             ${changed ? `<button class="lnk" id="bpImpView" style="margin-left:6px">View affected CIs →</button>` : ""}</div>
         </div>` : ""}
+
+        <hr class="dw-div">
+        <div class="sechead">BOM capabilities <span>— switch on any combination; each one is a rule in its own module</span></div>
+        ${capCardHTML(d, "lic", `
+          <div class="avail" style="line-height:1.6">Every matching CI is enrolled for BOM generation, and CIs that
+            start matching later are enrolled too — that is what makes the conditions worth writing once.</div>
+          <div class="polband-x" style="margin-top:9px">
+            <span class="polband-n"><b>${hits.filter(c=>!c.enrolled).length}</b> of ${hits.length} not enrolled yet</span>
+            <span class="polband-n" style="margin-left:14px"><b>${Math.max(0,licLeft())}</b> seats available</span>
+          </div>
+          ${hits.filter(c=>!c.enrolled).length > licLeft() ? `<div class="ferr" style="margin-top:10px;padding:11px 13px;background:var(--crit-soft);border-radius:6px;line-height:1.55">
+            <b>Not enough seats.</b> ${hits.filter(c=>!c.enrolled).length} CI${hits.filter(c=>!c.enrolled).length===1?"":"s"} would need enrolling but only
+            ${Math.max(0,licLeft())} seat${licLeft()===1?"":"s"} remain — the rest stay unenrolled until seats are freed.</div>` : ""}`)}
+        ${capCardHTML(d, "bs", schedFieldsHTML({...d.caps.bs, err:d.err}, "bps"))}
+        ${capCardHTML(d, "rt", `
+          <div class="polstack">
+            <div class="polline">Keep the latest ${ddHTML("bpKeep", d.caps.rt.keep, KEEP_OPTS, 168)}</div>
+            <div class="polline">or delete versions older than ${ddHTML("bpPeriod", d.caps.rt.period, PERIOD_OPTS, 150)}</div>
+          </div>
+          <div class="polrow-note">${rtNote(d.caps.rt.keep, d.caps.rt.period)}</div>`)}
+        <div class="rt-note" style="margin-top:-4px">A policy may switch on one, two or all three — none of them is required.
+          Whatever is on becomes an ordinary rule in that module, editable there too.</div>
+
+        <hr class="dw-div">
+        <div class="sechead">Precedence <span>— who wins when two policies set the same capability</span></div>
+        <div class="grid2">
+          <div class="fld" style="margin-bottom:0">
+            <span class="flab">Priority</span>
+            ${ddHTML("bpPrio", String(d.priority), ["1","2","3","4","5"], "full")}
+            <div class="rt-note" style="margin-top:6px">1 is highest. Where two policies set the same capability differently, the higher priority applies — never both.</div>
+          </div>
+        </div>
+        <div id="bpOvl">${overlapPanelHTML(d)}</div>
       </div>
 
       <div class="dw-foot">
-        <span class="avail">${hits.length} matching CI${hits.length===1?"":"s"} · ${enr} enrolled</span>
+        <span class="avail">${hits.length} matching CI${hits.length===1?"":"s"} · ${enr} enrolled${
+          capsOn(d).length ? ` · ${capsOn(d).map(c=>CAP_NAME[c]).join(", ")}` : " · no capability switched on"}</span>
         <span class="gap"></span>
         <button class="btn lg" id="bpDCancel">Cancel</button>
         <button class="btn pri lg" id="bpDSave">${d.id ? "Save policy" : "Create policy"}</button>
@@ -5521,31 +6402,82 @@ function renderPolicyDrawer(){
   if($("bpViewCis")) $("bpViewCis").onclick = ()=>bpPreviewOpen();
 
   wireCbGroups(d.groups, renderPolicyDrawer);
+  wireSchedFields(d.caps.bs, "bps", renderPolicyDrawer);
+  document.querySelectorAll("[data-bpcap]").forEach(b=>b.onclick=()=>{
+    const c = b.dataset.bpcap; d.caps[c].on = !d.caps[c].on; renderPolicyDrawer();
+  });
+  /* The four ways out of an overlap. Priority is the model's answer; the other
+     two send you to whichever half you would rather change. */
+  document.querySelectorAll("[data-bpwin]").forEach(b=>b.onclick=()=>{
+    const o = bpOf(b.dataset.bpwin);
+    d.priority = Math.max(1, o.priority - 1); renderPolicyDrawer();
+    toast(`Priority ${d.priority} — this policy now wins over "${o.name}"`);
+  });
+  document.querySelectorAll("[data-bpyield]").forEach(b=>b.onclick=()=>{
+    const o = bpOf(b.dataset.bpyield);
+    d.priority = Math.min(5, o.priority + 1); renderPolicyDrawer();
+    toast(`Priority ${d.priority} — "${o.name}" now wins`);
+  });
+  document.querySelectorAll("[data-bpedcond]").forEach(b=>b.onclick=()=>{
+    const el = document.querySelector("#bpHost .cb"); if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+  });
+  document.querySelectorAll("[data-bpedcap]").forEach(b=>b.onclick=()=>{
+    const c = b.dataset.bpedcap;
+    if(!d.caps[c].on){ d.caps[c].on = true; renderPolicyDrawer(); }
+    const el = document.getElementById("bpcap-"+c); if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+  });
+
   document.querySelectorAll("#bpHost [data-dd]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN = DD_OPEN===b.dataset.dd ? null : b.dataset.dd; renderPolicyDrawer();
   });
   document.querySelectorAll("#bpHost [data-ddpick]").forEach(b=>b.onclick=e=>{
-    e.stopPropagation(); ddSet(b.dataset.ddpick, b.dataset.ddval);
+    e.stopPropagation();
+    const id = b.dataset.ddpick, v = b.dataset.ddval;
+    if(id === "bpKeep")   d.caps.rt.keep = v;
+    if(id === "bpPeriod") d.caps.rt.period = v;
+    if(id === "bpPrio")   d.priority = +v;
+    schedDdSet(d.caps.bs, "bps", id, v);
+    /* Condition selects still route through the shared ddSet; capability selects
+       are handled here, so neither can answer for the other. */
+    if(/^c[fov]-/.test(id)) ddSet(id, v);
+    else { DD_OPEN = null; renderPolicyDrawer(); }
   });
   document.querySelectorAll("#bpHost [data-ddclose]").forEach(b=>b.onclick=e=>{
     e.stopPropagation(); DD_OPEN=null; renderPolicyDrawer();
   });
 
   $("bpDSave").onclick = ()=>{
-    if(!d.name.trim()){ d.err = true; renderPolicyDrawer(); $("bpName").focus(); return; }
+    /* Only what the chosen shape actually requires — the same rule the Scheduler's
+       own drawer applies, so a weekly schedule can never be saved with no day. */
+    const gap = d.caps.bs.on && d.caps.bs.kind === "Recurring"
+      ? (d.caps.bs.freq === "Weekly" && !(d.caps.bs.days||[]).length ? "a day for the weekly schedule"
+       : d.caps.bs.freq === "Custom" && !d.caps.bs.endDate          ? "an end date for the schedule" : null)
+      : null;
+    if(!d.name.trim() || gap){
+      d.err = true; renderPolicyDrawer();
+      if(!d.name.trim()) $("bpName").focus(); else toast(`Needs ${gap} before it can be saved`);
+      return;
+    }
     const s = {id:d.id || bpNextId(), name:d.name.trim(), desc:d.desc.trim(), on:d.on,
-               updated:todayLabel(),
+               priority:d.priority, updated:todayLabel(),
                groups:(d.groups||[]).map(g=>({join:g.join, conds:g.conds.map(c=>({...c}))}))};
     const imp = bpImpact(d);
     if(d.id) BOM_POLICIES = BOM_POLICIES.map(x=>x.id===s.id ? s : x); else BOM_POLICIES.push(s);
+    /* The switches are written to the modules AFTER the policy exists, so a rule
+       created here always has a policy to reference. */
+    const res = applyCaps(s, d.caps);
     const back = d.back;
     const n = bpCis(s).length;
     BP_DRAFT = null; BP_IMPACT = false; renderPolicyDrawer();
-    renderPolicies();
+    renderPolicies(); renderLicensing(); renderScheduler(); renderRetention();
     if(back) back(s.id);
-    toast(imp && (imp.added.length || imp.removed.length)
-      ? `Saved "${s.name}" — now matching ${n} CI${n===1?"":"s"} (+${imp.added.length} / −${imp.removed.length})`
-      : `${d.id?"Saved":"Created"} "${s.name}" — matching ${n} CI${n===1?"":"s"}`);
+    const capNote = res.added.length ? ` · switched on ${res.added.join(", ")}` : "";
+    toast(res.short
+      ? `Saved "${s.name}" — ${res.enrolled} CI${res.enrolled===1?"":"s"} enrolled, ${res.short} could not (no seats)`
+      : imp && (imp.added.length || imp.removed.length)
+        ? `Saved "${s.name}" — now matching ${n} CI${n===1?"":"s"} (+${imp.added.length} / −${imp.removed.length})${capNote}`
+        : `${d.id?"Saved":"Created"} "${s.name}" — matching ${n} CI${n===1?"":"s"}${capNote}${
+            res.enrolled ? `, ${res.enrolled} newly enrolled` : ""}`);
   };
 
   if(!d._focused){ d._focused = true; setTimeout(()=>{ const el=$("bpName"); if(el && !d.id) el.focus(); },0); }
@@ -5553,6 +6485,93 @@ function renderPolicyDrawer(){
 
 /* The policy editor borrows the shared preview drawer rather than growing its own. */
 function bpPreviewOpen(){ TP = {mod:"bp"}; TP_MOUNTED = false; TP_Q = ""; TP_SORT = "id"; renderStack(); }
+
+/* ── one capability card ───────────────────────────────────────
+   A switch and, when it is on, that module's OWN compact configuration — the
+   same controls the module's drawer uses, not a second set. */
+const CAPS_ORDER = ["lic","bs","rt"];
+const capsOn = d => CAPS_ORDER.filter(c=>d.caps[c].on);
+/* A switch read back in words — the same phrasing the Capabilities column uses,
+   so the preview and the saved row say the same thing. */
+const capDraftPhrase = (d, cap) =>
+  cap === "lic" ? "Auto-enrol"
+: cap === "bs"  ? `${bsTrigger(d.caps.bs)} · ${bsClock(d.caps.bs)}`
+:                 `${d.caps.rt.keep} / ${d.caps.rt.period === "Never delete" ? "never deleted" : d.caps.rt.period}`;
+const CAP_VERB = {lic:"Auto-enrol matching CIs", bs:"Generate BOMs on a schedule",
+                  rt:"Keep BOM versions for a set time"};
+function capCardHTML(d, cap, body){
+  const live = d.caps[cap].on;
+  /* Named when a rule already exists, so the switch never looks like it is about
+     to create a duplicate of something the module already has. */
+  const ex = d.id && capRuleOf(d.id, cap);
+  return `<div class="capcard${live?" on":""}">
+    <div class="capcard-h">
+      <span class="capcard-i">${CAPS_ICON[cap]}</span>
+      <span class="tile-hd">
+        <span class="capcard-t">${CAP_NAME[cap]}</span>
+        <span class="capcard-d">${CAP_VERB[cap]}${ex ? ` · currently “${esc(ex.name)}” in ${CAP_NAME[cap]}` : ""}</span>
+      </span>
+      <span class="capcard-sw"><button class="sw${live?" on":""}" data-bpcap="${cap}" role="switch"
+        aria-checked="${live}" aria-label="${CAP_NAME[cap]} capability"></button></span>
+    </div>
+    ${live ? `<div class="capcard-b" id="bpcap-${cap}">${body}</div>` : ""}
+  </div>`;
+}
+
+/* ── overlap, before it can be saved ───────────────────────────
+   Same engine the page banner uses, read for the draft. Never a silently
+   ambiguous state: every clash offers a way out — take priority, yield it, edit
+   the conditions, or edit the capability that clashes. Cancel is the footer. */
+function overlapPanelHTML(d){
+  if(!d.id) return "";                        // a new policy has no saved CIs yet
+  const p = bpOf(d.id); if(!p) return "";
+  const overlaps = bpOverlaps({...p, priority:d.priority});
+  if(!overlaps.length) return "";
+  const clashing = overlaps.filter(x=>x.clashes.length);
+  return `
+    <div class="ovl${clashing.length?"":" calm"}" style="margin-top:18px;margin-bottom:0">
+      <span class="ic">${clashing.length
+        ? `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2.4l6 10.4H2L8 2.4z"/><path d="M8 6.6v3M8 11.3h.01"/></svg>`
+        : `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 7.4v3.4M8 5.2h.01"/></svg>`}</span>
+      <div style="min-width:0">
+        <div class="ovl-t">${clashing.length ? "Policy overlap detected"
+          : `Overlaps ${overlaps.length} polic${overlaps.length===1?"y":"ies"} — no conflict`}</div>
+        <div class="ovl-d">${clashing.length
+          ? `This policy covers some of the same CIs as ${overlaps.length} other${overlaps.length===1?"":"s"}, and ${clashing.length===1?"one sets":`${clashing.length} set`} the same capability differently. Priority decides which value applies.`
+          : `Sharing CIs is not a conflict on its own — these policies drive different capabilities, so the same CI safely receives both.`}</div>
+      </div>
+    </div>
+    ${overlaps.map(x=>`
+      <div class="ovitem${x.clashes.length?" clash":""}">
+        <div class="ovitem-h">${esc(x.other.name)}
+          <span class="n">${x.cis.length} shared CI${x.cis.length===1?"":"s"} · priority ${x.other.priority}</span></div>
+        <div class="ovitem-d">${x.clashes.length
+          ? `Conflicting capabilit${x.clashes.length===1?"y":"ies"}: <b style="color:var(--ink)">${x.clashes.map(c=>CAP_NAME[c.cap]).join(", ")}</b>`
+          : `Different capabilities. The shared CIs receive both, which is the point of the model.`}</div>
+        ${x.clashes.map(c=>{
+          const mineWins = x.winner === "mine";
+          return `<div class="ovcap">
+            <span class="ovcap-l">${CAP_NAME[c.cap]}</span>
+            <span class="ovside${mineWins?" win":""}"><b>${mineWins?"Applies · this policy":"This policy"}</b>${esc(c.mine)}</span>
+            <span class="ovside${mineWins?"":" win"}"><b>${mineWins?esc(x.other.name):`Applies · ${esc(x.other.name)}`}</b>${esc(c.theirs)}</span>
+          </div>`;
+        }).join("")}
+        ${x.clashes.length ? `${
+          /* Priority 1 is the ceiling. When the other policy is already there, a
+             tie is settled by specificity — say so rather than offering a button
+             that cannot deliver what it promises. */
+          x.winner === "theirs" && x.other.priority <= 1
+            ? `<div class="ovitem-d" style="margin-top:8px">Both would be priority 1, and a tie goes to the more
+               specific policy — <b style="color:var(--ink)">${esc(x.other.name)}</b> covers ${bpCis(x.other).length} CIs
+               against this policy's ${bpCis(p).length}. Narrow the conditions or change the capability to settle it here.</div>` : ""}
+        <div class="ovacts">
+          ${x.winner === "mine" || x.other.priority <= 1 ? "" : `<button class="btn sm" data-bpwin="${x.other.id}">Make this policy win</button>`}
+          ${x.winner === "theirs" ? "" : `<button class="btn sm" data-bpyield="${x.other.id}">Let ${esc(x.other.name)} win</button>`}
+          <button class="btn sm" data-bpedcond="1">Edit conditions</button>
+          <button class="btn sm" data-bpedcap="${x.clashes[0].cap}">Edit ${CAP_NAME[x.clashes[0].cap].toLowerCase()}</button>
+        </div>` : ""}
+      </div>`).join("")}`;
+}
 
 /* ── view switching ───────────────────────────────────────────
    The rail owns two destinations: the inventory overview and the BOM
@@ -5616,7 +6635,6 @@ document.querySelectorAll(".adcard").forEach(c=>c.onclick=()=>{
   else if(c.dataset.route === ROUTES.policies)    setView("policies");
   else go({route:c.dataset.route, desc:c.dataset.desc});
 });
-document.getElementById("bsQ").addEventListener("input", e=>{ BS_Q=e.target.value; renderScheduler(); });
 document.getElementById("bsNew").onclick = ()=>bsOpen(null);
 document.getElementById("bpQ").addEventListener("input", e=>{ BP_Q=e.target.value; renderPolicies(); });
 document.getElementById("bpNew").onclick = ()=>bpOpen(null);
